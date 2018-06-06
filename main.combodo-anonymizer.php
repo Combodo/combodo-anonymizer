@@ -49,7 +49,34 @@ class AnonymizationPlugIn implements iPopupMenuExtension, iPageUIExtension
 	 */
 	public function GetNorthPaneHtml(iTopWebPage $oPage)
 	{
-		$oPage->add_dict_entries('Anonymization');
+		// backward compatbility with iTop 2.4, emulate add_dict_entries
+		$aDictEntries = array(
+			'Anonymization:AnonymizeAll',
+			'Anonymization:AnonymizeOne',
+			'Anonymization:OnePersonWarning',
+			'Anonymization:ListOfPersonsWarning',
+			'Anonymization:Confirmation',
+			'Anonymization:Information',
+			'Anonymization:RefreshTheList',
+			'Anonymization:DoneOnePerson',
+			'Anonymization:InProgress',
+			'Anonymization:Success',
+			'Anonymization:Error',
+			'Anonymization:Close',
+			'Anonymization:Configuration',
+			'Menu:ConfigAnonymizer',
+			'Anonymization:AutomationParameters',
+			'Anonymization:NotificationsPurgeParameters',
+			'Anonymization:AnonymizationDelay_Input',
+			'Anonymization:PurgeDelay_Input',
+			'Anonymization:Person:name',
+			'Anonymization:Person:first_name',
+			'UI:Button:Ok',
+		);
+		foreach($aDictEntries as $sDictCode)
+		{
+			$oPage->add_dict_entry($sDictCode);
+		}
 	}
 	
 	/**
@@ -69,6 +96,44 @@ class AnonymizationPlugIn implements iPopupMenuExtension, iPageUIExtension
 	public function GetBannerHtml(iTopWebPage $oPage)
 	{
 		
+	}
+}
+
+
+//
+// Menus
+//
+class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
+{
+	/**
+	 * Create the menu to manage the configuration of the extension, but only for
+	 * users allowed to manage the configuration
+	 * Handle the differences between iTop 2.4 and 2.5
+	 */
+	public static function OnMenuCreation()
+	{
+		$bConfigMenuEnabled = false;
+		
+		if (MetaModel::IsValidClass('ResourceAdminMenu'))
+		{
+			// iTop version 2.5 or newer, check the rights used when defining the admin menu
+			// We cannot directly check if the admin menu is enabled right now, since we are in the process of building the list of menus
+			$bConfigMenuEnabled = UserRights::IsActionAllowed('ResourceAdminMenu', UR_ACTION_MODIFY);
+			if ($bConfigMenuEnabled)
+			{
+				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), ApplicationMenu::GetMenuIndexById('ConfigMenu'), 10 , 'ResourceAdminMenu', UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
+			}
+		}
+		else
+		{
+			// Only administrators
+			$bConfigMenuEnabled = UserRights::IsAdministrator();
+			if ($bConfigMenuEnabled)
+			{
+				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), ApplicationMenu::GetMenuIndexById('ConfigMenu'), 10 /* fRank */);
+			}
+			
+		}
 	}
 }
 
@@ -135,7 +200,6 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 	public function GetPeriodicity()
 	{
 		// Run once per day
-		return 15; // For debugging, run every 15 seconds...
-		//return 24*60*60;
+		return 24*60*60;
 	}
 }

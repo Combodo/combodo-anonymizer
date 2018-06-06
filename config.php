@@ -115,8 +115,17 @@ function ApplyConfiguration(WebPage $oP, Config $oConfig)
 /////////////////////////////////////////////////////////////////////
 // Main program
 //
-LoginWebPage::DoLogin(); // Check user rights and prompt if needed
-ApplicationMenu::CheckMenuIdEnabled('ConfigAnonymizer');
+if (MetaModel::IsValidClass('ResourceAdminMenu'))
+{
+	// Since iTop 2.5, access to the configuration can be granted to non-administrators
+	LoginWebPage::DoLogin(); // Check user rights and prompt if needed
+	ApplicationMenu::CheckMenuIdEnabled('ConfigAnonymizer');
+}
+else
+{
+	// Prior to iTop 2.5, acces is only for administrators
+	LoginWebPage::DoLogin(true); // Check user rights and prompt if needed (must be admin)
+}
 
 $oP = new iTopWebPage(Dict::S('Anonymization:Configuration'));
 $oP->set_base(utils::GetAbsoluteUrlAppRoot().'pages/');
