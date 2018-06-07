@@ -92,7 +92,7 @@
             // Now remove the name of the contact from all the changes she/he made
             $sChangeTable = MetaModel::DBGetTable('CMDBChange');
             $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE userinfo=".CMDBSource::Quote($sOriginalName);
-IssueLog::Info('Anonymization: '.$sSQL);
+            IssueLog::Info('Anonymization: '.$sSQL);
             CMDBSource::Query($sSQL);
         }
 ]]></code>
@@ -104,26 +104,40 @@ IssueLog::Info('Anonymization: '.$sSQL);
           <code><![CDATA[
         protected function CleanupCaseLogs($sPersonFriendlyName)
         {
-          // 1) Build the expression to search (and replace)
-          $sPattern = ' : %1$s (%2$d) ============';
-          $sEraser = str_repeat('*', strlen($sPersonFriendlyName)); // replace the person's name by a string of stars... of the same length to preserver the case log's index
-          
-          $sSearch = sprintf($sPattern, $sPersonFriendlyName, $this->GetKey());
-          $sReplace = sprintf($sPattern, $sEraser, $this->GetKey());
-          
-          // 2) Find all classes containing case logs
-          foreach(MetaModel::GetClasses() as $sClass)
+          // Check for all user accounts associated with this contact
+          $oSearch = new DBObjectSearch('User');
+          $oSearch->AddCondition('contactid', $this->GetKey());
+          $oSet = new DBObjectSet($oSearch);
+          while($oUser = $oSet->Fetch())
           {
-            foreach(MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef)
+            // For each user account associated with the contact
+            
+            // 1) Build the expression to search (and replace)
+            $sPattern = ' : %1$s (%2$d) ============';
+            $sEraser = str_repeat('*', strlen($sPersonFriendlyName)); // replace the person's name by a string of stars... of the same length to preserver the case log's index
+            
+            $sSearch1 = sprintf($sPattern, $sPersonFriendlyName, $oUser->GetKey());
+            $sReplace1 = sprintf($sPattern, $sEraser, $oUser->GetKey());
+
+            $sSearch2 = $sPersonFriendlyName;
+            $sReplace2 = $sEraser;
+            
+            // 2) Find all classes containing case logs
+            foreach(MetaModel::GetClasses() as $sClass)
             {
-              $sTable = MetaModel::DBGetTable($sClass);
-              if ((MetaModel::GetAttributeOrigin($sClass, $sAttCode) == $sClass) && $oAttDef instanceof AttributeCaseLog)
+              foreach(MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef)
               {
-                $aSQLColumns = $oAttDef->GetSQLColumns();
-                $sColumn = array_keys($aSQLColumns)[0]; // We assume that the first column is the text (the second one is the index)
-                
-                $sSQL = "UPDATE `$sTable` SET `$sColumn` = REPLACE(`$sColumn`, ".CMDBSource::Quote($sSearch).", ".CMDBSource::Quote($sReplace).") WHERE `$sColumn` LIKE ".CMDBSource::Quote('%'.$sSearch.'%')."";
-                CMDBSource::Query($sSQL);
+                $sTable = MetaModel::DBGetTable($sClass);
+                if ((MetaModel::GetAttributeOrigin($sClass, $sAttCode) == $sClass) && $oAttDef instanceof AttributeCaseLog)
+                {
+                  $aSQLColumns = $oAttDef->GetSQLColumns();
+                  $sColumn1 = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
+                  $sColumn2 = array_keys($aSQLColumns)[1]; // We assume that the second column is the index
+                  
+                  $sSQL = "UPDATE `$sTable` SET `$sColumn1` = REPLACE(`$sColumn1`, ".CMDBSource::Quote($sSearch1).", ".CMDBSource::Quote($sReplace1)."), `$sColumn2` = REPLACE(`$sColumn2`, ".CMDBSource::Quote($sSearch2).", ".CMDBSource::Quote($sReplace2).")  WHERE `$sColumn1` LIKE ".CMDBSource::Quote('%'.$sSearch1.'%')."";
+                  IssueLog::Info('Anonymization: '.$sSQL);
+                  CMDBSource::Query($sSQL);
+                }
               }
             }
           }
