@@ -121,7 +121,7 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 			$bConfigMenuEnabled = UserRights::IsActionAllowed('ResourceAdminMenu', UR_ACTION_MODIFY);
 			if ($bConfigMenuEnabled)
 			{
-				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), ApplicationMenu::GetMenuIndexById('ConfigMenu'), 10 , 'ResourceAdminMenu', UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
+				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), ApplicationMenu::GetMenuIndexById('ConfigEditor'), 10 , 'ResourceAdminMenu', UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
 			}
 		}
 		else
@@ -130,7 +130,7 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 			$bConfigMenuEnabled = UserRights::IsAdministrator();
 			if ($bConfigMenuEnabled)
 			{
-				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), ApplicationMenu::GetMenuIndexById('ConfigMenu'), 10 /* fRank */);
+				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), ApplicationMenu::GetMenuIndexById('ConfigEditor'), 10 /* fRank */);
 			}
 			
 		}
