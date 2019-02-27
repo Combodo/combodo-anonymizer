@@ -177,7 +177,7 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 			$iRetentionDays = MetaModel::GetModuleSetting($sModuleName, 'obsolete_persons_retention', -1);
 			if ($iRetentionDays > 0)
 			{
-				$sOQL = "SELECT Person WHERE obsolescence_flag = 1 AND anonymized = 1 AND obsolescence_date < :date"; 
+				$sOQL = "SELECT Person WHERE obsolescence_flag = 1 AND anonymized = 0 AND obsolescence_date < :date";
 				$oDateLimit = new DateTime();
 				$oDateLimit->modify("-$iRetentionDays days");
 				$sDateLimit = $oDateLimit->format(AttributeDateTime::GetSQLFormat());
