@@ -5,7 +5,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'combodo-anonymizer/1.0.0',
+	'combodo-anonymizer/1.0.1',
 	array(
 		// Identification
 		//
