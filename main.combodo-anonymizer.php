@@ -127,6 +127,9 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 	public static function OnMenuCreation()
 	{
 		$bConfigMenuEnabled = false;
+		// From iTop 2.7, the "ConfigurationTools" menu group exists
+		// Before, only "AdminTools" was available for that kind of entry
+		$sParentMenuId = ApplicationMenu::GetMenuIndexById('ConfigurationTools') > -1 ? 'ConfigurationTools' : 'AdminTools';
 		
 		if (MetaModel::IsValidClass('ResourceAdminMenu'))
 		{
@@ -135,7 +138,7 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 			$bConfigMenuEnabled = UserRights::IsActionAllowed('ResourceAdminMenu', UR_ACTION_MODIFY);
 			if ($bConfigMenuEnabled)
 			{
-				$oParentMenu = new MenuGroup('Configuration', 90 , null, UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
+				$oParentMenu = new MenuGroup($sParentMenuId, 90 , null, UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
 				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), $oParentMenu->GetIndex(), 10 , 'ResourceAdminMenu', UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
 			}
 		}
@@ -145,7 +148,7 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 			$bConfigMenuEnabled = UserRights::IsAdministrator();
 			if ($bConfigMenuEnabled)
 			{
-				$oParentMenu = new MenuGroup('Configuration', 90 , null, UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
+				$oParentMenu = new MenuGroup($sParentMenuId, 90 , null, UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
 				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), $oParentMenu->GetIndex(), 10 /* fRank */);
 			}
 			
