@@ -31,3 +31,12 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Anonymization:Person:name' => 'Contact',
 	'Anonymization:Person:first_name' => 'Anonymous',
 ));
+
+//
+// Class: Person
+//
+
+Dict::Add('EN US', 'English', 'English', array(
+	'Class:Person/Attribute:anonymized' => 'Anonymized',
+	'Class:Person/Attribute:anonymized+' => '',
+));
