@@ -54,7 +54,11 @@ try
 		
 		// Anonymize a complete list
 		case 'anonymize_list':
-		$sFilter = utils::ReadParam('filter');
+		$sFilter = utils::ReadParam('filter', "", false, 'raw_data');
+		if (empty($sFilter))
+		{
+			throw new CoreUnexpectedValue('mandatory filter parameter is empty !');
+		}
 		$oSearch = DBSearch::unserialize($sFilter);
 		$oSet = new DBObjectSet($oSearch);
 		
@@ -83,8 +87,14 @@ try
 catch(Exception $e)
 {
 	$oP = new ajax_page('');
-	CMDBSource::Query('ROLLBACK');
+	try
+	{
+		CMDBSource::Query('ROLLBACK');
+	}
+	catch (Exception $eRollback)
+	{
+		// we may not have opened a transaction... we shouldn't ccrash if this is the case !
+	}
 	$oP->add_ready_script('AnonymizationDialog('.json_encode(Dict::S('Anonymization:Error')).', '.json_encode("Internal Error: ".$e->getMessage().' All modifications have been reverted.').')');
 	$oP->output();
-	
 }
