@@ -1,27 +1,20 @@
 <?php
-// Copyright (C) 2018 Combodo SARL
-//
-//   This file is part of iTop.
-//
-//   iTop is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU Affero General Public License as published by
-//   the Free Software Foundation, either version 3 of the License, or
-//   (at your option) any later version.
-//
-//   iTop is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU Affero General Public License for more details.
-//
-//   You should have received a copy of the GNU Affero General Public License
-//   along with iTop. If not, see <http://www.gnu.org/licenses/>
-
-
 /**
- * Handles anonymization ajax requests
+ * Copyright (C) 2013-2020 Combodo SARL
  *
- * @copyright   Copyright (C) 2018 Combodo SARL
- * @license     http://opensource.org/licenses/AGPL-3.0
+ * This file is part of iTop.
+ *
+ * iTop is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * iTop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
  */
 
 require_once('../../approot.inc.php');
@@ -61,7 +54,11 @@ try
 		
 		// Anonymize a complete list
 		case 'anonymize_list':
-		$sFilter = utils::ReadParam('filter');
+		$sFilter = utils::ReadParam('filter', "", false, 'raw_data');
+		if (empty($sFilter))
+		{
+			throw new CoreUnexpectedValue('mandatory filter parameter is empty !');
+		}
 		$oSearch = DBSearch::unserialize($sFilter);
 		$oSet = new DBObjectSet($oSearch);
 		
@@ -90,8 +87,14 @@ try
 catch(Exception $e)
 {
 	$oP = new ajax_page('');
-	CMDBSource::Query('ROLLBACK');
+	try
+	{
+		CMDBSource::Query('ROLLBACK');
+	}
+	catch (Exception $eRollback)
+	{
+		// we may not have opened a transaction... we shouldn't ccrash if this is the case !
+	}
 	$oP->add_ready_script('AnonymizationDialog('.json_encode(Dict::S('Anonymization:Error')).', '.json_encode("Internal Error: ".$e->getMessage().' All modifications have been reverted.').')');
 	$oP->output();
-	
 }

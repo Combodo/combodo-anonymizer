@@ -1,14 +1,30 @@
 <?php
+/**
+ * Copyright (C) 2013-2020 Combodo SARL
+ *
+ * This file is part of iTop.
+ *
+ * iTop is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * iTop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ */
+
+/**
+ * Class AnonymizationPlugIn
+ */
 class AnonymizationPlugIn implements iPopupMenuExtension, iPageUIExtension
 {
 	/**
-	 * Get the list of items to be added to a menu.
-	 *
-	 * This method is called by the framework for each menu.
-	 * The items will be inserted in the menu in the order of the returned array.
-	 * @param int $iMenuId The identifier of the type of menu, as listed by the constants MENU_xxx
-	 * @param mixed $param Depends on $iMenuId, see the constants defined above
-	 * @return object[] An array of ApplicationPopupMenuItem or an empty array if no action is to be added to the menu
+	 * @inheritDoc
+	 * @throws \Exception
 	 */
 	public static function EnumItems($iMenuId, $param)
 	{
@@ -43,9 +59,7 @@ class AnonymizationPlugIn implements iPopupMenuExtension, iPageUIExtension
 	}
 	
 	/**
-	 * Add content to the North pane
-	 * @param iTopWebPage $oPage The page to insert stuff into.
-	 * @return string The HTML content to add into the page
+	 * @inheritDoc
 	 */
 	public function GetNorthPaneHtml(iTopWebPage $oPage)
 	{
@@ -80,18 +94,15 @@ class AnonymizationPlugIn implements iPopupMenuExtension, iPageUIExtension
 	}
 	
 	/**
-	 * Add content to the South pane
-	 * @param iTopWebPage $oPage The page to insert stuff into.
-	 * @return string The HTML content to add into the page
+	 * @inheritDoc
 	 */
 	public function GetSouthPaneHtml(iTopWebPage $oPage)
 	{
 		
 	}
+
 	/**
-	 * Add content to the "admin banner"
-	 * @param iTopWebPage $oPage The page to insert stuff into.
-	 * @return string The HTML content to add into the page
+	 * @inheritDoc
 	 */
 	public function GetBannerHtml(iTopWebPage $oPage)
 	{
@@ -109,10 +120,16 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 	 * Create the menu to manage the configuration of the extension, but only for
 	 * users allowed to manage the configuration
 	 * Handle the differences between iTop 2.4 and 2.5
+	 *
+	 * @inheritDoc
+	 * @throws \Exception
 	 */
 	public static function OnMenuCreation()
 	{
 		$bConfigMenuEnabled = false;
+		// From iTop 2.7, the "ConfigurationTools" menu group exists
+		// Before, only "AdminTools" was available for that kind of entry
+		$sParentMenuId = ApplicationMenu::GetMenuIndexById('ConfigurationTools') > -1 ? 'ConfigurationTools' : 'AdminTools';
 		
 		if (MetaModel::IsValidClass('ResourceAdminMenu'))
 		{
@@ -121,7 +138,8 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 			$bConfigMenuEnabled = UserRights::IsActionAllowed('ResourceAdminMenu', UR_ACTION_MODIFY);
 			if ($bConfigMenuEnabled)
 			{
-				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), ApplicationMenu::GetMenuIndexById('ConfigEditor'), 10 , 'ResourceAdminMenu', UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
+				$oParentMenu = new MenuGroup($sParentMenuId, 90 , null, UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
+				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), $oParentMenu->GetIndex(), 10 , 'ResourceAdminMenu', UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
 			}
 		}
 		else
@@ -130,7 +148,8 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 			$bConfigMenuEnabled = UserRights::IsAdministrator();
 			if ($bConfigMenuEnabled)
 			{
-				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), ApplicationMenu::GetMenuIndexById('ConfigEditor'), 10 /* fRank */);
+				$oParentMenu = new MenuGroup($sParentMenuId, 90 , null, UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
+				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), $oParentMenu->GetIndex(), 10 /* fRank */);
 			}
 			
 		}
@@ -140,12 +159,11 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 class AnonymisationBackgroundProcess implements iBackgroundProcess
 {
 	/**
-	 * @param int $iUnixTimeLimit
-	 *
-	 * @return string status message
-	 * @throws \ProcessException
-	 * @throws \ProcessFatalException
-	 * @throws MySQLHasGoneAwayException
+	 * @inheritDoc
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 * @throws \MySQLException
+	 * @throws \OQLException
 	 */
 	public function Process($iUnixTimeLimit)
 	{
@@ -177,7 +195,7 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 			$iRetentionDays = MetaModel::GetModuleSetting($sModuleName, 'obsolete_persons_retention', -1);
 			if ($iRetentionDays > 0)
 			{
-				$sOQL = "SELECT Person WHERE obsolescence_flag = 1 AND anonymized = 1 AND obsolescence_date < :date"; 
+				$sOQL = "SELECT Person WHERE obsolescence_flag = 1 AND anonymized = 0 AND obsolescence_date < :date";
 				$oDateLimit = new DateTime();
 				$oDateLimit->modify("-$iRetentionDays days");
 				$sDateLimit = $oDateLimit->format(AttributeDateTime::GetSQLFormat());
@@ -195,7 +213,7 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 	}
 	
 	/**
-	 * @return int repetition rate in seconds
+	 * @inheritDoc
 	 */
 	public function GetPeriodicity()
 	{

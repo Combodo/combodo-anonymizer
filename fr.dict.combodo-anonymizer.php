@@ -5,7 +5,6 @@
  * @copyright   Copyright (C) 2018 Combodo SARL
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
-
 Dict::Add('FR FR', 'French', 'Français', array(
 	// Dictionary entries go here
 	'Anonymization:AnonymizeAll' => 'Tout anonymiser',
@@ -30,4 +29,13 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	// Default values used during anonymization
 	'Anonymization:Person:name' => 'Contact',
 	'Anonymization:Person:first_name' => 'Anonyme',
+));
+
+//
+// Class: Person
+//
+
+Dict::Add('FR FR', 'French', 'Français', array(
+	'Class:Person/Attribute:anonymized' => 'Anonymisé(e)~~',
+	'Class:Person/Attribute:anonymized+' => '~~',
 ));
