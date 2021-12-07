@@ -2,10 +2,10 @@
 /**
  * Localized data
  *
- * @copyright   Copyright (C) 2018 Combodo SARL
+ * @copyright   Copyright (C) 2018-2021 Combodo SARL
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
-Dict::Add('ES CR', 'Spanish', 'Español, Castellaño', array(
+Dict::Add('ES CR', 'Spanish', 'Español, Castellano', array(
 	// Dictionary entries go here
 	'Anonymization:AnonymizeAll' => 'Anonymize All~~',
 	'Anonymization:AnonymizeOne' => 'Anonymize~~',
@@ -35,7 +35,7 @@ Dict::Add('ES CR', 'Spanish', 'Español, Castellaño', array(
 // Class: Person
 //
 
-Dict::Add('ES CR', 'Spanish', 'Español, Castellaño', array(
+Dict::Add('ES CR', 'Spanish', 'Español, Castellano', array(
 	'Class:Person/Attribute:anonymized' => 'Anonymized~~',
 	'Class:Person/Attribute:anonymized+' => '~~',
 ));
