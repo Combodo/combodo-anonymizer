@@ -18,46 +18,11 @@
  */
 
 /**
- * Class AnonymizationPlugIn
+ * Class AnonymizationPlugInLegacy
+ * @deprecated since 3.0.0
  */
-class AnonymizationPlugIn implements iPopupMenuExtension, iPageUIExtension
+class AnonymizationPlugInLegacy implements iPageUIExtension
 {
-	/**
-	 * @inheritDoc
-	 * @throws \Exception
-	 */
-	public static function EnumItems($iMenuId, $param)
-	{
-		$aExtraMenus = array();
-		$sJSUrl = utils::GetAbsoluteUrlModulesRoot().basename(__DIR__).'/js/anonymize.js';
-		switch($iMenuId)
-		{
-			case iPopupMenuExtension::MENU_OBJLIST_ACTIONS:
-			/**
-			 * @var DBObjectSet $param
-			 */
-			if ($param->GetClass() == 'Person')
-			{
-				$aExtraMenus[] = new JSPopupMenuItem('Anonymize', Dict::S('Anonymization:AnonymizeAll'), 'AnonymizeAListOfPersons('.json_encode($param->GetFilter()->serialize()).', '.$param->Count().');', array($sJSUrl));
-			}
-			break;
-			
-			case iPopupMenuExtension::MENU_OBJDETAILS_ACTIONS:
-			/**
-			 * @var DBObject $param
-			 */
-			if ($param instanceof Person)
-			{
-				$aExtraMenus[] = new JSPopupMenuItem('Anonymize', Dict::S('Anonymization:AnonymizeOne'), 'AnonymizeOnePerson('.$param->GetKey().');', array($sJSUrl));
-			}
-			break;
-			
-			default:
-				// Do nothing
-		}
-		return $aExtraMenus;
-	}
-	
 	/**
 	 * @inheritDoc
 	 */
@@ -109,7 +74,77 @@ class AnonymizationPlugIn implements iPopupMenuExtension, iPageUIExtension
 		
 	}
 }
+/*
+ * Class AnonymizationJsPlugin
+ */
+class AnonymizationJsPlugin implements iBackofficeDictEntriesExtension
+{
 
+	public function GetDictEntries(): array
+	{
+		return [
+			'Anonymization:AnonymizeAll',
+			'Anonymization:AnonymizeOne',
+			'Anonymization:OnePersonWarning',
+			'Anonymization:ListOfPersonsWarning',
+			'Anonymization:Confirmation',
+			'Anonymization:Information',
+			'Anonymization:RefreshTheList',
+			'Anonymization:DoneOnePerson',
+			'Anonymization:InProgress',
+			'Anonymization:Success',
+			'Anonymization:Error',
+			'Anonymization:Close',
+			'Anonymization:Configuration',
+			'Menu:ConfigAnonymizer',
+			'Anonymization:AutomationParameters',
+			'Anonymization:NotificationsPurgeParameters',
+			'Anonymization:AnonymizationDelay_Input',
+			'Anonymization:PurgeDelay_Input',
+			'Anonymization:Person:name',
+			'Anonymization:Person:first_name',
+			'UI:Button:Ok'];
+	}
+}
+
+/**
+ * Class AnonymizationMenuPlugIn
+ */
+class AnonymizationMenuPlugIn implements iPopupMenuExtension
+{
+
+	public static function EnumItems($iMenuId, $param)
+	{
+		$aExtraMenus = array();
+		$sJSUrl ='env-'.utils::GetCurrentEnvironment().'/'.basename(__DIR__).'/js/anonymize.js';
+		switch($iMenuId)
+		{
+			case iPopupMenuExtension::MENU_OBJLIST_ACTIONS:
+				/**
+				 * @var DBObjectSet $param
+				 */
+				if ($param->GetClass() == 'Person')
+				{
+					$aExtraMenus[] = new JSPopupMenuItem('Anonymize', Dict::S('Anonymization:AnonymizeAll'), 'AnonymizeAListOfPersons('.json_encode($param->GetFilter()->serialize()).', '.$param->Count().');', array($sJSUrl));
+				}
+				break;
+
+			case iPopupMenuExtension::MENU_OBJDETAILS_ACTIONS:
+				/**
+				 * @var DBObject $param
+				 */
+				if ($param instanceof Person)
+				{
+					$aExtraMenus[] = new JSPopupMenuItem('Anonymize', Dict::S('Anonymization:AnonymizeOne'), 'AnonymizeOnePerson('.$param->GetKey().');', array($sJSUrl));
+				}
+				break;
+
+			default:
+				// Do nothing
+		}
+		return $aExtraMenus;
+	}
+}
 
 //
 // Menus
