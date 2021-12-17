@@ -120,7 +120,11 @@ class AnonymizationMenuPlugIn implements iPopupMenuExtension
 	public static function EnumItems($iMenuId, $param)
 	{
 		$aExtraMenus = array();
-		$sJSUrl = utils::GetAbsoluteUrlModulesRoot().basename(__DIR__).'/js/anonymize.js';
+		if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0) {
+			$sJSUrl = utils::GetAbsoluteUrlModulesRoot().basename(__DIR__).'/js/anonymize.js';
+		} else {
+			$sJSUrl = 'env-'.utils::GetCurrentEnvironment().'/'.basename(__DIR__).'/js/anonymize.js';
+		}
 		switch($iMenuId)
 		{
 			case iPopupMenuExtension::MENU_OBJLIST_ACTIONS:
