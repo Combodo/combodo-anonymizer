@@ -17,96 +17,100 @@
  * You should have received a copy of the GNU Affero General Public License
  */
 
-/**
- * Class AnonymizationPlugInLegacy
- * @deprecated since 3.0.0
- */
-class AnonymizationPlugInLegacy implements iPageUIExtension
-{
+if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0) {
 	/**
-	 * @inheritDoc
+	 * Class AnonymizationPlugInLegacy
+	 *
+	 * @deprecated since 3.0.0
 	 */
-	public function GetNorthPaneHtml(iTopWebPage $oPage)
+	class AnonymizationPlugInLegacy implements iPageUIExtension
 	{
-		// backward compatbility with iTop 2.4, emulate add_dict_entries
-		$aDictEntries = array(
-			'Anonymization:AnonymizeAll',
-			'Anonymization:AnonymizeOne',
-			'Anonymization:OnePersonWarning',
-			'Anonymization:ListOfPersonsWarning',
-			'Anonymization:Confirmation',
-			'Anonymization:Information',
-			'Anonymization:RefreshTheList',
-			'Anonymization:DoneOnePerson',
-			'Anonymization:InProgress',
-			'Anonymization:Success',
-			'Anonymization:Error',
-			'Anonymization:Close',
-			'Anonymization:Configuration',
-			'Menu:ConfigAnonymizer',
-			'Anonymization:AutomationParameters',
-			'Anonymization:NotificationsPurgeParameters',
-			'Anonymization:AnonymizationDelay_Input',
-			'Anonymization:PurgeDelay_Input',
-			'Anonymization:Person:name',
-			'Anonymization:Person:first_name',
-			'UI:Button:Ok',
-		);
-		foreach($aDictEntries as $sDictCode)
+		/**
+		 * @inheritDoc
+		 */
+		public function GetNorthPaneHtml(iTopWebPage $oPage)
 		{
-			$oPage->add_dict_entry($sDictCode);
+			// backward compatbility with iTop 2.4, emulate add_dict_entries
+			$aDictEntries = array(
+				'Anonymization:AnonymizeAll',
+				'Anonymization:AnonymizeOne',
+				'Anonymization:OnePersonWarning',
+				'Anonymization:ListOfPersonsWarning',
+				'Anonymization:Confirmation',
+				'Anonymization:Information',
+				'Anonymization:RefreshTheList',
+				'Anonymization:DoneOnePerson',
+				'Anonymization:InProgress',
+				'Anonymization:Success',
+				'Anonymization:Error',
+				'Anonymization:Close',
+				'Anonymization:Configuration',
+				'Menu:ConfigAnonymizer',
+				'Anonymization:AutomationParameters',
+				'Anonymization:NotificationsPurgeParameters',
+				'Anonymization:AnonymizationDelay_Input',
+				'Anonymization:PurgeDelay_Input',
+				'Anonymization:Person:name',
+				'Anonymization:Person:first_name',
+				'UI:Button:Ok',
+			);
+			foreach ($aDictEntries as $sDictCode) {
+				$oPage->add_dict_entry($sDictCode);
+			}
+		}
+
+		/**
+		 * @inheritDoc
+		 */
+		public function GetSouthPaneHtml(iTopWebPage $oPage)
+		{
+
+		}
+
+		/**
+		 * @inheritDoc
+		 */
+		public function GetBannerHtml(iTopWebPage $oPage)
+		{
+
 		}
 	}
-	
-	/**
-	 * @inheritDoc
+} else {
+	/*
+	 * Class AnonymizationJsPlugin
 	 */
-	public function GetSouthPaneHtml(iTopWebPage $oPage)
-	{
-		
-	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public function GetBannerHtml(iTopWebPage $oPage)
+	class AnonymizationJsPlugin implements iBackofficeDictEntriesExtension
 	{
-		
+
+		public function GetDictEntries(): array
+		{
+			return [
+				'Anonymization:AnonymizeAll',
+				'Anonymization:AnonymizeOne',
+				'Anonymization:OnePersonWarning',
+				'Anonymization:ListOfPersonsWarning',
+				'Anonymization:Confirmation',
+				'Anonymization:Information',
+				'Anonymization:RefreshTheList',
+				'Anonymization:DoneOnePerson',
+				'Anonymization:InProgress',
+				'Anonymization:Success',
+				'Anonymization:Error',
+				'Anonymization:Close',
+				'Anonymization:Configuration',
+				'Menu:ConfigAnonymizer',
+				'Anonymization:AutomationParameters',
+				'Anonymization:NotificationsPurgeParameters',
+				'Anonymization:AnonymizationDelay_Input',
+				'Anonymization:PurgeDelay_Input',
+				'Anonymization:Person:name',
+				'Anonymization:Person:first_name',
+				'UI:Button:Ok'
+			];
+		}
 	}
 }
-/*
- * Class AnonymizationJsPlugin
- */
-class AnonymizationJsPlugin implements iBackofficeDictEntriesExtension
-{
-
-	public function GetDictEntries(): array
-	{
-		return [
-			'Anonymization:AnonymizeAll',
-			'Anonymization:AnonymizeOne',
-			'Anonymization:OnePersonWarning',
-			'Anonymization:ListOfPersonsWarning',
-			'Anonymization:Confirmation',
-			'Anonymization:Information',
-			'Anonymization:RefreshTheList',
-			'Anonymization:DoneOnePerson',
-			'Anonymization:InProgress',
-			'Anonymization:Success',
-			'Anonymization:Error',
-			'Anonymization:Close',
-			'Anonymization:Configuration',
-			'Menu:ConfigAnonymizer',
-			'Anonymization:AutomationParameters',
-			'Anonymization:NotificationsPurgeParameters',
-			'Anonymization:AnonymizationDelay_Input',
-			'Anonymization:PurgeDelay_Input',
-			'Anonymization:Person:name',
-			'Anonymization:Person:first_name',
-			'UI:Button:Ok'];
-	}
-}
-
 /**
  * Class AnonymizationMenuPlugIn
  */
@@ -116,7 +120,7 @@ class AnonymizationMenuPlugIn implements iPopupMenuExtension
 	public static function EnumItems($iMenuId, $param)
 	{
 		$aExtraMenus = array();
-		$sJSUrl ='env-'.utils::GetCurrentEnvironment().'/'.basename(__DIR__).'/js/anonymize.js';
+		$sJSUrl = utils::GetAbsoluteUrlModulesRoot().basename(__DIR__).'/js/anonymize.js';
 		switch($iMenuId)
 		{
 			case iPopupMenuExtension::MENU_OBJLIST_ACTIONS:
