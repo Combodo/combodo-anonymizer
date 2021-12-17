@@ -30,8 +30,12 @@ try
 	require_once(APPROOT.'/application/loginwebpage.class.inc.php');
 	
 	LoginWebPage::DoLoginEx(null /* any portal */, true /* must be admin */);
-	
-	$oP = new ajax_page('');
+
+	if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0) {
+		$oP = new ajax_page('');
+	} else {
+		$oP = new AjaxPage('');
+	}
 	
 	$sOperation = utils::ReadParam('operation');
 	

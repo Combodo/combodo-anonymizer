@@ -1,19 +1,56 @@
 function AnonymizeAListOfPersons(sSerializedFilter, iCount)
 {
 	var sLabel = Dict.S('Anonymization:OnePersonWarning');
-	
-	if (iCount > 1)
-	{
+
+	if (iCount > 1) {
 		var sTemplate = Dict.S('Anonymization:ListOfPersonsWarning');
 		sLabel = sTemplate.replace('%d', iCount);
 	}
-	AnonymizationConfirmDialog(sLabel, function() { $.blockUI({ message: '<h1><img src="../images/indicator.gif" /> '+Dict.S('Anonymization:InProgress')+'</h1>' }); $.post(GetAbsoluteUrlModulesRoot()+'combodo-anonymizer/ajax.php', {operation: 'anonymize_list', filter: sSerializedFilter }, function(data) { $('body').append(data); }); });
+	AnonymizationConfirmDialog(sLabel, function () {
+		const oInProgressModal = $('<h1><img src="../images/indicator.gif" /> '+Dict.S('Anonymization:InProgress')+'</h1>');
+		$('body').append(oInProgressModal);
+		oInProgressModal.dialog({
+			modal: true,
+			close: function () {
+				oInProgressModal.remove();
+			}
+		});
+		$.post(GetAbsoluteUrlModulesRoot()+'combodo-anonymizer/ajax.php', {operation: 'anonymize_list', filter: sSerializedFilter}, function (data) {
+			$('body').append(data);
+			oInProgressModal.dialog('close');
+		});
+	});
 }
 
-function AnonymizeOnePerson(iPersonId)
-{
+//var jDlg = $('<div>'+sLabel+'</div>');
+// 	$('body').append(jDlg);
+// 	jDlg.dialog({
+// 		title: sTitle,
+// 		width: 500,
+// 		autoOpen: true,
+// 		modal: true,
+// 		close: function() { jDlg.remove(); },
+// 		buttons: [
+// 		{ text: sCancelLabel, click: function() { jDlg.dialog('close'); } },
+// 		{ text: sOkLabel, click: function() { jDlg.dialog('close'); fnAction(); } }
+// 		]
+// 	});
+function AnonymizeOnePerson(iPersonId) {
 	var sLabel = Dict.S('Anonymization:OnePersonWarning');
-	AnonymizationConfirmDialog(sLabel, function() { $.blockUI({ message: '<h1><img src="../images/indicator.gif" /> '+Dict.S('Anonymization:InProgress')+'</h1>' }); $.post(GetAbsoluteUrlModulesRoot()+'combodo-anonymizer/ajax.php', {operation: 'anonymize_one', id: iPersonId }, function(data) { $('body').append(data); }); });
+	AnonymizationConfirmDialog(sLabel, function () {
+		const oInProgressModal = $('<h1><img src="../images/indicator.gif" /> '+Dict.S('Anonymization:InProgress')+'</h1>');
+		$('body').append(oInProgressModal);
+		oInProgressModal.dialog({
+			modal: true,
+			close: function () {
+				oInProgressModal.remove();
+			}
+		});
+		$.post(GetAbsoluteUrlModulesRoot()+'combodo-anonymizer/ajax.php', {operation: 'anonymize_one', id: iPersonId}, function (data) {
+			$('body').append(data);
+			oInProgressModal.dialog('close');
+		});
+	});
 }
 
 function AnonymizationConfirmDialog(sLabel, fnAction)
