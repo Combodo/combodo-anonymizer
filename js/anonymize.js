@@ -22,19 +22,6 @@ function AnonymizeAListOfPersons(sSerializedFilter, iCount)
 	});
 }
 
-//var jDlg = $('<div>'+sLabel+'</div>');
-// 	$('body').append(jDlg);
-// 	jDlg.dialog({
-// 		title: sTitle,
-// 		width: 500,
-// 		autoOpen: true,
-// 		modal: true,
-// 		close: function() { jDlg.remove(); },
-// 		buttons: [
-// 		{ text: sCancelLabel, click: function() { jDlg.dialog('close'); } },
-// 		{ text: sOkLabel, click: function() { jDlg.dialog('close'); fnAction(); } }
-// 		]
-// 	});
 function AnonymizeOnePerson(iPersonId) {
 	var sLabel = Dict.S('Anonymization:OnePersonWarning');
 	AnonymizationConfirmDialog(sLabel, function () {
