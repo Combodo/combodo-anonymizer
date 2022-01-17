@@ -90,13 +90,15 @@ try
 }
 catch(Exception $e)
 {
-	$oP = new ajax_page('');
-	try
-	{
+	if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0') < 0) {
+		$oP = new ajax_page('');
+	} else {
+		$oP = new AjaxPage('');
+	}
+	try {
 		CMDBSource::Query('ROLLBACK');
 	}
-	catch (Exception $eRollback)
-	{
+	catch (Exception $eRollback) {
 		// we may not have opened a transaction... we shouldn't ccrash if this is the case !
 	}
 	$oP->add_ready_script('AnonymizationDialog('.json_encode(Dict::S('Anonymization:Error')).', '.json_encode("Internal Error: ".$e->getMessage().' All modifications have been reverted.').')');
