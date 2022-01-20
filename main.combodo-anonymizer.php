@@ -17,9 +17,12 @@
  * You should have received a copy of the GNU Affero General Public License
  */
 
+//iBackofficeDictEntriesExtension can only be used since 3.0.1
+if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.1') < 0) {
 	/**
 	 * Class AnonymizationPlugInLegacy
 	 *
+	 * @deprecated since 3.1.0
 	 */
 	class AnonymizationPlugInLegacy implements iPageUIExtension
 	{
@@ -73,6 +76,42 @@
 
 		}
 	}
+} else {
+	/*
+	 * Class AnonymizationJsPlugin
+	 */
+
+	class AnonymizationJsPlugin implements iBackofficeDictEntriesExtension
+	{
+
+		public function GetDictEntries(): array
+		{
+			return [
+				'Anonymization:AnonymizeAll',
+				'Anonymization:AnonymizeOne',
+				'Anonymization:OnePersonWarning',
+				'Anonymization:ListOfPersonsWarning',
+				'Anonymization:Confirmation',
+				'Anonymization:Information',
+				'Anonymization:RefreshTheList',
+				'Anonymization:DoneOnePerson',
+				'Anonymization:InProgress',
+				'Anonymization:Success',
+				'Anonymization:Error',
+				'Anonymization:Close',
+				'Anonymization:Configuration',
+				'Menu:ConfigAnonymizer',
+				'Anonymization:AutomationParameters',
+				'Anonymization:NotificationsPurgeParameters',
+				'Anonymization:AnonymizationDelay_Input',
+				'Anonymization:PurgeDelay_Input',
+				'Anonymization:Person:name',
+				'Anonymization:Person:first_name',
+				'UI:Button:Ok'
+			];
+		}
+	}
+}
 /**
  * Class AnonymizationMenuPlugIn
  */
@@ -155,7 +194,7 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 			{
 				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), $sParentMenuIndex, 10 /* fRank */);
 			}
-			
+
 		}
 	}
 }
@@ -183,7 +222,7 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 				$oDateLimit = new DateTime();
 				$oDateLimit->modify("-$iRetentionDays days");
 				$sDateLimit = $oDateLimit->format(AttributeDateTime::GetSQLFormat());
-				
+
 				$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array('date' => true), array('date' => $sDateLimit));
 				while((time() < $iUnixTimeLimit) && ($oNotif = $oSet->Fetch()))
 				{
@@ -203,7 +242,7 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 				$oDateLimit = new DateTime();
 				$oDateLimit->modify("-$iRetentionDays days");
 				$sDateLimit = $oDateLimit->format(AttributeDateTime::GetSQLFormat());
-				
+
 				$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array('obsolescence_date' => true), array('date' => $sDateLimit));
 				while((time() < $iUnixTimeLimit) && ($oPerson = $oSet->Fetch()))
 				{
@@ -215,7 +254,7 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 		$sMessage = sprintf("%d notification(s) deleted, %d person(s) anonymized.", $iCountDeleted, $iCountAnonymized);
 		return $sMessage;
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -225,3 +264,4 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 		return 24*60*60;
 	}
 }
+
