@@ -24,7 +24,10 @@ try
 {
 	require_once(APPROOT.'/application/application.inc.php');
 	require_once(APPROOT.'/application/startup.inc.php');
-	
+	if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0) {
+		require_once(APPROOT.'/application/webpage.class.inc.php');
+		require_once(APPROOT.'/application/ajaxwebpage.class.inc.php');
+	}
 	require_once(APPROOT.'/application/loginwebpage.class.inc.php');
 	
 	LoginWebPage::DoLoginEx(null /* any portal */, true /* must be admin */);
