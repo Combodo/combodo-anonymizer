@@ -31,7 +31,9 @@ use Combodo\iTop\Application\UI\Base\Component\Title\TitleUIBlockFactory;
 use Combodo\iTop\Application\UI\Base\Component\Toolbar\ToolbarUIBlockFactory;
 
 require_once(APPROOT.'application/application.inc.php');
-require_once(APPROOT.'application/itopwebpage.class.inc.php');
+if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0) {
+	require_once(APPROOT.'application/itopwebpage.class.inc.php');
+}
 require_once(APPROOT.'application/startup.inc.php');
 require_once(APPROOT.'application/loginwebpage.class.inc.php');
 
