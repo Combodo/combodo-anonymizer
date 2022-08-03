@@ -37,8 +37,6 @@ try
 	LoginWebPage::DoLoginEx(null /* any portal */, true /* must be admin */);
 
 	if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0) {
-		require_once(APPROOT.'/application/webpage.class.inc.php');
-		require_once(APPROOT.'/application/ajaxwebpage.class.inc.php');
 		$oP = new ajax_page('');
 	} else {
 		$oP = new AjaxPage('');
