@@ -4,31 +4,33 @@
  *
  * @copyright   Copyright (C) 2018 Combodo SARL
  * @license     http://opensource.org/licenses/AGPL-3.0
+ * @author      Lars Kaltefleiter <lars.kaltefleiter@itomig.de>
  */
+
 Dict::Add('DE DE', 'German', 'Deutsch', array(
 	// Dictionary entries go here
-	'Anonymization:AnonymizeAll' => 'Anonymize All~~',
-	'Anonymization:AnonymizeOne' => 'Anonymize~~',
-	'Anonymization:OnePersonWarning' => 'Are you sure that you want to anonymize this Person? (this cannot be undone)~~',
-	'Anonymization:ListOfPersonsWarning' => 'Are you sure that you want to anonymize %d Persons? (this cannot be undone)~~',
-	'Anonymization:Confirmation' => 'Please confirm~~',
-	'Anonymization:Information' => 'Information~~',
-	'Anonymization:RefreshTheList' => 'Refresh the list to see the effect of anonymization...~~',
-	'Anonymization:DoneOnePerson' => 'The contact has been anonymized...~~',
-	'Anonymization:InProgress' => 'Anonymization in progress...~~',
-	'Anonymization:Success' => 'Anonymization successful~~',
-	'Anonymization:Error' => 'Anonymization FAILED~~',
-	'Anonymization:Close' => 'Close~~',
-	'Anonymization:Configuration' => 'Configuration of automatic anonymization~~',
-	'Menu:ConfigAnonymizer' => 'Anonymization~~',
-	'Anonymization:AutomationParameters' => 'Automatic anonymization~~',
-	'Anonymization:NotificationsPurgeParameters' => 'Automatic purge of notifications~~',
-	'Anonymization:AnonymizationDelay_Input' => 'Automatically anonymize Persons which are obsolete since more than %1$s days.~~',
-	'Anonymization:PurgeDelay_Input' => 'Automatically delete all notifications emitted since more than %1$s days.~~',
+	'Anonymization:AnonymizeAll' => 'Alle anonymisieren',
+	'Anonymization:AnonymizeOne' => 'Anonymisieren',
+	'Anonymization:OnePersonWarning' => 'Sind Sie sicher, dass Sie diese Person anonymisieren wollen? (Diese Operation kann nicht rückgängig gemacht werden)',
+	'Anonymization:ListOfPersonsWarning' => 'Sind Sie sicher, dass Sie %d Personen anonymisieren wollen? (Diese Operation kann nicht rückgängig gemacht werden)',
+	'Anonymization:Confirmation' => 'Bitte bestätigen',
+	'Anonymization:Information' => 'Information',
+	'Anonymization:RefreshTheList' => 'Bitte aktualisieren Sie die Liste, um das Resultat der Anonymisierung zu sehen...',
+	'Anonymization:DoneOnePerson' => 'Der Kontakt wurde anonymisiert...',
+	'Anonymization:InProgress' => 'Anonymisierung in Arbeit...',
+	'Anonymization:Success' => 'Anonymisierung erfolgreich',
+	'Anonymization:Error' => 'Anonymisierung FEHLGESCHLAGEN',
+	'Anonymization:Close' => 'Schließen',
+	'Anonymization:Configuration' => 'Konfiguration der automatischen Anonymisierung',
+	'Menu:ConfigAnonymizer' => 'Anonymisierung',
+	'Anonymization:AutomationParameters' => 'Automatische Anonymisierung',
+	'Anonymization:NotificationsPurgeParameters' => 'Automatische Löschen von Benachrichtigungen',
+	'Anonymization:AnonymizationDelay_Input' => 'Automatisch Personen anonymisieren, die obsolet sind seit %1$s Tagen.',
+	'Anonymization:PurgeDelay_Input' => 'Automatisch Benachrichtigungen entfernen, die vor mehr als %1$s Tagen gesendet wurden.',
 	
 	// Default values used during anonymization
-	'Anonymization:Person:name' => 'Contact~~',
-	'Anonymization:Person:first_name' => 'Anonymous~~',
+	'Anonymization:Person:name' => 'Kontakt',
+	'Anonymization:Person:first_name' => 'Anonym',
 ));
 
 //
@@ -36,6 +38,6 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 //
 
 Dict::Add('DE DE', 'German', 'Deutsch', array(
-	'Class:Person/Attribute:anonymized' => 'Anonymized~~',
-	'Class:Person/Attribute:anonymized+' => '~~',
+	'Class:Person/Attribute:anonymized' => 'Anonymisiert',
+	'Class:Person/Attribute:anonymized+' => '',
 ));
