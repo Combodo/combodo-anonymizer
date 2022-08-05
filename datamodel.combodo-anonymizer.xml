@@ -5,6 +5,13 @@
   </constants>
   <classes>
     <class id="Person">
+      <properties>
+        <uniqueness_rules>
+          <rule id="name" _delta="must_exist">
+              <filter _delta="redefine" ><![CDATA[employee_number != '' AND first_name != 'Anonymous']]></filter>
+          </rule>
+        </uniqueness_rules>
+      </properties>
       <fields>
       <field id="anonymized" xsi:type="AttributeBoolean" _delta="define">
         <sql>anonymized</sql>
@@ -52,7 +59,11 @@
         
           // Put some more fancy values
           $this->SetAnonymousValues();
-          
+
+          //TODO when min iTop Version > 3.0 : save person after the purge of his data
+          // actually in case of error during purge, person is already anonymized and it isn't possible to restart the processus
+          // in 2.7 we can't get anonymized friendlyname whitout save object
+
           // Write the object
           $this->Set('anonymized', true); // Mark the Person as anonymized
           $this->DBWrite();
@@ -75,8 +86,6 @@
           <code><![CDATA[
         protected function PurgeHistory($sOriginalName, $sAnonymizedName)
         {
-        	$sRootClass = MetaModel::GetRootClass(get_class($this));
-        	
         	// Delete any existing change tracking about the current object
         	$oFilter = new DBObjectSearch('CMDBChangeOp');
         	$oFilter->AddCondition('objclass', get_class($this), '=');
@@ -89,11 +98,11 @@
         	$oMyChangeOp->Set("description", 'Anonymization');
         	$iId = $oMyChangeOp->DBInsertNoReload();
           
-            // Now remove the name of the contact from all the changes she/he made
-            $sChangeTable = MetaModel::DBGetTable('CMDBChange');
-            $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE userinfo=".CMDBSource::Quote($sOriginalName);
-            IssueLog::Info('Anonymization: '.$sSQL);
-            CMDBSource::Query($sSQL);
+           // Now remove the name of the contact from all the changes she/he made
+           $sChangeTable = MetaModel::DBGetTable('CMDBChange');
+              $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE userinfo=".CMDBSource::Quote($sOriginalName);
+              IssueLog::Info('Anonymization: '.$sSQL);
+              CMDBSource::Query($sSQL);
         }
 ]]></code>
         </method>
@@ -104,7 +113,7 @@
           <code><![CDATA[
         protected function CleanupCaseLogs($sPersonFriendlyName)
         {
-          // Check for all user accounts associated with this contact
+		      // Check for all user accounts associated with this contact
           $oSearch = new DBObjectSearch('User');
           $oSearch->AddCondition('contactid', $this->GetKey());
           $oSet = new DBObjectSet($oSearch);
@@ -133,10 +142,10 @@
                   $aSQLColumns = $oAttDef->GetSQLColumns();
                   $sColumn1 = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
                   $sColumn2 = array_keys($aSQLColumns)[1]; // We assume that the second column is the index
-                  
+
                   $sSQL = "UPDATE `$sTable` SET `$sColumn1` = REPLACE(`$sColumn1`, ".CMDBSource::Quote($sSearch1).", ".CMDBSource::Quote($sReplace1)."), `$sColumn2` = REPLACE(`$sColumn2`, ".CMDBSource::Quote($sSearch2).", ".CMDBSource::Quote($sReplace2).")  WHERE `$sColumn1` LIKE ".CMDBSource::Quote('%'.$sSearch1.'%')."";
                   IssueLog::Info('Anonymization: '.$sSQL);
-                  CMDBSource::Query($sSQL);
+                        CMDBSource::Query($sSQL);
                 }
               }
             }
@@ -152,7 +161,7 @@
         public function SetAnonymousValues()
         {
           // Put some more fancy values
-          $this->Set('name', Dict::S('Anonymization:Person:name'));
+          $this->Set('name', Dict::S('Anonymization:Person:name')||' '||$this->GetKey());
           $this->Set('first_name', Dict::S('Anonymization:Person:first_name'));
           // Mark the contact as obsolete
           $this->Set('status', 'inactive');
