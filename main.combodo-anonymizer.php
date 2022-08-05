@@ -210,6 +210,7 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 	 */
 	public function Process($iUnixTimeLimit)
 	{
+		$iMaxBufferSize =   $oConfig->GetModuleSetting($sModuleName, 'max_buffer_size', 1000);
 		$sModuleName = basename(__DIR__);
 		$bCleanupNotification = MetaModel::GetModuleSetting($sModuleName, 'cleanup_notifications', false);
 		$iCountDeleted = 0;
@@ -222,12 +223,20 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 				$oDateLimit = new DateTime();
 				$oDateLimit->modify("-$iRetentionDays days");
 				$sDateLimit = $oDateLimit->format(AttributeDateTime::GetSQLFormat());
+				$bExecuteQuery = true;
 
-				$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array('date' => true), array('date' => $sDateLimit));
-				while((time() < $iUnixTimeLimit) && ($oNotif = $oSet->Fetch()))
-				{
-					$oNotif->DBDelete();
-					$iCountDeleted++;
+				//split update by lot
+				while ((time() < $iUnixTimeLimit) && $bExecuteQuery) {
+					$iCountCurrentQuery = 0;
+					$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array('date' => true), array('date' => $sDateLimit), null, $iMaxBufferSize);
+					while ((time() < $iUnixTimeLimit) && ($oNotif = $oSet->Fetch())) {
+						$oNotif->DBDelete();
+						$iCountDeleted++;
+						$iCountCurrentQuery++;
+					}
+					if($iCountCurrentQuery<$iMaxBufferSize){
+						$bExecuteQuery = false;
+					}
 				}
 			}
 		}
@@ -242,12 +251,18 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 				$oDateLimit = new DateTime();
 				$oDateLimit->modify("-$iRetentionDays days");
 				$sDateLimit = $oDateLimit->format(AttributeDateTime::GetSQLFormat());
-
-				$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array('obsolescence_date' => true), array('date' => $sDateLimit));
-				while((time() < $iUnixTimeLimit) && ($oPerson = $oSet->Fetch()))
-				{
-					$oPerson->Anonymize();
-					$iCountAnonymized++;
+				$bExecuteQuery = true;
+				while ((time() < $iUnixTimeLimit) && $bExecuteQuery) {
+					$iCountCurrentQuery = 0;
+					$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array('obsolescence_date' => true), array('date' => $sDateLimit), null, $iMaxBufferSize);
+					while ((time() < $iUnixTimeLimit) && ($oPerson = $oSet->Fetch())) {
+						$oPerson->Anonymize();
+						$iCountAnonymized++;
+						$iCountCurrentQuery++;
+					}
+					if ($iCountCurrentQuery < $iMaxBufferSize) {
+						$bExecuteQuery = false;
+					}
 				}
 			}
 		}

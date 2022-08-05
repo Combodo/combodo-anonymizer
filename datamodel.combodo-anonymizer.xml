@@ -59,7 +59,7 @@
         
           // Put some more fancy values
           $this->SetAnonymousValues();
-
+          
           //TODO when min iTop Version > 3.0 : save person after the purge of his data
           // actually in case of error during purge, person is already anonymized and it isn't possible to restart the processus
           // in 2.7 we can't get anonymized friendlyname whitout save object
@@ -100,9 +100,34 @@
           
            // Now remove the name of the contact from all the changes she/he made
            $sChangeTable = MetaModel::DBGetTable('CMDBChange');
+
+           if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0) {
               $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE userinfo=".CMDBSource::Quote($sOriginalName);
               IssueLog::Info('Anonymization: '.$sSQL);
               CMDBSource::Query($sSQL);
+
+              $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE userinfo=".CMDBSource::Quote($sOriginalName.' (CSV)');
+              IssueLog::Info('Anonymization: '.$sSQL);
+              CMDBSource::Query($sSQL);
+           } else  {
+              $oSearch = new DBObjectSearch('User');
+              $oSearch->AddCondition('contactid', $this->GetKey());
+              $oSet = new DBObjectSet($oSearch);
+              while($oUser = $oSet->Fetch())
+              {
+                $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE user_id=".$oUser->GetKey();
+                IssueLog::Info('Anonymization: '.$sSQL);
+                CMDBSource::Query($sSQL);
+              }
+              //remove data created before 3.0
+              $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE userinfo=".CMDBSource::Quote($sOriginalName).' AND user_id IS NULL';
+              IssueLog::Info('Anonymization: '.$sSQL);
+              CMDBSource::Query($sSQL);
+
+              $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE userinfo=".CMDBSource::Quote($sOriginalName.' (CSV)').' AND user_id IS NULL';
+              IssueLog::Info('Anonymization: '.$sSQL);
+              CMDBSource::Query($sSQL);
+           }
         }
 ]]></code>
         </method>
@@ -113,6 +138,7 @@
           <code><![CDATA[
         protected function CleanupCaseLogs($sPersonFriendlyName)
         {
+          $iMaxBufferSize =   $oConfig->GetModuleSetting($sModuleName, 'max_buffer_size', 1000);
 		      // Check for all user accounts associated with this contact
           $oSearch = new DBObjectSearch('User');
           $oSearch->AddCondition('contactid', $this->GetKey());
@@ -143,9 +169,25 @@
                   $sColumn1 = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
                   $sColumn2 = array_keys($aSQLColumns)[1]; // We assume that the second column is the index
 
-                  $sSQL = "UPDATE `$sTable` SET `$sColumn1` = REPLACE(`$sColumn1`, ".CMDBSource::Quote($sSearch1).", ".CMDBSource::Quote($sReplace1)."), `$sColumn2` = REPLACE(`$sColumn2`, ".CMDBSource::Quote($sSearch2).", ".CMDBSource::Quote($sReplace2).")  WHERE `$sColumn1` LIKE ".CMDBSource::Quote('%'.$sSearch1.'%')."";
-                  IssueLog::Info('Anonymization: '.$sSQL);
+                  $bExecuteQuery = true;
+
+                  while ($bExecuteQuery) {
+                    $oResult = CMDBSource::Query("SELECT  id FROM `$sTable` WHERE `$sColumn1` LIKE ".CMDBSource::Quote('%'.$sSearch1.'%')." LIMIT " . $iMaxBufferSize);
+                    IssueLog::Error('AnonymizationQuery: '."SELECT  id FROM `$sTable` WHERE `$sColumn1` LIKE ".CMDBSource::Quote('%'.$sSearch1.'%')." LIMIT " . $iMaxBufferSize);
+                    foreach($oResult->fetch_assoc() as $id)
+                    {
+                        $aObjects[] = $id;
+                     }
+                     if(count($aObjects)>0) {
+                        $sSQL = "UPDATE `$sTable` SET `$sColumn1` = REPLACE(`$sColumn1`, ".CMDBSource::Quote($sSearch1).", ".CMDBSource::Quote($sReplace1)."), `$sColumn2` = REPLACE(`$sColumn2`, ".CMDBSource::Quote($sSearch2).", ".CMDBSource::Quote($sReplace2).")  WHERE id IN (".implode(', ', $aObjects).");";
+                        IssueLog::Error('AnonymizationUpdate: '.$sSQL);
                         CMDBSource::Query($sSQL);
+                      }
+                       if(count($aObjects)<$iMaxBufferSize) {
+                          $bExecuteQuery=false;
+                       }
+                  }
+
                 }
               }
             }
