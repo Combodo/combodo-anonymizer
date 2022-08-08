@@ -121,40 +121,50 @@ class AnonymizationMenuPlugIn implements iPopupMenuExtension
 	public static function EnumItems($iMenuId, $param)
 	{
 		$aExtraMenus = array();
-		if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0) {
-			$sJSUrl = utils::GetAbsoluteUrlModulesRoot().basename(__DIR__).'/js/anonymize.js';
-		} else {
-			$sJSUrl = 'env-'.utils::GetCurrentEnvironment().'/'.basename(__DIR__).'/js/anonymize.js';
-		}
-		switch($iMenuId)
-		{
-			case iPopupMenuExtension::MENU_OBJLIST_ACTIONS:
-				/**
-				 * @var DBObjectSet $param
-				 */
-				if ($param->GetClass() == 'Person')
-				{
-					$aExtraMenus[] = new JSPopupMenuItem('Anonymize', Dict::S('Anonymization:AnonymizeAll'), 'AnonymizeAListOfPersons('.json_encode($param->GetFilter()->serialize()).', '.$param->Count().');', array($sJSUrl));
-				}
-				break;
 
-			case iPopupMenuExtension::MENU_OBJDETAILS_ACTIONS:
-				/**
-				 * @var DBObject $param
-				 */
-				if ($param instanceof Person)
-				{
-					$aExtraMenus[] = new JSPopupMenuItem('Anonymize', Dict::S('Anonymization:AnonymizeOne'), 'AnonymizeOnePerson('.$param->GetKey().');', array($sJSUrl));
-				}
-				break;
+		if ( AnonymizationUtils::CanAnonymize()) {
+			if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0') < 0) {
+				$sJSUrl = utils::GetAbsoluteUrlModulesRoot().basename(__DIR__).'/js/anonymize.js';
+			} else {
+				$sJSUrl = 'env-'.utils::GetCurrentEnvironment().'/'.basename(__DIR__).'/js/anonymize.js';
+			}
+			switch ($iMenuId) {
+				case iPopupMenuExtension::MENU_OBJLIST_ACTIONS:
+					/**
+					 * @var DBObjectSet $param
+					 */
+					if ($param->GetClass() == 'Person') {
+						$aExtraMenus[] = new JSPopupMenuItem('Anonymize', Dict::S('Anonymization:AnonymizeAll'), 'AnonymizeAListOfPersons('.json_encode($param->GetFilter()->serialize()).', '.$param->Count().');', array($sJSUrl));
+					}
+					break;
 
-			default:
+				case iPopupMenuExtension::MENU_OBJDETAILS_ACTIONS:
+					/**
+					 * @var DBObject $param
+					 */
+					if ($param instanceof Person) {
+						$aExtraMenus[] = new JSPopupMenuItem('Anonymize', Dict::S('Anonymization:AnonymizeOne'), 'AnonymizeOnePerson('.$param->GetKey().');', array($sJSUrl));
+					}
+					break;
+
+				default:
 				// Do nothing
+			}
 		}
 		return $aExtraMenus;
 	}
 }
 
+class  AnonymizationUtils
+{
+	/**
+	 * @return bool true if the user have right to anonymize
+	 */
+	public static function CanAnonymize()
+	{
+		return (UserRights::IsAdministrator() || UserRights::IsActionAllowed('RessourceAnonymization', UR_ACTION_MODIFY)) ;
+	}
+}
 //
 // Menus
 //
@@ -180,9 +190,7 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 		{
 			// iTop version 2.5 or newer, check the rights used when defining the admin menu
 			// We cannot directly check if the admin menu is enabled right now, since we are in the process of building the list of menus
-			$bConfigMenuEnabled = UserRights::IsActionAllowed('ResourceAdminMenu', UR_ACTION_MODIFY);
-			if ($bConfigMenuEnabled)
-			{
+			if ( UserRights::IsActionAllowed('RessourceAnonymization', UR_ACTION_MODIFY)) {
 				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), $sParentMenuIndex, 10 , 'ResourceAdminMenu', UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
 			}
 		}
@@ -210,7 +218,7 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 	 */
 	public function Process($iUnixTimeLimit)
 	{
-		$iMaxBufferSize =   $oConfig->GetModuleSetting($sModuleName, 'max_buffer_size', 1000);
+		$iMaxBufferSize =   MetaModel::GetModuleSetting('combodo-anonymizer', 'max_buffer_size', 1000);
 		$sModuleName = basename(__DIR__);
 		$bCleanupNotification = MetaModel::GetModuleSetting($sModuleName, 'cleanup_notifications', false);
 		$iCountDeleted = 0;
