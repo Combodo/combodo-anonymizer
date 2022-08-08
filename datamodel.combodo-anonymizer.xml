@@ -4,6 +4,16 @@
   <constants>
   </constants>
   <classes>
+    <class id="RessourceAnonymization" _delta="define">
+      <parent>AbstractResource</parent>
+      <properties>
+        <comment>/* Anonymization menu access control. */</comment>
+        <abstract>true</abstract>
+        <category>grant_by_profile</category>
+      </properties>
+      <presentation/>
+      <methods/>
+    </class>
     <class id="Person">
       <properties>
         <uniqueness_rules>
@@ -115,7 +125,7 @@
               $oSet = new DBObjectSet($oSearch);
               while($oUser = $oSet->Fetch())
               {
-                $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE user_id=".$oUser->GetKey();
+                $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE user_id=". $this->GetKey();
                 IssueLog::Info('Anonymization: '.$sSQL);
                 CMDBSource::Query($sSQL);
               }
@@ -138,7 +148,8 @@
           <code><![CDATA[
         protected function CleanupCaseLogs($sPersonFriendlyName)
         {
-          $iMaxBufferSize =   $oConfig->GetModuleSetting($sModuleName, 'max_buffer_size', 1000);
+
+          $iMaxBufferSize =   MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer', 'max_buffer_size', 1000);
 		      // Check for all user accounts associated with this contact
           $oSearch = new DBObjectSearch('User');
           $oSearch->AddCondition('contactid', $this->GetKey());
@@ -146,17 +157,17 @@
           while($oUser = $oSet->Fetch())
           {
             // For each user account associated with the contact
-            
+
             // 1) Build the expression to search (and replace)
             $sPattern = ' : %1$s (%2$d) ============';
             $sEraser = str_repeat('*', strlen($sPersonFriendlyName)); // replace the person's name by a string of stars... of the same length to preserver the case log's index
-            
+
             $sSearch1 = sprintf($sPattern, $sPersonFriendlyName, $oUser->GetKey());
             $sReplace1 = sprintf($sPattern, $sEraser, $oUser->GetKey());
 
             $sSearch2 = $sPersonFriendlyName;
             $sReplace2 = $sEraser;
-            
+
             // 2) Find all classes containing case logs
             foreach(MetaModel::GetClasses() as $sClass)
             {
@@ -173,16 +184,18 @@
 
                   while ($bExecuteQuery) {
                     $oResult = CMDBSource::Query("SELECT  id FROM `$sTable` WHERE `$sColumn1` LIKE ".CMDBSource::Quote('%'.$sSearch1.'%')." LIMIT " . $iMaxBufferSize);
-                    IssueLog::Error('AnonymizationQuery: '."SELECT  id FROM `$sTable` WHERE `$sColumn1` LIKE ".CMDBSource::Quote('%'.$sSearch1.'%')." LIMIT " . $iMaxBufferSize);
-                    foreach($oResult->fetch_assoc() as $id)
-                    {
-                        $aObjects[] = $id;
-                     }
-                     if(count($aObjects)>0) {
-                        $sSQL = "UPDATE `$sTable` SET `$sColumn1` = REPLACE(`$sColumn1`, ".CMDBSource::Quote($sSearch1).", ".CMDBSource::Quote($sReplace1)."), `$sColumn2` = REPLACE(`$sColumn2`, ".CMDBSource::Quote($sSearch2).", ".CMDBSource::Quote($sReplace2).")  WHERE id IN (".implode(', ', $aObjects).");";
-                        IssueLog::Error('AnonymizationUpdate: '.$sSQL);
-                        CMDBSource::Query($sSQL);
+                    IssueLog::Debug('AnonymizationQuery: '."SELECT  id FROM `$sTable` WHERE `$sColumn1` LIKE ".CMDBSource::Quote('%'.$sSearch1.'%')." LIMIT " . $iMaxBufferSize);
+                    $aObjects = [] ;
+                    if ($oResult->num_rows>0) {
+                      while ($oRaw = $oResult->fetch_assoc()){
+                        $aObjects[] = $oRaw['id'];
                       }
+                      $sSQL = "UPDATE `$sTable` SET `$sColumn1` = REPLACE(`$sColumn1`, ".CMDBSource::Quote($sSearch1).", ".CMDBSource::Quote($sReplace1)."),".
+	                                                                         " `$sColumn2` = REPLACE(`$sColumn2`, ".CMDBSource::Quote($sSearch2).", ".CMDBSource::Quote($sReplace2).") ".
+	                                  " WHERE id IN (".implode(', ', $aObjects).");";
+                      IssueLog::Debug('AnonymizationUpdate: '.$sSQL);
+                      CMDBSource::Query($sSQL);
+                    }
                        if(count($aObjects)<$iMaxBufferSize) {
                           $bExecuteQuery=false;
                        }
@@ -203,7 +216,7 @@
         public function SetAnonymousValues()
         {
           // Put some more fancy values
-          $this->Set('name', Dict::S('Anonymization:Person:name')||' '||$this->GetKey());
+          $this->Set('name', Dict::S('Anonymization:Person:name').' '.$this->GetKey());
           $this->Set('first_name', Dict::S('Anonymization:Person:first_name'));
           // Mark the contact as obsolete
           $this->Set('status', 'inactive');
@@ -218,8 +231,26 @@
   </menus>
   <user_rights>
     <groups>
+      <group id="RessourceAnonymizationGroup">
+        <classes>
+          <class id="RessourceAnonymization"/>
+          <class id="Person"/>
+        </classes>
+      </group>
     </groups>
     <profiles>
+      <profile id="49" _delta="define">
+        <name>Anonymization Agent</name>
+        <description>Person in charge of anonymization. Must be used in conjunction with other profiles (e.g. Configuration Manager, Service Manager,…).</description>
+        <groups>
+          <group id="RessourceAnonymizationGroup">
+            <actions>
+              <action id="action:write">allow</action>
+              <action id="action:bulk write">allow</action>
+            </actions>
+          </group>
+        </groups>
+        </profile>
     </profiles>
   </user_rights>
   <dictionaries>

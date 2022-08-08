@@ -34,7 +34,10 @@ try
 	}
 	require_once(APPROOT.'/application/loginwebpage.class.inc.php');
 	
-	LoginWebPage::DoLoginEx(null /* any portal */, true /* must be admin */);
+	LoginWebPage::DoLoginEx(null /* any portal */, false /* must be admin */);
+	if(!AnonymizationUtils::CanAnonymize()){
+	   	throw new SecurityException(Dict::Format('UI:Error:ActionNotAllowed' ));
+	}
 
 	if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0) {
 		$oP = new ajax_page('');
