@@ -239,7 +239,7 @@
       </group>
     </groups>
     <profiles>
-      <profile id="49" _delta="define">
+      <profile id="52" _delta="define">
         <name>Anonymization Agent</name>
         <description>Person in charge of anonymization. Must be used in conjunction with other profiles (e.g. Configuration Manager, Service Manager,…).</description>
         <groups>
