@@ -18,7 +18,7 @@
       <properties>
         <uniqueness_rules>
           <rule id="name" _delta="must_exist">
-              <filter _delta="redefine" ><![CDATA[employee_number != '' AND first_name != 'Anonymous']]></filter>
+              <filter _delta="redefine" ><![CDATA[first_name != 'Anonymous' OR name NOT LIKE 'Contact%']]></filter>
           </rule>
         </uniqueness_rules>
       </properties>
