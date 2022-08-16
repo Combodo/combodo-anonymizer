@@ -80,7 +80,17 @@
           
           $this->Reload();
           $sAnonymizedName = $this->GetName();
-          
+
+           //desactivate linked user
+          $oSearch = new DBObjectSearch('User');
+          $oSearch->AddCondition('contactid', $this->GetKey());
+          $oSet = new DBObjectSet($oSearch);
+          while($oUser = $oSet->Fetch())
+          {
+            $oUser->Set('status', 'disabled');
+            $oUser->DBUpdate();
+          }
+
           // Purge the history for this object, otherwise previous values can be retrieved from the history
           $this->PurgeHistory($sPersonFriendlyName, $sAnonymizedName);
           
@@ -220,6 +230,7 @@
           $this->Set('first_name', Dict::S('Anonymization:Person:first_name'));
           // Mark the contact as obsolete
           $this->Set('status', 'inactive');
+          $this->Set('picture',null);
         }
 
 ]]></code>
