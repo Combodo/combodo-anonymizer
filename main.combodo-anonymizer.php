@@ -231,8 +231,12 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 				$oDateLimit = new DateTime();
 				$oDateLimit->modify("-$iRetentionDays days");
 				$sDateLimit = $oDateLimit->format(AttributeDateTime::GetSQLFormat());
-				$bExecuteQuery = true;
 
+				$this->Trace('|- Parameters:');
+				$this->Trace('|  |- OQL scope: '.$sOQL);
+				$this->Trace('|  |- sDateLimit: '.$sDateLimit);
+
+				$bExecuteQuery = true;
 				//split update by lot
 				while ((time() < $iUnixTimeLimit) && $bExecuteQuery) {
 					$iCountCurrentQuery = 0;
@@ -259,6 +263,11 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 				$oDateLimit = new DateTime();
 				$oDateLimit->modify("-$iRetentionDays days");
 				$sDateLimit = $oDateLimit->format(AttributeDateTime::GetSQLFormat());
+
+				$this->Trace('|- Parameters:');
+				$this->Trace('|  |- OQL scope: '.$sOQL);
+				$this->Trace('|  |- sDateLimit: '.$sDateLimit);
+
 				$bExecuteQuery = true;
 				while ((time() < $iUnixTimeLimit) && $bExecuteQuery) {
 					$iCountCurrentQuery = 0;
@@ -274,7 +283,29 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 				}
 			}
 		}
-		$sMessage = sprintf("%d notification(s) deleted, %d person(s) anonymized.", $iCountDeleted, $iCountAnonymized);
+
+		$iStepAnonymized = 0;
+		if ($bAnonymizeObsoletePersons)
+		{
+			$sOQL = "SELECT BatchAnonymization";
+			$bExecuteQuery = true;
+
+			$this->Trace('|- Parameters:');
+			$this->Trace('|  |- OQL scope: '.$sOQL);
+
+			while ((time() < $iUnixTimeLimit) && $bExecuteQuery) {
+				$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array(), array(), null, $iMaxBufferSize);
+				while ((time() < $iUnixTimeLimit) && ($oStepForAnonymize = $oSet->Fetch())) {
+					$oStepForAnonymize->executeStep($iUnixTimeLimit);
+					$iStepAnonymized++;
+				}
+				$this->Trace('iStepAnonymized: '.$iStepAnonymized);
+				if ($iStepAnonymized < $iMaxBufferSize) {
+					$bExecuteQuery = false;
+				}
+			}
+		}
+		$sMessage = sprintf("%d notification(s) deleted, %d person(s) anonymization started. %d step done", $iCountDeleted, $iCountAnonymized,$iStepAnonymized );
 		return $sMessage;
 	}
 
@@ -284,7 +315,15 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 	public function GetPeriodicity()
 	{
 		// Run once per day
-		return 24*60*60;
+		return 5*60;
+	}	/**
+ * Prints a $sMessage in the cron output.
+ *
+ * @param string $sMessage
+ */
+	protected function Trace($sMessage)
+	{
+			echo $sMessage."\n";
 	}
 }
 
