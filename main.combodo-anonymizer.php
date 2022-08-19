@@ -285,27 +285,24 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 		}
 
 		$iStepAnonymized = 0;
-		if ($bAnonymizeObsoletePersons)
-		{
-			$sOQL = "SELECT BatchAnonymization";
-			$bExecuteQuery = true;
+		$sOQL = "SELECT BatchAnonymization";
+		$bExecuteQuery = true;
 
-			$this->Trace('|- Parameters:');
-			$this->Trace('|  |- OQL scope: '.$sOQL);
+		$this->Trace('|- Parameters:');
+		$this->Trace('|  |- OQL scope: '.$sOQL);
 
-			while ((time() < $iUnixTimeLimit) && $bExecuteQuery) {
-				$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array(), array(), null, $iMaxBufferSize);
-				while ((time() < $iUnixTimeLimit) && ($oStepForAnonymize = $oSet->Fetch())) {
-					$oStepForAnonymize->executeStep($iUnixTimeLimit);
-					$iStepAnonymized++;
-				}
-				$this->Trace('iStepAnonymized: '.$iStepAnonymized);
-				if ($iStepAnonymized < $iMaxBufferSize) {
-					$bExecuteQuery = false;
-				}
+		while ((time() < $iUnixTimeLimit) && $bExecuteQuery) {
+			$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array(), array(), null, $iMaxBufferSize);
+			while ((time() < $iUnixTimeLimit) && ($oStepForAnonymize = $oSet->Fetch())) {
+				$oStepForAnonymize->executeStep($iUnixTimeLimit);
+				$iStepAnonymized++;
+			}
+			$this->Trace('iStepAnonymized: '.$iStepAnonymized);
+			if ($iStepAnonymized < $iMaxBufferSize) {
+				$bExecuteQuery = false;
 			}
 		}
-		$sMessage = sprintf("%d notification(s) deleted, %d person(s) anonymization started. %d step done", $iCountDeleted, $iCountAnonymized,$iStepAnonymized );
+		$sMessage = sprintf("%d notification(s) deleted, %d person(s) anonymization started. %d step(s) done", $iCountDeleted, $iCountAnonymized,$iStepAnonymized );
 		return $sMessage;
 	}
 

@@ -47,14 +47,20 @@
           <is_null_allowed>true</is_null_allowed>
           <tracking_level>none</tracking_level>
         </field>
+        <field id="emailToAnonymize" xsi:type="AttributeString">
+          <sql>emailToAnonymize</sql>
+          <default_value></default_value>
+          <is_null_allowed>true</is_null_allowed>
+          <tracking_level>none</tracking_level>
+        </field>
         <field id="nameToAnonymize" xsi:type="AttributeString">
           <sql>nameToAnonymize</sql>
           <default_value></default_value>
           <is_null_allowed>false</is_null_allowed>
           <tracking_level>none</tracking_level>
         </field>
-        <field id="anonymousValue" xsi:type="AttributeString">
-          <sql>anonymousValue</sql>
+        <field id="anonymizedName" xsi:type="AttributeString">
+          <sql>anonymizedName</sql>
           <default_value></default_value>
           <is_null_allowed>false</is_null_allowed>
           <tracking_level>none</tracking_level>
@@ -82,6 +88,9 @@
               break;
               case 'PurgeOnMentionByBatch':
                 return $this->PurgeOnMentionByBatch( $iTimeLimit);
+              break;
+              case 'PurgeEmailByBatch':
+                return $this->PurgeEmailByBatch( $iTimeLimit);
               break;
               default:
             return false;
@@ -140,37 +149,39 @@
            // Now remove the name of the contact from all the changes she/he made
            $sChangeTable = MetaModel::DBGetTable('CMDBChange');
 
-           if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0) {
+           if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0  || is_null($this->Get('idUserToAnonymize')) ) {
               $sSqlSearch = "SELECT id from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($this->Get('nameToAnonymize'));
-              $sSqlUpdate = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($this->Get('anonymousValue'));
+              $sSqlUpdate = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($this->Get('anonymizedName'));
              $bFinish = $this->executeQueryByLot($sSqlSearch,$sSqlUpdate, $iTimeLimit);
 
 	           if ( $bFinish ) {
 		           $sSqlSearch = "SELECT id from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($this->Get('nameToAnonymize').' (CSV)');
-		           $sSqlUpdate = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($this->Get('anonymousValue').' (CSV)');
+		           $sSqlUpdate = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($this->Get('anonymizedName').' (CSV)');
 		           $bFinish = $this->executeQueryByLot($sSqlSearch, $sSqlUpdate, $iTimeLimit);
 	           }
                if($bFinish) {
+                  echo 'DELETE';
                   $this->DBDelete();
               }
            } else  {
-                $sSqlSearch = "SELECT id from `$sChangeTable` WHERE user_id=". $this->Get('idUserToAnonymize');
-                $sSqlUpdate = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($this->Get('anonymousValue'));
-                $bFinish = $this->executeQueryByLot($sSqlSearch,$sSqlUpdate, $iTimeLimit);
+              $sSqlSearch = "SELECT id from `$sChangeTable` WHERE user_id=". $this->Get('idUserToAnonymize');
+              $sSqlUpdate = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($this->Get('anonymizedName'));
+              $bFinish = $this->executeQueryByLot($sSqlSearch,$sSqlUpdate, $iTimeLimit);
 
 	           if ( $bFinish ) {
 	           	    //remove data created before 3.0
-		           $sSqlSearch = "SELECT id from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($this->Get('nameToAnonymize')).' AND user_id IS NULL';
-		           $sSqlUpdate = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($this->Get('anonymousValue'));
-		           $bFinish = $this->executeQueryByLot($sSqlSearch, $sSqlUpdate, $iTimeLimit);
+                 $sSqlSearch = "SELECT id from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($this->Get('nameToAnonymize')).' AND user_id IS NULL';
+                 $sSqlUpdate = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($this->Get('anonymizedName'));
+                 $bFinish = $this->executeQueryByLot($sSqlSearch, $sSqlUpdate, $iTimeLimit);
 	           }
 	           if ( $bFinish ) {
-		           $sSqlSearch = "SELECT id from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($this->Get('nameToAnonymize').' (CSV)').' AND user_id IS NULL';
-		           $sSqlUpdate = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($this->Get('anonymousValue').' (CSV)');
-		           $bFinish = $this->executeQueryByLot($sSqlSearch, $sSqlUpdate, $iTimeLimit);
+                 $sSqlSearch = "SELECT id from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($this->Get('nameToAnonymize').' (CSV)').' AND user_id IS NULL';
+                 $sSqlUpdate = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($this->Get('anonymizedName').' (CSV)');
+                 $bFinish = $this->executeQueryByLot($sSqlSearch, $sSqlUpdate, $iTimeLimit);
 	           }
 
               if($bFinish) {
+                  echo 'DELETE';
                   $this->DBDelete();
               }
            }
@@ -232,8 +243,8 @@
           <code><![CDATA[
         protected function PurgeOnMentionByBatch($iTimeLimit)
         {
-		    $aMentionsAllowedClasses = MetaModel::GetConfig()->Get('mentions.allowed_classes');
-	        $bFinish = false;
+            $aMentionsAllowedClasses = MetaModel::GetConfig()->Get('mentions.allowed_classes');
+	          $bFinish = false;
             foreach(MetaModel::GetClasses() as $sClass)
           {
               foreach(MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef)
@@ -243,34 +254,29 @@
                   {
                         $aSQLColumns = $oAttDef->GetSQLColumns();
                         $sColumn1 = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
-                        // $sColumn2 = array_keys($aSQLColumns)[1]; // We assume that the second column is the index
+
                         foreach($aMentionsAllowedClasses as $sMentionChar => $sMentionClass) {
-                           //$sMentionItemUrl = utils::GetAbsoluteUrlAppRoot().'pages/UI.php?operation=details&class='.$sMentionClass.'&id={id}';
                            if (MetaModel::IsParentClass('User',$sMentionClass)) {
                                 $sSearch1 = "class=".$sMentionClass."&amp;id=".$this->Get('idUserToAnonymize')."\">@";
                                 $sRegexPatternToFind = $sSearch1."(.*?)</a>/i'";
-                                $sReplaceableText = $sSearch1.CMDBSource::Quote($this->Get('anonymousValue'))."<";
+                                $sReplaceableText = $sSearch1.CMDBSource::Quote($this->Get('anonymizedName'))."<";
                                 $sSqlSearch ="SELECT  id FROM `$sTable` WHERE `$sColumn1` LIKE ".CMDBSource::Quote('%'.$sSearch1.'%');
-                                $sSqlUpdate = "UPDATE `$sTable` SET `$sColumn1` =REGEXP_REPLACE(`$sColumn1`,'".CMDBSource::Quote($sRegexPatternToFind)."','".CMDBSource::Quote($sReplaceableText)."')";
-                                IssueLog::Info('Anonymization: '.$sSqlSearch);
-                                IssueLog::Info('Anonymization: '.$sSqlUpdate);
+                                $sSqlUpdate = "UPDATE `$sTable` SET `$sColumn1` = REGEXP_REPLACE(`$sColumn1`,'".CMDBSource::Quote($sRegexPatternToFind)."','".CMDBSource::Quote($sReplaceableText)."')";
                                 $bFinish = $this->executeQueryByLot($sSqlSearch,$sSqlUpdate, $iTimeLimit);
-	                            if (!$bFinish){
-		                           //end of time
-		                           return;
-	                            }
+                                if (!$bFinish){
+                                 //end of time
+                                return;
+                                }
                            } else if (MetaModel::IsParentClass('Contact',$sMentionClass))  {
                                  $sSearch1 = "class=".$sMentionClass."&amp;id=".$this->Get('idToAnonymize')."\">@";
                                 $sRegexPatternToFind = $sSearch1."";
-                                $sReplaceableText = $sSearch1.CMDBSource::Quote($this->Get('anonymousValue'))."<";
-                                IssueLog::Info('Anonymization: '.$sSqlSearch);
-                                IssueLog::Info('Anonymization: '.$sSqlUpdate);
+                                $sReplaceableText = $sSearch1.CMDBSource::Quote($this->Get('anonymizedName'))."<";
                                 $sSqlSearch = "SELECT id from `$sTable` WHERE `$sColumn1` =".CMDBSource::Quote('%'.$this->Get('nameToAnonymize').'%');
-                                $sSqlUpdate = "UPDATE `$sTable` SET `$sColumn1` =REGEXP_REPLACE(`$sColumn1`,'".CMDBSource::Quote($sRegexPatternToFind)."','".CMDBSource::Quote($sReplaceableText)."')";
+                                $sSqlUpdate = "UPDATE `$sTable` SET `$sColumn1` = REGEXP_REPLACE(`$sColumn1`,'".CMDBSource::Quote($sRegexPatternToFind)."','".CMDBSource::Quote($sReplaceableText)."')";
                                 $bFinish = $this->executeQueryByLot($sSqlSearch,$sSqlUpdate, $iTimeLimit);
 	                            if (!$bFinish){
 		                           //end of time
-		                           return;
+                              return;
 	                            }
                            }
                         }
@@ -284,6 +290,55 @@
 
 ]]></code>
         </method>
+        <method id="PurgeEmailByBatch" _delta="define">
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[
+        protected function PurgeEmailByBatch( $iTimeLimit)
+        {
+
+          $sNewEmail = $this->Get('idToAnonymize').'@anonymous.contact';
+           // Now change email adress
+          $sNotificationTable = MetaModel::DBGetTable('EventNotificationEmail');
+
+          $sSqlSearch = "SELECT id from `$sNotificationTable` WHERE `from` like '".$this->Get('emailToAnonymize')."'";
+          $sSqlUpdate = "UPDATE `$sNotificationTable` SET  `from` = REPLACE(`to`, '".$this->Get('emailToAnonymize')."', '".$sNewEmail."'),".
+                                                                               "  `subject` = REPLACE(`subject`, '".$this->Get('emailToAnonymize')."', '".$sNewEmail."'),".
+                                                                               "  `body` = REPLACE(`body`, '".$this->Get('emailToAnonymize')."', '".$sNewEmail."') ";
+          $bFinish = $this->executeQueryByLot($sSqlSearch,$sSqlUpdate, $iTimeLimit);
+
+           if ( $bFinish ) {
+              $sSqlSearch = "SELECT id from `$sNotificationTable` WHERE `to` like '%".$this->Get('emailToAnonymize')."%'";
+              $sSqlUpdate = "UPDATE `$sNotificationTable` SET  `to` = REPLACE(`to`, '".$this->Get('emailToAnonymize')."', '".$sNewEmail."'),".
+                                                                               "  `subject` = REPLACE(`subject`, '".$this->Get('emailToAnonymize')."', '".$sNewEmail."'),".
+                                                                               "  `body` = REPLACE(`body`, '".$this->Get('emailToAnonymize')."', '".$sNewEmail."') ";
+		           $bFinish = $this->executeQueryByLot($sSqlSearch, $sSqlUpdate, $iTimeLimit);
+	        }
+
+	        if ( $bFinish ) {
+		           $sSqlSearch = "SELECT id from `$sNotificationTable` WHERE `cc` like '%".$this->Get('emailToAnonymize')."%'";
+                $sSqlUpdate = "UPDATE `$sNotificationTable` SET  `cc` = REPLACE(`to`, '".$this->Get('emailToAnonymize')."', '".$sNewEmail."'),".
+                                                                               "  `subject` = REPLACE(`subject`, '".$this->Get('emailToAnonymize')."', '".$sNewEmail."'),".
+                                                                               "  `body` = REPLACE(`body`, '".$this->Get('emailToAnonymize')."', '".$sNewEmail."') ";
+		           $bFinish = $this->executeQueryByLot($sSqlSearch, $sSqlUpdate, $iTimeLimit);
+	       }
+
+	        if ( $bFinish ) {
+		           $sSqlSearch = "SELECT id from `$sNotificationTable` WHERE `bcc` like '%".$this->Get('emailToAnonymize')."%'";
+                $sSqlUpdate = "UPDATE `$sNotificationTable` SET  `bcc` = REPLACE(`to`, '".$this->Get('emailToAnonymize')."', '".$sNewEmail."'),".
+                                                                               "  `subject` = REPLACE(`subject`, '".$this->Get('emailToAnonymize')."', '".$sNewEmail."'),".
+                                                                               "  `body` = REPLACE(`body`, '".$this->Get('emailToAnonymize')."', '".$sNewEmail."') ";
+		           $bFinish = $this->executeQueryByLot($sSqlSearch, $sSqlUpdate, $iTimeLimit);
+	       }
+
+          if($bFinish) {
+               $this->DBDelete();
+          }
+        }
+]]></code>
+        </method>
+
       </methods>
       <presentation></presentation>
     </class>
@@ -311,6 +366,7 @@
                public function Anonymize()
         {
           $sPersonFriendlyName = $this->GetName();
+          $sEmail = $this->Get('email');
 
           // Cleanup all non mandatory values
           foreach(MetaModel::ListAttributeDefs(get_class($this)) as $sAttCode => $oAttDef)
@@ -359,7 +415,8 @@
 	                    'idToAnonymize' => $this->GetKey(),
 	                    'idUserToAnonymize' => null,
 	                    'nameToAnonymize' => $sPersonFriendlyName,
-	                    'anonymousValue' => $sAnonymizedName,
+	                    'anonymizedName' => $sAnonymizedName,
+	                    'emailToAnonymize' => $sEmail,
 	                    'function' => 'PurgeHistoryByBatch'];
           $bUserExist = false;
           $oSearch = new DBObjectSearch('User');
@@ -373,9 +430,11 @@
 	          $bUserExist = true;
             $oValues [  'idUserToAnonymize'] = $oUser->GetKey();
 
+            // Purge the history for this object, otherwise previous values can be retrieved from the history
             $oBatchAnonymization = MetaModel::NewObject("BatchAnonymization",$oValues);
 	          $oBatchAnonymization->DBInsertNoReload();
 
+            // Cleanup all references to the Person's name as an author of a case log entry
 	          $oValues['function'] =  'CleanupCaseLogsByBatch';
             $oBatchAnonymization = MetaModel::NewObject("BatchAnonymization",$oValues);
 	          $oBatchAnonymization->DBInsertNoReload();
@@ -385,9 +444,16 @@
               $oBatchAnonymization = MetaModel::NewObject("BatchAnonymization",$oValues);
               $oBatchAnonymization->DBInsertNoReload();
 	          }
+
+	          if (!empty($sEmail)){
+              $oValues['function'] =  'PurgeEmailByBatch';
+              $oBatchAnonymization = MetaModel::NewObject("BatchAnonymization",$oValues);
+              $oBatchAnonymization->DBInsertNoReload();
+	          }
           }
 
           if (!$bUserExist) {
+            // Purge the history for this object, otherwise previous values can be retrieved from the history
 	          $oBatchAnonymization = MetaModel::NewObject("BatchAnonymization",$oValues);
 	          $oBatchAnonymization->DBInsertNoReload();
             if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') >= 0) {
@@ -395,130 +461,13 @@
                 $oBatchAnonymization = MetaModel::NewObject("BatchAnonymization",$oValues);
                 $oBatchAnonymization->DBInsertNoReload();
 	          }
-          }
-          // Purge the history for this object, otherwise previous values can be retrieved from the history
-          //$this->PurgeHistory($sPersonFriendlyName, $sAnonymizedName);
 
-          // Cleanup all references to the Person's name as an author of a case log entry
-          //$this->CleanupCaseLogs($sPersonFriendlyName);
-        }
-]]></code>
-        </method>
-        <method id="PurgeHistory" _delta="define">
-          <static>false</static>
-          <access>protected</access>
-          <type>Overload-DBObject</type>
-          <code><![CDATA[
-        protected function PurgeHistory($sOriginalName, $sAnonymizedName)
-        {
-        	// Delete any existing change tracking about the current object
-        	$oFilter = new DBObjectSearch('CMDBChangeOp');
-        	$oFilter->AddCondition('objclass', get_class($this), '=');
-        	$oFilter->AddCondition('objkey', $this->GetKey(), '=');
-        	MetaModel::PurgeData($oFilter);
-        	
-        	$oMyChangeOp = MetaModel::NewObject("CMDBChangeOpPlugin");
-        	$oMyChangeOp->Set("objclass", get_class($this));
-        	$oMyChangeOp->Set("objkey", $this->GetKey());
-        	$oMyChangeOp->Set("description", 'Anonymization');
-        	$iId = $oMyChangeOp->DBInsertNoReload();
-          
-           // Now remove the name of the contact from all the changes she/he made
-           $sChangeTable = MetaModel::DBGetTable('CMDBChange');
+	          if (!empty($sEmail)){
+              $oValues['function'] =  'PurgeEmailByBatch';
+              $oBatchAnonymization = MetaModel::NewObject("BatchAnonymization",$oValues);
+              $oBatchAnonymization->DBInsertNoReload();
 
-           if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0) {
-              $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE userinfo=".CMDBSource::Quote($sOriginalName);
-              IssueLog::Info('Anonymization: '.$sSQL);
-              CMDBSource::Query($sSQL);
-
-              $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE userinfo=".CMDBSource::Quote($sOriginalName.' (CSV)');
-              IssueLog::Info('Anonymization: '.$sSQL);
-              CMDBSource::Query($sSQL);
-           } else  {
-              $oSearch = new DBObjectSearch('User');
-              $oSearch->AddCondition('contactid', $this->GetKey());
-              $oSet = new DBObjectSet($oSearch);
-              while($oUser = $oSet->Fetch())
-              {
-                $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE user_id=". $this->GetKey();
-                IssueLog::Info('Anonymization: '.$sSQL);
-                CMDBSource::Query($sSQL);
-              }
-              //remove data created before 3.0
-              $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE userinfo=".CMDBSource::Quote($sOriginalName).' AND user_id IS NULL';
-              IssueLog::Info('Anonymization: '.$sSQL);
-              CMDBSource::Query($sSQL);
-
-              $sSQL = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sAnonymizedName)." WHERE userinfo=".CMDBSource::Quote($sOriginalName.' (CSV)').' AND user_id IS NULL';
-              IssueLog::Info('Anonymization: '.$sSQL);
-              CMDBSource::Query($sSQL);
-           }
-        }
-]]></code>
-        </method>
-        <method id="CleanupCaseLogs" _delta="define">
-          <static>false</static>
-          <access>protected</access>
-          <type>Overload-DBObject</type>
-          <code><![CDATA[
-        protected function CleanupCaseLogs($sPersonFriendlyName)
-        {
-
-          $iMaxBufferSize =   MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer', 'max_buffer_size', 1000);
-		      // Check for all user accounts associated with this contact
-          $oSearch = new DBObjectSearch('User');
-          $oSearch->AddCondition('contactid', $this->GetKey());
-          $oSet = new DBObjectSet($oSearch);
-          while($oUser = $oSet->Fetch())
-          {
-            // For each user account associated with the contact
-
-            // 1) Build the expression to search (and replace)
-            $sPattern = ' : %1$s (%2$d) ============';
-            $sEraser = str_repeat('*', strlen($sPersonFriendlyName)); // replace the person's name by a string of stars... of the same length to preserver the case log's index
-
-            $sSearch1 = sprintf($sPattern, $sPersonFriendlyName, $oUser->GetKey());
-            $sReplace1 = sprintf($sPattern, $sEraser, $oUser->GetKey());
-
-            $sSearch2 = $sPersonFriendlyName;
-            $sReplace2 = $sEraser;
-
-            // 2) Find all classes containing case logs
-            foreach(MetaModel::GetClasses() as $sClass)
-            {
-              foreach(MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef)
-              {
-                $sTable = MetaModel::DBGetTable($sClass);
-                if ((MetaModel::GetAttributeOrigin($sClass, $sAttCode) == $sClass) && $oAttDef instanceof AttributeCaseLog)
-                {
-                  $aSQLColumns = $oAttDef->GetSQLColumns();
-                  $sColumn1 = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
-                  $sColumn2 = array_keys($aSQLColumns)[1]; // We assume that the second column is the index
-
-                  $bExecuteQuery = true;
-
-                  while ($bExecuteQuery) {
-                    $oResult = CMDBSource::Query("SELECT  id FROM `$sTable` WHERE `$sColumn1` LIKE ".CMDBSource::Quote('%'.$sSearch1.'%')." LIMIT " . $iMaxBufferSize);
-                    IssueLog::Debug('AnonymizationQuery: '."SELECT  id FROM `$sTable` WHERE `$sColumn1` LIKE ".CMDBSource::Quote('%'.$sSearch1.'%')." LIMIT " . $iMaxBufferSize);
-                    $aObjects = [] ;
-                    if ($oResult->num_rows>0) {
-                      while ($oRaw = $oResult->fetch_assoc()){
-                        $aObjects[] = $oRaw['id'];
-                      }
-                      $sSQL = "UPDATE `$sTable` SET `$sColumn1` = REPLACE(`$sColumn1`, ".CMDBSource::Quote($sSearch1).", ".CMDBSource::Quote($sReplace1)."),".
-	                                                                         " `$sColumn2` = REPLACE(`$sColumn2`, ".CMDBSource::Quote($sSearch2).", ".CMDBSource::Quote($sReplace2).") ".
-	                                  " WHERE id IN (".implode(', ', $aObjects).");";
-                      IssueLog::Debug('AnonymizationUpdate: '.$sSQL);
-                      CMDBSource::Query($sSQL);
-                    }
-                       if(count($aObjects)<$iMaxBufferSize) {
-                          $bExecuteQuery=false;
-                       }
-                  }
-
-                }
-              }
-            }
+	          }
           }
         }
 ]]></code>
@@ -533,6 +482,7 @@
           // Put some more fancy values
           $this->Set('name', Dict::S('Anonymization:Person:name').' '.$this->GetKey());
           $this->Set('first_name', Dict::S('Anonymization:Person:first_name'));
+          $this->Set('email', '');
           // Mark the contact as obsolete
           $this->Set('status', 'inactive');
           $this->Set('picture',null);
@@ -551,6 +501,7 @@
       <group id="RessourceAnonymizationGroup">
         <classes>
           <class id="RessourceAnonymization"/>
+          <class id="BatchAnonymization"/>"
           <class id="Person"/>
         </classes>
       </group>
@@ -562,6 +513,8 @@
         <groups>
           <group id="RessourceAnonymizationGroup">
             <actions>
+              <action id="action:read">allow</action>
+              <action id="action:bulk read">allow</action>
               <action id="action:write">allow</action>
               <action id="action:bulk write">allow</action>
             </actions>
