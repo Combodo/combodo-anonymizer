@@ -207,8 +207,45 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 	}
 }
 
-class AnonymisationBackgroundProcess implements iBackgroundProcess
+class PurgeEmailNotification extends AbstractWeeklyScheduledProcess
 {
+
+	const MODULE_SETTING_DEBUG = 'debug';
+	const MODULE_SETTING_MAX_PER_REQUEST = 'max_buffer_size';
+	const MODULE_SETTING_MAX_TIME = 'endtime';
+
+	const DEFAULT_MODULE_SETTING_DEBUG = false;
+	const DEFAULT_MODULE_SETTING_MAX_PER_REQUEST = '5';
+
+	protected $bDebug;
+	protected $iMaxItemsPerRequest;
+	/* max hour of repeat process * */
+	protected $sEndTime;
+	/* end time of current process*/
+	protected $sTimeLimit;
+
+	protected function GetModuleName(){
+		return 'combodo-anonymizer';
+	}
+
+	protected function GetDefaultModuleSettingTime(){
+		return '01:00';
+	}
+
+	protected function GetDefaultModuleSettingEndTime(){
+		return '23:45';
+	}
+
+	/**
+	 * AutoCloseTicket constructor.
+	 */
+	function __construct()
+	{
+		$this->bDebug = (bool) MetaModel::GetModuleSetting($this->GetModuleName(), static::MODULE_SETTING_DEBUG, static::DEFAULT_MODULE_SETTING_DEBUG);
+		$this->iMaxItemsPerRequest = (int) MetaModel::GetModuleSetting($this->GetModuleName(), static::MODULE_SETTING_MAX_PER_REQUEST, static::DEFAULT_MODULE_SETTING_MAX_PER_REQUEST);
+		$this->sEndTime = MetaModel::GetModuleSetting($this->GetModuleName(), static::MODULE_SETTING_MAX_TIME,$this->GetDefaultModuleSettingEndTime());
+		$this->sTimeLimit = time()+100;
+	}
 	/**
 	 * @inheritDoc
 	 * @throws \CoreException
@@ -218,6 +255,7 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 	 */
 	public function Process($iUnixTimeLimit)
 	{
+		$this->sTimeLimit = $iUnixTimeLimit;
 		$iMaxBufferSize =   MetaModel::GetModuleSetting('combodo-anonymizer', 'max_buffer_size', 1000);
 		$sModuleName = basename(__DIR__);
 		$bCleanupNotification = MetaModel::GetModuleSetting($sModuleName, 'cleanup_notifications', false);
@@ -252,6 +290,124 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 				}
 			}
 		}
+		$sMessage = sprintf("%d notification(s) deleted", $iCountDeleted );
+		return $sMessage;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function GetNextOccurrence($sCurrentTime = 'now')
+	{
+		$bEnabled = $this->getOConfig()->GetModuleSetting($this->GetModuleName(),	static::MODULE_SETTING_ENABLED,	static::DEFAULT_MODULE_SETTING_ENABLED);
+		//if background process is disabled
+		if (!$bEnabled)
+		{
+			return new DateTime('3000-01-01');
+		}
+
+		if (!preg_match('/[0-2][0-9]:[0-5][0-9]/', $this->sEndTime)) {
+			throw new Exception($this->GetModuleName().": wrong format for setting 'time' (found '$this->sEndTime')");
+		}
+		$dEndToday = new DateTime();
+		list($sHours, $sMinutes) = explode(':', $this->sEndTime);
+		$dEndToday->setTime((int)$sHours, (int)$sMinutes);
+		$iEndTimeToday = $dEndToday->getTimestamp();
+		$this->Trace('End time:'. $this->sEndTime) ;
+		$this->Trace('Next occurence:'.$iEndTimeToday  );
+		$this->Trace('timelimit:'.$this->sTimeLimit  );
+		$this->Trace('time actuel:'.time()  );
+
+		//IF FINISH next time is tomorrow
+		if (time() < $this->sTimeLimit || time() > $iEndTimeToday) {
+			$this->Trace('Next day'  );
+			// 1st - Interpret the list of days as ordered numbers (monday = 1)
+			$aDays = $this->InterpretWeekDays();
+
+			// 2nd - Find the next active week day
+			//
+			$sStartTime = MetaModel::GetConfig()->GetModuleSetting($this->GetModuleName(), static::MODULE_SETTING_TIME,  $this->GetDefaultModuleSettingTime());
+			if (!preg_match('/[0-2][0-9]:[0-5][0-9]/', $sStartTime)) {
+				throw new Exception($this->GetModuleName().": wrong format for setting 'time' (found '$sStartTime')");
+			}
+			$oNow = new DateTime();
+			$iNextPos = false;
+			for ($iDay = $oNow->format('N'); $iDay <= 7; $iDay++) {
+				$iNextPos = array_search($iDay, $aDays);
+				if ($iNextPos !== false) {
+					if (($iDay > $oNow->format('N')) || ($oNow->format('H:i') < $sStartTime)) {
+						break;
+					}
+					$iNextPos = false; // necessary on sundays
+				}
+			}
+
+			// 3rd - Compute the result
+			//
+			if ($iNextPos === false) {
+				// Jump to the first day within the next week
+				$iFirstDayOfWeek = $aDays[0];
+				$iDayMove = $oNow->format('N') - $iFirstDayOfWeek;
+				$oRet = clone $oNow;
+				$oRet->modify('-'.$iDayMove.' days');
+				$oRet->modify('+1 weeks');
+			} else {
+				$iNextDayOfWeek = $aDays[$iNextPos];
+				$iMove = $iNextDayOfWeek - $oNow->format('N');
+				$oRet = clone $oNow;
+				$oRet->modify('+'.$iMove.' days');
+			}
+			list($sHours, $sMinutes) = explode(':', $sStartTime);
+			$oRet->setTime((int)$sHours, (int)$sMinutes);
+			return $oRet;
+		} else {
+			//TRY ANOTHER TIME next time is 5 min later
+			$this->Trace('Later'  );
+
+			$oPlannedStart = new DateTime();
+			$oPlannedStart->modify('+ 30 seconds');
+
+			return $oPlannedStart;
+		}
+	}
+
+	/**
+	 * Prints a $sMessage in the cron output.
+	 *
+	 * @param string $sMessage
+	 */
+	protected function Trace($sMessage)
+	{
+		echo $sMessage."\n";
+	}
+}
+
+
+
+class BackgroundAnonymisation extends PurgeEmailNotification
+{
+
+	protected function GetDefaultModuleSettingTime(){
+		return '01:00';
+	}
+
+	protected function GetDefaultModuleSettingEndTime(){
+		return '23:30';
+	}
+
+	/**
+	 * @inheritDoc
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 * @throws \MySQLException
+	 * @throws \OQLException
+	 */
+	public function Process($iUnixTimeLimit)
+	{
+		$this->sTimeLimit = $iUnixTimeLimit;
+		$iMaxBufferSize =   MetaModel::GetModuleSetting('combodo-anonymizer', 'max_buffer_size', 1000);
+		$sModuleName = basename(__DIR__);
+
 		$bAnonymizeObsoletePersons = MetaModel::GetModuleSetting($sModuleName, 'anonymize_obsolete_persons', false);
 		$iCountAnonymized = 0;
 		if ($bAnonymizeObsoletePersons)
@@ -290,37 +446,32 @@ class AnonymisationBackgroundProcess implements iBackgroundProcess
 
 		$this->Trace('|- Parameters:');
 		$this->Trace('|  |- OQL scope: '.$sOQL);
+		$iNbPersonAnonymized = 0;
 
 		while ((time() < $iUnixTimeLimit) && $bExecuteQuery) {
 			$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array(), array(), null, $iMaxBufferSize);
+			$sIdCurrentPerson = '';
 			while ((time() < $iUnixTimeLimit) && ($oStepForAnonymize = $oSet->Fetch())) {
+				if ($sIdCurrentPerson != $oStepForAnonymize->Get('idToAnonymize')){
+					if ($sIdCurrentPerson != '') {
+						$iNbPersonAnonymized++;
+					}
+					$sIdCurrentPerson = $oStepForAnonymize->Get('idToAnonymize');
+				}
 				$oStepForAnonymize->executeStep($iUnixTimeLimit);
 				$iStepAnonymized++;
+			}
+
+			if (time() > $iUnixTimeLimit && $sIdCurrentPerson != ''){
+				$iNbPersonAnonymized++;
 			}
 			$this->Trace('iStepAnonymized: '.$iStepAnonymized);
 			if ($iStepAnonymized < $iMaxBufferSize) {
 				$bExecuteQuery = false;
 			}
 		}
-		$sMessage = sprintf("%d notification(s) deleted, %d person(s) anonymization started. %d step(s) done", $iCountDeleted, $iCountAnonymized,$iStepAnonymized );
+		$sMessage = sprintf("Anonymization started for %d person(s). %d person(s) completly anonymized.%d step(s) executed", $iCountAnonymized,  $iNbPersonAnonymized, $iStepAnonymized );
 		return $sMessage;
 	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function GetPeriodicity()
-	{
-		// Run once per day
-		return 5*60;
-	}	/**
- * Prints a $sMessage in the cron output.
- *
- * @param string $sMessage
- */
-	protected function Trace($sMessage)
-	{
-			echo $sMessage."\n";
 	}
-}
 

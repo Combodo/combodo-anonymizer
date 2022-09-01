@@ -65,6 +65,12 @@ SetupWebPage::AddModule(
 		//
 		'settings' => array(
 			// Module specific settings go here, if any
+			'week_days' => 'monday, tuesday, wednesday, thursday, friday, saturday, sunday',
+			'time' => '00:30',
+			'endtime' => '05:30',
+			'enabled' => true,
+			'debug' => true,
+			'max_buffer_size' => 1000,
 		),
 	)
 );
