@@ -233,7 +233,7 @@ class PurgeEmailNotification extends AbstractWeeklyScheduledProcess
 	}
 
 	protected function GetDefaultModuleSettingEndTime(){
-		return '23:45';
+		return '05:00';
 	}
 
 	/**
@@ -257,12 +257,11 @@ class PurgeEmailNotification extends AbstractWeeklyScheduledProcess
 	{
 		$this->sTimeLimit = $iUnixTimeLimit;
 		$iMaxBufferSize =   MetaModel::GetModuleSetting('combodo-anonymizer', 'max_buffer_size', 1000);
-		$sModuleName = basename(__DIR__);
-		$bCleanupNotification = MetaModel::GetModuleSetting($sModuleName, 'cleanup_notifications', false);
+		$bCleanupNotification = MetaModel::GetModuleSetting($this->GetModuleName(), 'cleanup_notifications', false);
 		$iCountDeleted = 0;
 		if ($bCleanupNotification)
 		{
-			$iRetentionDays = MetaModel::GetModuleSetting($sModuleName, 'notifications_retention', -1);
+			$iRetentionDays = MetaModel::GetModuleSetting($this->GetModuleName(), 'notifications_retention', -1);
 			if ($iRetentionDays > 0)
 			{
 				$sOQL = "SELECT EventNotificationEmail WHERE date < :date";
@@ -384,7 +383,7 @@ class PurgeEmailNotification extends AbstractWeeklyScheduledProcess
 
 
 
-class BackgroundAnonymisation extends PurgeEmailNotification
+class PersonalDataAnonymizer extends PurgeEmailNotification
 {
 
 	protected function GetDefaultModuleSettingTime(){
@@ -392,7 +391,7 @@ class BackgroundAnonymisation extends PurgeEmailNotification
 	}
 
 	protected function GetDefaultModuleSettingEndTime(){
-		return '23:30';
+		return '05:00';
 	}
 
 	/**
@@ -406,23 +405,34 @@ class BackgroundAnonymisation extends PurgeEmailNotification
 	{
 		$this->sTimeLimit = $iUnixTimeLimit;
 		$iMaxBufferSize =   MetaModel::GetModuleSetting('combodo-anonymizer', 'max_buffer_size', 1000);
-		$sModuleName = basename(__DIR__);
 
-		$bAnonymizeObsoletePersons = MetaModel::GetModuleSetting($sModuleName, 'anonymize_obsolete_persons', false);
+		$oResult = CMDBSource::Query("SELECT DISTINCT idToAnonymize FROM priv_batch_anonymization");
+		$aIdPersonAlreadyInProgress = [] ;
+		if ($oResult->num_rows>0) {
+			while ($oRaw = $oResult->fetch_assoc()) {
+				$aIdPersonAlreadyInProgress[] = $oRaw['idToAnonymize'];
+			}
+		}
+		$bAnonymizeObsoletePersons = MetaModel::GetModuleSetting($this->GetModuleName(), 'anonymize_obsolete_persons', false);
 		$iCountAnonymized = 0;
 		if ($bAnonymizeObsoletePersons)
 		{
-			$iRetentionDays = MetaModel::GetModuleSetting($sModuleName, 'obsolete_persons_retention', -1);
+			$iRetentionDays = MetaModel::GetModuleSetting($this->GetModuleName(), 'obsolete_persons_retention', -1);
 			if ($iRetentionDays > 0)
 			{
 				$sOQL = "SELECT Person WHERE obsolescence_flag = 1 AND anonymized = 0 AND obsolescence_date < :date";
+				if (sizeof($aIdPersonAlreadyInProgress)>0){
+					$sOQL .= " AND id NOT IN (".implode(",", $aIdPersonAlreadyInProgress).")";
+				}
+				$this->Trace('RetentionDays'.$iRetentionDays);
+				$this->Trace($sOQL);
 				$oDateLimit = new DateTime();
 				$oDateLimit->modify("-$iRetentionDays days");
 				$sDateLimit = $oDateLimit->format(AttributeDateTime::GetSQLFormat());
 
 				$this->Trace('|- Parameters:');
 				$this->Trace('|  |- OQL scope: '.$sOQL);
-				$this->Trace('|  |- sDateLimit: '.$sDateLimit);
+				$this->Trace('|  |- sDate Limit: '.$sDateLimit);
 
 				$bExecuteQuery = true;
 				while ((time() < $iUnixTimeLimit) && $bExecuteQuery) {
@@ -462,7 +472,7 @@ class BackgroundAnonymisation extends PurgeEmailNotification
 				$iStepAnonymized++;
 			}
 
-			if (time() > $iUnixTimeLimit && $sIdCurrentPerson != ''){
+			if (time() < $iUnixTimeLimit && $sIdCurrentPerson != ''){
 				$iNbPersonAnonymized++;
 			}
 			$this->Trace('iStepAnonymized: '.$iStepAnonymized);
