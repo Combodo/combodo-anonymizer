@@ -39,6 +39,7 @@ SetupWebPage::AddModule(
 		),
 		'mandatory' => false,
 		'visible' => true,
+		'installer' => 'AnonymizerInstaller',
 
 		// Components
 		//
@@ -74,3 +75,30 @@ SetupWebPage::AddModule(
 		),
 	)
 );
+
+
+if (!class_exists('AnonymizerInstaller'))
+{
+	// Module installation handler
+	//
+	class AnonymizerInstaller extends ModuleInstallerAPI
+	{
+		/**
+		 * Handler called before creating or upgrading the database schema
+		 * @param $oConfiguration Config The new configuration of the application
+		 * @param $sPreviousVersion string PRevious version number of the module (empty string in case of first install)
+		 * @param $sCurrentVersion string Current version number of the module
+		 */
+		public static function BeforeDatabaseCreation(Config $oConfiguration, $sPreviousVersion, $sCurrentVersion)
+		{
+			if (strlen($sPreviousVersion) > 0)
+			{
+				// If you want to migrate data from one format to another, do it here
+				$sQueryUpdate = "UPDATE `priv_backgroundtask` SET `class_name` = 'PersonalDataAnonymizer' WHERE `class_name` = 'AnonymisationBackgroundProcess'";
+				CMDBSource::Query($sQueryUpdate);
+			}
+		}
+	}
+}
+
+
