@@ -30,9 +30,9 @@
       <methods/>
     </class>
     <class id="BatchAnonymization" _delta="define">
-      <parent>cmdbAbstractObject</parent>
+      <parent>DBObject</parent>
       <properties>
-        <category>bizmodel,addon</category>
+        <category></category>
         <abstract>false</abstract>
         <db_table>priv_batch_anonymization</db_table>
         <naming>
@@ -582,6 +582,7 @@
 	          }  else {
 	              $oUser->Set('login', 'Anonymous'.$this->GetKey().'-'.$iNbUser);
 	          }
+	          $oUser->AllowWrite(true);
 	          $oUser->DBUpdate();
 
 	          $bUserExist = true;
@@ -648,7 +649,6 @@
 ]]></code>
         </method>
       </methods>
-
     </class>
   </classes>
   <menus>
@@ -660,7 +660,6 @@
           <class id="RessourceAnonymization"/>
           <class id="BatchAnonymization"/>
           <class id="Person"/>
-          <class id="User"/>
         </classes>
       </group>
     </groups>
