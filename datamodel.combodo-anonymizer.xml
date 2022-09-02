@@ -489,7 +489,30 @@
 ]]></code>
         </method>
       </methods>
-      <presentation></presentation>
+      <presentation>
+        <list>
+          <items>
+            <item id="classToAnonymize">
+              <rank>10</rank>
+            </item>
+            <item id="idToAnonymize">
+              <rank>20</rank>
+            </item>
+            <item id="idUserToAnonymize">
+              <rank>30</rank>
+            </item>
+            <item id="friendlynameToAnonymize">
+              <rank>40</rank>
+            </item>
+            <item id="emailToAnonymize">
+              <rank>50</rank>
+            </item>
+            <item id="function">
+              <rank>60</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
     </class>
     <class id="Person">
       <properties>
