@@ -252,7 +252,7 @@
 
             if (in_array('email',$aCleanupCaseLog)){
               $sSearch2 = $this->Get('emailToAnonymize');
-              $sReplace2 = str_repeat('*', strlen($this->Get('emailToAnonymize')));
+              $sReplace2 = str_repeat('*', strlen($sSearch2));
 
                $sStartReplace = "REPLACE(".$sStartReplace;
                $sEndReplace = $sEndReplace.", ".CMDBSource::Quote($sSearch2).", ".CMDBSource::Quote($sReplace2).")";
@@ -260,7 +260,7 @@
 
             if (in_array('name',$aCleanupCaseLog)){
                $sSearch3 = $this->Get('nameToAnonymize');
-               $sReplace3 = "Contact ".$this->Get('idToAnonymize');
+               $sReplace3 = str_repeat('*', strlen($sSearch3));
 
                $sStartReplace = "REPLACE(".$sStartReplace;
                $sEndReplace = $sEndReplace.", ".CMDBSource::Quote($sSearch3).", ".CMDBSource::Quote($sReplace3).")";
@@ -495,7 +495,7 @@
       <properties>
         <uniqueness_rules>
           <rule id="name" _delta="must_exist">
-              <filter _delta="redefine" ><![CDATA[first_name != 'Anonymous' OR name NOT LIKE 'Contact%']]></filter>
+              <filter _delta="redefine" ><![CDATA[anonymized = 0]]></filter>
           </rule>
         </uniqueness_rules>
       </properties>
@@ -567,8 +567,7 @@
                         'friendlynameToAnonymize' => $sPersonFriendlyName,
                         'anonymizedFriendlyname' => $sAnonymizedFriendlyname,
                         'nameToAnonymize' =>  $sNameToAnonymize,
-                        'emailToAnonymize' => $sEmail,
-                        'function' => 'PurgeHistoryByBatch'];
+                        'emailToAnonymize' => $sEmail];
           $bUserExist = false;
           $oSearch = new DBObjectSearch('User');
           $oSearch->AddCondition('contactid', $this->GetKey());
@@ -589,6 +588,7 @@
             $oValues [  'idUserToAnonymize'] = $oUser->GetKey();
 
             // Purge the history for this object, otherwise previous values can be retrieved from the history
+            $oValues['function'] =  'PurgeHistoryByBatch';
             $oBatchAnonymization = MetaModel::NewObject("BatchAnonymization",$oValues);
 	          $oBatchAnonymization->DBInsertNoReload();
 

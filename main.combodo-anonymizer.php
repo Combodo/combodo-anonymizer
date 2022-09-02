@@ -237,7 +237,7 @@ class PurgeEmailNotification extends AbstractWeeklyScheduledProcess
 	}
 
 	/**
-	 * AutoCloseTicket constructor.
+	 * PurgeEmailNotification constructor.
 	 */
 	function __construct()
 	{
@@ -360,11 +360,11 @@ class PurgeEmailNotification extends AbstractWeeklyScheduledProcess
 			$oRet->setTime((int)$sHours, (int)$sMinutes);
 			return $oRet;
 		} else {
-			//TRY ANOTHER TIME next time is 5 min later
+			//TRY ANOTHER TIME next time is 2 seconds  later
 			$this->Trace('Later'  );
 
 			$oPlannedStart = new DateTime();
-			$oPlannedStart->modify('+ 30 seconds');
+			$oPlannedStart->modify('+ 2 seconds');
 
 			return $oPlannedStart;
 		}
