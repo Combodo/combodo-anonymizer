@@ -613,6 +613,7 @@
 
           if (!$bUserExist) {
             // Purge the history for this object, otherwise previous values can be retrieved from the history
+            $oValues['function'] =  'PurgeHistoryByBatch';
 	          $oBatchAnonymization = MetaModel::NewObject("BatchAnonymization",$oValues);
 	          $oBatchAnonymization->DBInsertNoReload();
             if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') >= 0) {
