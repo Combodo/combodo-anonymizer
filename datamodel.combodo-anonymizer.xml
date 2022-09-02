@@ -518,7 +518,7 @@
       <properties>
         <uniqueness_rules>
           <rule id="name" _delta="must_exist">
-              <filter _delta="redefine" ><![CDATA[anonymized = 0]]></filter>
+            <filter _delta="redefine" ><![CDATA[anonymized = 0]]></filter>
           </rule>
         </uniqueness_rules>
       </properties>
@@ -578,6 +578,7 @@
           //persons are marked as anonymized later when all the process is finish
 
           // Write the object
+         $this->AllowWrite(true);
          $this->DBWrite();
 
           $this->Reload();
@@ -684,7 +685,13 @@
         <classes>
           <class id="RessourceAnonymization"/>
           <class id="BatchAnonymization"/>
-          <class id="Person"/>
+        </classes>
+      </group>
+      <group id="RessourcePersonGroup">
+        <classes>
+          <class id="Location"/>
+          <class id="Organization"/>
+          <class id="Contact"/>
         </classes>
       </group>
     </groups>
@@ -699,6 +706,12 @@
               <action id="action:bulk read">allow</action>
               <action id="action:write">allow</action>
               <action id="action:bulk write">allow</action>
+            </actions>
+          </group>
+          <group id="RessourcePersonGroup">
+            <actions>
+              <action id="action:read">allow</action>
+              <action id="action:bulk read">allow</action>
             </actions>
           </group>
         </groups>
