@@ -628,15 +628,6 @@
 	          }
           }
 
-          //run one time background process.
-					$oSearch = DBObjectSearch::FromOQL("SELECT BackgroundTask WHERE class_name = 'PersonalDataAnonymizer'");
-					$oSet = new DBObjectSet($oSearch);
-					while($oTask = $oSet->Fetch())
-					{
-					  $oPlannedStart = new DateTime();
-						$oTask->Set('next_run_date', $oPlannedStart->format('Y-m-d H:i:s'));
-	          $oTask->DBUpdate();
-					}
         }
 ]]></code>
         </method>

@@ -59,6 +59,17 @@ try
 		CMDBSource::Query('START TRANSACTION');
 		$oPerson->Anonymize();
 		CMDBSource::Query('COMMIT');
+
+		//run one time background process.
+		$oSearch = DBObjectSearch::FromOQL("SELECT BackgroundTask WHERE class_name = 'PersonalDataAnonymizer'");
+		$oSet = new DBObjectSet($oSearch);
+		while($oTask = $oSet->Fetch())
+		{
+			$oPlannedStart = new DateTime();
+			$oTask->Set('next_run_date', $oPlannedStart->format('Y-m-d H:i:s'));
+			$oTask->DBUpdate();
+		}
+
 		$sUrl = utils::GetAbsoluteUrlAppRoot().'pages/UI.php?operation=details&class='.get_class($oPerson).'&id='.$iContact;
 		cmdbAbstractObject::SetSessionMessage(get_class($oPerson), $oPerson->GetKey(), 'anonymization', Dict::S('Anonymization:DoneOnePerson'), 'ok', 1);
 		$oP->add_ready_script("window.location.href='$sUrl'");
@@ -86,7 +97,17 @@ try
 		}
 		set_time_limit($iPreviousTimeLimit);
 		CMDBSource::Query('COMMIT');
-		
+
+		//run one time background process.
+		$oSearch = DBObjectSearch::FromOQL("SELECT BackgroundTask WHERE class_name = 'PersonalDataAnonymizer'");
+		$oSet = new DBObjectSet($oSearch);
+		while($oTask = $oSet->Fetch())
+		{
+			$oPlannedStart = new DateTime();
+			$oTask->Set('next_run_date', $oPlannedStart->format('Y-m-d H:i:s'));
+			$oTask->DBUpdate();
+		}
+
 		$oP->add_ready_script('AnonymizationDialog('.json_encode(Dict::S('Anonymization:Success')).', '.json_encode(Dict::S('Anonymization:RefreshTheList')).')');
 		break;
 		
