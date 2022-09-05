@@ -595,6 +595,7 @@
           $bUserExist = false;
           $oSearch = new DBObjectSearch('User');
           $oSearch->AddCondition('contactid', $this->GetKey());
+          $oSearch->AllowAllData(true);
           $oSet = new DBObjectSet($oSearch);
           $iNbUser = 0;
           while($oUser = $oSet->Fetch())
