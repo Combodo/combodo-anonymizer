@@ -155,6 +155,20 @@
           <code><![CDATA[
         protected function PurgeHistoryByBatch( $iTimeLimit)
         {
+          $oPerson =  MetaModel::GetObject('Person',$this->Get('idToAnonymize'), true);
+          // Cleanup all non mandatory values //end of job
+          foreach(MetaModel::ListAttributeDefs('Person') as $sAttCode => $oAttDef)
+          {
+            if (!$oAttDef->IsWritable()) continue;
+
+            if ($oAttDef instanceof AttributeLinkedSetIndirect)
+            {
+              $oValue = DBObjectSet::FromScratch($oAttDef->GetLinkedClass());
+              $oPerson->Set($sAttCode, $oValue);
+            }
+          }
+         $oPerson->DBWrite();
+
         	// Delete any existing change tracking about the current object
         	$oFilter = new DBObjectSearch('CMDBChangeOp');
         	$oFilter->AddCondition('objclass', $this->Get('classToAnonymize'), '=');
@@ -444,7 +458,7 @@
             $sNotificationTable = MetaModel::DBGetTable('EventNotificationEmail');
 
             $sSqlSearch = "SELECT id from `$sNotificationTable` WHERE `from` like '".$this->Get('emailToAnonymize')."'";
-            $sSqlUpdate = "UPDATE `$sNotificationTable` SET  `from` = REPLACE(`to`, '".$this->Get('emailToAnonymize')."', '".$sEmailAnonymized."'),".
+            $sSqlUpdate = "UPDATE `$sNotificationTable` SET  `from` = REPLACE(`from`, '".$this->Get('emailToAnonymize')."', '".$sEmailAnonymized."'),".
                                                                                  "  `subject` = ".$sStartReplace."`subject`".$sEndReplace.",".
                                                                                  "  `body` = ".$sStartReplace."`body`".$sEndReplace." ";
             $bFinish = $this->executeQueryByLot($sSqlSearch,$sSqlUpdate, $iTimeLimit);
@@ -459,7 +473,7 @@
 
              if ( $bFinish ) {
                  $sSqlSearch = "SELECT id from `$sNotificationTable` WHERE `cc` like '%".$this->Get('emailToAnonymize')."%'";
-                  $sSqlUpdate = "UPDATE `$sNotificationTable` SET  `cc` = REPLACE(`to`, '".$this->Get('emailToAnonymize')."', '".$sEmailAnonymized."'),".
+                  $sSqlUpdate = "UPDATE `$sNotificationTable` SET  `cc` = REPLACE(`cc`, '".$this->Get('emailToAnonymize')."', '".$sEmailAnonymized."'),".
                                                                                  "  `subject` = ".$sStartReplace."`subject`".$sEndReplace.",".
                                                                                  "  `body` = ".$sStartReplace."`body`".$sEndReplace." ";
                  $bFinish = $this->executeQueryByLot($sSqlSearch, $sSqlUpdate, $iTimeLimit);
@@ -467,7 +481,7 @@
 
              if ( $bFinish ) {
                  $sSqlSearch = "SELECT id from `$sNotificationTable` WHERE `bcc` like '%".$this->Get('emailToAnonymize')."%'";
-                  $sSqlUpdate = "UPDATE `$sNotificationTable` SET  `bcc` = REPLACE(`to`, '".$this->Get('emailToAnonymize')."', '".$sEmailAnonymized."'),".
+                  $sSqlUpdate = "UPDATE `$sNotificationTable` SET  `bcc` = REPLACE(`bcc`, '".$this->Get('emailToAnonymize')."', '".$sEmailAnonymized."'),".
                                                                                  "  `subject` = ".$sStartReplace."`subject`".$sEndReplace.",".
                                                                                  "  `body` = ".$sStartReplace."`body`".$sEndReplace." ";
                  $bFinish = $this->executeQueryByLot($sSqlSearch, $sSqlUpdate, $iTimeLimit);
@@ -561,11 +575,6 @@
               {
                 $this->Set($sAttCode, null);
               }
-            }
-            else if ($oAttDef instanceof AttributeLinkedSetIndirect)
-            {
-              $oValue = DBObjectSet::FromScratch($oAttDef->GetLinkedClass());
-              $this->Set($sAttCode, $oValue);
             }
           }
 
