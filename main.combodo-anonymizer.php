@@ -406,11 +406,11 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 		$this->sTimeLimit = $iUnixTimeLimit;
 		$iMaxBufferSize =   MetaModel::GetModuleSetting('combodo-anonymizer', 'max_buffer_size', 1000);
 
-		$oResult = CMDBSource::Query("SELECT DISTINCT idToAnonymize FROM priv_batch_anonymization");
+		$oResult = CMDBSource::Query("SELECT DISTINCT id_to_anonymize FROM priv_batch_anonymization");
 		$aIdPersonAlreadyInProgress = [] ;
 		if ($oResult->num_rows>0) {
 			while ($oRaw = $oResult->fetch_assoc()) {
-				$aIdPersonAlreadyInProgress[] = $oRaw['idToAnonymize'];
+				$aIdPersonAlreadyInProgress[] = $oRaw['id_to_anonymize'];
 			}
 		}
 		$bAnonymizeObsoletePersons = MetaModel::GetModuleSetting($this->GetModuleName(), 'anonymize_obsolete_persons', false);
@@ -462,12 +462,14 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 			$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array(), array(), null, $iMaxBufferSize);
 			$sIdCurrentPerson = '';
 			while ((time() < $iUnixTimeLimit) && ($oStepForAnonymize = $oSet->Fetch())) {
-				if ($sIdCurrentPerson != $oStepForAnonymize->Get('idToAnonymize')){
+				if ($sIdCurrentPerson != $oStepForAnonymize->Get('id_to_anonymize')){
 					if ($sIdCurrentPerson != '') {
 						$iNbPersonAnonymized++;
 					}
-					$sIdCurrentPerson = $oStepForAnonymize->Get('idToAnonymize');
+					$sIdCurrentPerson = $oStepForAnonymize->Get('id_to_anonymize');
+					$this->Trace('|  |  |Anonymized idPerson: '.$sIdCurrentPerson);
 				}
+				$this->Trace('|  |  |  | function: '.$oStepForAnonymize->Get('function'));
 				$oStepForAnonymize->executeStep($iUnixTimeLimit);
 				$iStepAnonymized++;
 			}
@@ -475,7 +477,7 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 			if (time() < $iUnixTimeLimit && $sIdCurrentPerson != ''){
 				$iNbPersonAnonymized++;
 			}
-			$this->Trace('iStepAnonymized: '.$iStepAnonymized);
+
 			if ($iStepAnonymized < $iMaxBufferSize) {
 				$bExecuteQuery = false;
 			}
