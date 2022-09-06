@@ -24,7 +24,7 @@
 /** @noinspection PhpUnhandledExceptionInspection */
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'combodo-anonymizer/1.2.1-dev',
+	'combodo-anonymizer/1.3.0-dev',
 	array(
 		// Identification
 		//
@@ -93,8 +93,9 @@ if (!class_exists('AnonymizerInstaller'))
 		{
 			if (strlen($sPreviousVersion) > 0)
 			{
+				$sBackgroundTask = MetaModel::DBGetTable('BackgroundTask');
 				// If you want to migrate data from one format to another, do it here
-				$sQueryUpdate = "UPDATE `priv_backgroundtask` SET `class_name` = 'PersonalDataAnonymizer' WHERE `class_name` = 'AnonymisationBackgroundProcess'";
+				$sQueryUpdate = "UPDATE `$sBackgroundTask` SET `class_name` = 'PersonalDataAnonymizer' WHERE `class_name` = 'AnonymisationBackgroundProcess'";
 				CMDBSource::Query($sQueryUpdate);
 			}
 		}
