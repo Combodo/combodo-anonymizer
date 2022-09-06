@@ -191,7 +191,7 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 			// iTop version 2.5 or newer, check the rights used when defining the admin menu
 			// We cannot directly check if the admin menu is enabled right now, since we are in the process of building the list of menus
 			if ( UserRights::IsActionAllowed('RessourceAnonymization', UR_ACTION_MODIFY)) {
-				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), $sParentMenuIndex, 10 , 'ResourceAdminMenu', UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
+				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), $sParentMenuIndex, 15 , 'ResourceAdminMenu', UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
 			}
 		}
 		else
@@ -200,7 +200,7 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 			$bConfigMenuEnabled = UserRights::IsAdministrator();
 			if ($bConfigMenuEnabled)
 			{
-				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), $sParentMenuIndex, 10 /* fRank */);
+				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), $sParentMenuIndex, 15 /* fRank */);
 			}
 
 		}
