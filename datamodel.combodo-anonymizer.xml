@@ -277,7 +277,7 @@
                $sStartReplace = "REPLACE(".$sStartReplace;
                $sEndReplace = $sEndReplace.", ".CMDBSource::Quote($sSearch2).", ".CMDBSource::Quote($sReplace2).")";
             }
-
+ /*this option is waiting mysql 8.0 in order to have regex_replace
             if (in_array('name',$aCleanupCaseLog)){
                $sSearch3 = $this->Get('name_to_anonymize');
                $sReplace3 = str_repeat('*', strlen($sSearch3));
@@ -285,7 +285,7 @@
                $sStartReplace = "REPLACE(".$sStartReplace;
                $sEndReplace = $sEndReplace.", ".CMDBSource::Quote($sSearch3).", ".CMDBSource::Quote($sReplace3).")";
             }
-
+*/
             $bFinish = false;
             // 2) Find all classes containing case logs
             foreach(MetaModel::GetClasses() as $sClass)
@@ -387,14 +387,15 @@
                 if (in_array('email',$aCleanupCaseLog)){
                   $sSearch2 = $this->Get('email_to_anonymize');
                   $sReplaceInCaseLog2 = str_repeat('*', strlen($sSearch2));
-                  $sReplaceInText2 =  'anonymous.contact'.$this->Get('id_to_anonymize').'@anony.mized';;
+                  $sReplaceInText2 =  'anonymous.contact'.$this->Get('id_to_anonymize').'@anony.mized';
 
                    $sStartReplace = "REPLACE(".$sStartReplace;
                    $sEndReplaceInCaseLog = $sEndReplaceInCaseLog.", ".CMDBSource::Quote($sSearch2).", ".CMDBSource::Quote($sReplaceInCaseLog2).")";
                    $sEndReplaceInText = $sEndReplaceInText.", ".CMDBSource::Quote($sSearch2).", ".CMDBSource::Quote($sReplaceInText2).")";
                 }
 
-                if (in_array('name',$aCleanupCaseLog)){
+              /*this option is waiting mysql 8.0 in order to have regex_replace
+               *   if (in_array('name',$aCleanupCaseLog)){
                    $sSearch3 = $this->Get('name_to_anonymize');
                    $sReplaceInCaseLog3 = str_repeat('*', strlen($sSearch3));
                    $sReplaceInText3 = 'Contact '.$this->Get('id_to_anonymize');
@@ -402,7 +403,7 @@
                    $sStartReplace = "REPLACE(".$sStartReplace;
                    $sEndReplaceInCaseLog = $sEndReplaceInCaseLog.", ".CMDBSource::Quote($sSearch3).", ".CMDBSource::Quote($sReplaceInCaseLog3).")";
                    $sEndReplaceInText = $sEndReplaceInText.", ".CMDBSource::Quote($sSearch3).", ".CMDBSource::Quote($sReplaceInText3).")";
-                }
+                }*/
                $aClasses = array_merge([$sParentClass], MetaModel::GetSubclasses($sParentClass));
                $aAlreadyDone = [];
                foreach ($aClasses as $sClass)
@@ -583,7 +584,7 @@
     <class id="Person">
       <properties>
         <uniqueness_rules>
-          <rule id="name" _delta="must_exist">
+          <rule id="name" _delta="if_exists">
             <filter _delta="redefine" ><![CDATA[anonymized = 0]]></filter>
           </rule>
         </uniqueness_rules>
@@ -728,7 +729,7 @@
           // Put some more fancy values
           $this->Set('name', Dict::S('Anonymization:Person:name').' '.$this->GetKey());
           $this->Set('first_name', Dict::S('Anonymization:Person:first_name'));
-          $this->Set('email', '');
+          $this->Set('email',  'anonymous.contact'.$this->GetKey().'@anony.mized');
           // Mark the contact as obsolete
           $this->Set('status', 'inactive');
           $this->Set('picture',null);

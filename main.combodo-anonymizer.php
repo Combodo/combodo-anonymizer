@@ -405,8 +405,8 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 	{
 		$this->sTimeLimit = $iUnixTimeLimit;
 		$iMaxBufferSize =   MetaModel::GetModuleSetting('combodo-anonymizer', 'max_buffer_size', 1000);
-
-		$oResult = CMDBSource::Query("SELECT DISTINCT id_to_anonymize FROM priv_batch_anonymization");
+		$sBatchAnonymisation = MetaModel::DBGetTable('BatchAnonymization');
+		$oResult = CMDBSource::Query("SELECT DISTINCT id_to_anonymize FROM $sBatchAnonymisation");
 		$aIdPersonAlreadyInProgress = [] ;
 		if ($oResult->num_rows>0) {
 			while ($oRaw = $oResult->fetch_assoc()) {
