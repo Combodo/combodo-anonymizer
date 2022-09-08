@@ -250,7 +250,7 @@
           <code><![CDATA[
         protected function CleanupCaseLogsByBatch($iTimeLimit)
         {
-            $aCleanupCaseLog = MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer', 'caselog_content');
+            $aCleanupCaseLog = (array) MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer', 'caselog_content');
 
             // 1) Build the expression to search (and replace)
             $sPattern = ' : %1$s (%2$d) ============';
@@ -331,7 +331,7 @@
           <code><![CDATA[
         protected function CleanupOnMentionByBatch($iTimeLimit)
         {
-            $sCleanupOnmention = MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer','onmention');
+            $sCleanupOnmention = (array)  MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer','onmention');
             $bFinish = true;
             if($sCleanupOnmention == 'trigger-only') {
 	            $oScopeQuery = "SELECT TriggerOnObjectMention";
@@ -375,7 +375,7 @@
               if (sizeof($aMentionsAllowedClasses) == 0 ){
                 return true;
               }
-               $aCleanupCaseLog = MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer', 'caselog_content');
+               $aCleanupCaseLog = (array) MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer', 'caselog_content');
 
                $sSearch1 = $this->Get('friendlyname_to_anonymize');
                $sReplaceInCaseLog1 =  str_repeat('*', strlen($this->Get('friendlyname_to_anonymize')));
