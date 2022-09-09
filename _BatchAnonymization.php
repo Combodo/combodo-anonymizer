@@ -70,14 +70,14 @@ abstract class _BatchAnonymization extends DBObject
 		$bExecuteQuery = true;
 		while ($bExecuteQuery) {
 			$oResult = CMDBSource::Query($sSqlSearch." LIMIT ".$iMaxBufferSize);
-			echo("\n Search anonymization: ".$sSqlSearch);
+			//echo("\n Search anonymization: ".$sSqlSearch);
 			$aObjects = [];
 			if ($oResult->num_rows > 0) {
 				while ($oRaw = $oResult->fetch_assoc()) {
 					$aObjects[] = $oRaw[$sKey];
 				}
 				$sSQL = $sSqlUpdate."WHERE `$sKey` IN (".implode(', ', $aObjects).");";
-				echo("\n AnonymizationUpdate: ".$sSQL);
+				//echo("\n AnonymizationUpdate: ".$sSQL);
 				CMDBSource::Query($sSQL);
 			}
 			if (count($aObjects) < $iMaxBufferSize || (time() >= $iTimeLimit)) {
