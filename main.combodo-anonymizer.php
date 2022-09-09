@@ -462,7 +462,7 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 			$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array(), array(), null, $iMaxBufferSize);
 			$sIdCurrentPerson = '';
 			while ((time() < $iUnixTimeLimit) && ($oStepForAnonymize = $oSet->Fetch())) {
-				if ($sIdCurrentPerson != $oStepForAnonymize->Get('id_to_anonymize')){
+				if ($sIdCurrentPerson != $oStepForAnonymize->Get('id_to_anonymize')) {
 					if ($sIdCurrentPerson != '') {
 						$iNbPersonAnonymized++;
 					}
@@ -470,7 +470,7 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 					$this->Trace('|  |  |Anonymized idPerson: '.$sIdCurrentPerson);
 				}
 				$this->Trace('|  |  |  | function: '.$oStepForAnonymize->Get('function'));
-				$oStepForAnonymize->executeStep($iUnixTimeLimit);
+				$oStepForAnonymize->ExecuteStep($iUnixTimeLimit);
 				$iStepAnonymized++;
 			}
 

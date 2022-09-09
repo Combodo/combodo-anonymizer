@@ -44,8 +44,9 @@ SetupWebPage::AddModule(
 		// Components
 		//
 		'datamodel' => array(
+			'_BatchAnonymization.php',
 			'model.combodo-anonymizer.php',
-			'main.combodo-anonymizer.php'
+			'main.combodo-anonymizer.php',
 		),
 		'webservice' => array(
 			
