@@ -134,6 +134,13 @@ abstract class _BatchAnonymization extends DBObject
 		$sChangeTable = MetaModel::DBGetTable('CMDBChange');
 		$sKey = MetaModel::DBGetTable('CMDBChange');
 
+		foreach (explode(',', $this->Get('id_user_to_anonymize')) as $sIdUser) {
+			$oFilter = new DBObjectSearch('CMDBChangeOp');
+			$oFilter->AddCondition('objclass', 'User');
+			$oFilter->AddCondition('objkey', $sIdUser, '=');
+			MetaModel::PurgeData($oFilter);
+		}
+
 		if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0') < 0 || is_null($this->Get('id_user_to_anonymize'))) {
 			$sSqlSearch = "SELECT id from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($this->Get('friendlyname_to_anonymize'));
 			$sSqlUpdate = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($this->Get('anonymized_friendlyname'));
@@ -156,14 +163,6 @@ abstract class _BatchAnonymization extends DBObject
 				}
 			}
 		} else {
-
-			foreach (explode(',', $this->Get('id_user_to_anonymize')) as $sIdUser) {
-				$oFilter = new DBObjectSearch('CMDBChangeOp');
-				$oFilter->AddCondition('objclass', 'User');
-				$oFilter->AddCondition('objkey', $sIdUser, '=');
-				MetaModel::PurgeData($oFilter);
-			}
-
 			$sSqlSearch = "SELECT id from `$sChangeTable` WHERE user_id in (".$this->Get('id_user_to_anonymize').')';
 			$sSqlUpdate = "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($this->Get('anonymized_friendlyname'));
 			$bFinish = $this->ExecuteQueryByLot($sSqlSearch, $sSqlUpdate, $sKey, $iTimeLimit);
