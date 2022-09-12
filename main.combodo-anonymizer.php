@@ -480,7 +480,7 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 			if (time() < $iUnixTimeLimit && $sIdCurrentPerson != ''){
 				$iNbPersonAnonymized++;
 			}
-			if ($iLocalCounter < $iMaxBufferSize) {
+			if ($iLocalCounter < $iMaxChunkSize) {
 				$bExecuteQuery = false;
 			}
 		}
