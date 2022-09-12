@@ -72,7 +72,7 @@ SetupWebPage::AddModule(
 			'endtime' => '05:30',
 			'enabled' => true,
 			'debug' => true,
-			'max_buffer_size' => 1000,
+			'max_chunk_size' => 1000,
 		),
 	)
 );

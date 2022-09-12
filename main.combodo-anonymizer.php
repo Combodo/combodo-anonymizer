@@ -211,7 +211,7 @@ class PurgeEmailNotification extends AbstractWeeklyScheduledProcess
 {
 
 	const MODULE_SETTING_DEBUG = 'debug';
-	const MODULE_SETTING_MAX_PER_REQUEST = 'max_buffer_size';
+	const MODULE_SETTING_MAX_PER_REQUEST = 'max_chunk_size';
 	const MODULE_SETTING_MAX_TIME = 'endtime';
 
 	const DEFAULT_MODULE_SETTING_DEBUG = false;
@@ -256,7 +256,7 @@ class PurgeEmailNotification extends AbstractWeeklyScheduledProcess
 	public function Process($iUnixTimeLimit)
 	{
 		$this->sTimeLimit = $iUnixTimeLimit;
-		$iMaxBufferSize =   MetaModel::GetModuleSetting('combodo-anonymizer', 'max_buffer_size', 1000);
+		$iMaxChunkSize =   MetaModel::GetModuleSetting('combodo-anonymizer', 'max_chunk_size', 1000);
 		$bCleanupNotification = MetaModel::GetModuleSetting($this->GetModuleName(), 'cleanup_notifications', false);
 		$iCountDeleted = 0;
 		if ($bCleanupNotification)
@@ -277,13 +277,13 @@ class PurgeEmailNotification extends AbstractWeeklyScheduledProcess
 				//split update by lot
 				while ((time() < $iUnixTimeLimit) && $bExecuteQuery) {
 					$iCountCurrentQuery = 0;
-					$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array('date' => true), array('date' => $sDateLimit), null, $iMaxBufferSize);
+					$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array('date' => true), array('date' => $sDateLimit), null, $iMaxChunkSize);
 					while ((time() < $iUnixTimeLimit) && ($oNotif = $oSet->Fetch())) {
 						$oNotif->DBDelete();
 						$iCountDeleted++;
 						$iCountCurrentQuery++;
 					}
-					if($iCountCurrentQuery<$iMaxBufferSize){
+					if($iCountCurrentQuery<$iMaxChunkSize){
 						$bExecuteQuery = false;
 					}
 				}
@@ -404,7 +404,7 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 	public function Process($iUnixTimeLimit)
 	{
 		$this->sTimeLimit = $iUnixTimeLimit;
-		$iMaxBufferSize =   MetaModel::GetModuleSetting('combodo-anonymizer', 'max_buffer_size', 1000);
+		$iMaxChunkSize =   MetaModel::GetModuleSetting('combodo-anonymizer', 'max_chunk_size', 1000);
 		$sBatchAnonymisation = MetaModel::DBGetTable('BatchAnonymization');
 		$oResult = CMDBSource::Query("SELECT DISTINCT id_to_anonymize FROM $sBatchAnonymisation");
 		$aIdPersonAlreadyInProgress = [] ;
@@ -437,13 +437,13 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 				$bExecuteQuery = true;
 				while ((time() < $iUnixTimeLimit) && $bExecuteQuery) {
 					$iCountCurrentQuery = 0;
-					$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array('obsolescence_date' => true), array('date' => $sDateLimit), null, $iMaxBufferSize);
+					$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array('obsolescence_date' => true), array('date' => $sDateLimit), null, $iMaxChunkSize);
 					while ((time() < $iUnixTimeLimit) && ($oPerson = $oSet->Fetch())) {
 						$oPerson->Anonymize();
 						$iCountAnonymized++;
 						$iCountCurrentQuery++;
 					}
-					if ($iCountCurrentQuery < $iMaxBufferSize) {
+					if ($iCountCurrentQuery < $iMaxChunkSize) {
 						$bExecuteQuery = false;
 					}
 				}
@@ -459,10 +459,11 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 		$iNbPersonAnonymized = 0;
 
 		while ((time() < $iUnixTimeLimit) && $bExecuteQuery) {
-			$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array(), array(), null, $iMaxBufferSize);
+			$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array(), array(), null, $iMaxChunkSize);
 			$sIdCurrentPerson = '';
 			$iLocalCounter = 0;
 			while ((time() < $iUnixTimeLimit) && ($oStepForAnonymize = $oSet->Fetch())) {
+				$this->Trace('|  |  |Anonymized cle: '.$oStepForAnonymize->GetKey());
 				if ($sIdCurrentPerson != $oStepForAnonymize->Get('id_to_anonymize')) {
 					if ($sIdCurrentPerson != '') {
 						$iNbPersonAnonymized++;

@@ -52,10 +52,10 @@ abstract class _BatchAnonymization extends DBObject
 
 	/**
 	 * @param $sSqlSearch
-	 * @param $sSqlUpdate
-	 * @param $sKey
-	 * @param $iTimeLimit
-	 * Search objects to update and execute update by lot of  max_buffer_size elements
+	 * @param $sSqlUpdate query to update elements found by $sSqlSearch, don't specify the where close
+	 * @param $sKey primary key of updated table
+	 * @param $iTimeLimit limit as evaluated by time()
+	 * Search objects to update and execute update by lot of  max_chunk_size elements
 	 * return true if all objects where updated, false if the function don't have the time to finish
 	 *
 	 * @return bool
@@ -65,11 +65,11 @@ abstract class _BatchAnonymization extends DBObject
 	 */
 	protected static function ExecuteQueryByLot($sSqlSearch, $sSqlUpdate, $sKey, $iTimeLimit)
 	{
-		$iMaxBufferSize = MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer', 'max_buffer_size', 1000);
+		$iMaxChunkSize = MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer', 'max_chunk_size', 1000);
 		$aObjects = [];
 		$bExecuteQuery = true;
 		while ($bExecuteQuery) {
-			$oResult = CMDBSource::Query($sSqlSearch." LIMIT ".$iMaxBufferSize);
+			$oResult = CMDBSource::Query($sSqlSearch." LIMIT ".$iMaxChunkSize);
 			//echo("\n Search anonymization: ".$sSqlSearch);
 			$aObjects = [];
 			if ($oResult->num_rows > 0) {
@@ -80,12 +80,12 @@ abstract class _BatchAnonymization extends DBObject
 				//echo("\n AnonymizationUpdate: ".$sSQL);
 				CMDBSource::Query($sSQL);
 			}
-			if (count($aObjects) < $iMaxBufferSize || (time() >= $iTimeLimit)) {
+			if (count($aObjects) < $iMaxChunkSize || (time() >= $iTimeLimit)) {
 				$bExecuteQuery = false;
 			}
 		}
 
-		return (count($aObjects) < $iMaxBufferSize);
+		return (count($aObjects) < $iMaxChunkSize);
 	}
 
 	/**
@@ -132,7 +132,7 @@ abstract class _BatchAnonymization extends DBObject
 
 		// Now remove the name of the contact from all the changes she/he made
 		$sChangeTable = MetaModel::DBGetTable('CMDBChange');
-		$sKey = MetaModel::DBGetTable('CMDBChange');
+		$sKey = MetaModel::DBGetKey('CMDBChange');
 
 		foreach (explode(',', $this->Get('id_user_to_anonymize')) as $sIdUser) {
 			$oFilter = new DBObjectSearch('CMDBChangeOp');
@@ -250,7 +250,7 @@ abstract class _BatchAnonymization extends DBObject
 			foreach (MetaModel::GetClasses() as $sClass) {
 				foreach (MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef) {
 					$sTable = MetaModel::DBGetTable($sClass);
-					$sKey = MetaModel::DBGetTable($sClass);
+					$sKey = MetaModel::DBGetKey($sClass);
 					if ((MetaModel::GetAttributeOrigin($sClass, $sAttCode) == $sClass) && $oAttDef instanceof AttributeCaseLog) {
 						$aSQLColumns = $oAttDef->GetSQLColumns();
 						$sColumn1 = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
@@ -370,7 +370,7 @@ abstract class _BatchAnonymization extends DBObject
 		foreach ($aClasses as $sClass) {
 			foreach (MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef) {
 				$sTable = MetaModel::DBGetTable($sClass, $sAttCode);
-				$sKey = MetaModel::DBGetTable($sClass);
+				$sKey = MetaModel::DBGetKey($sClass);
 				if (!in_array($sTable.'->'.$sAttCode, $aAlreadyDone)) {
 					$aAlreadyDone[] = $sTable.'->'.$sAttCode;
 					if ((MetaModel::GetAttributeOrigin($sClass, $sAttCode) == $sClass)) {
@@ -440,7 +440,7 @@ abstract class _BatchAnonymization extends DBObject
 
 			// Now change email adress
 			$sNotificationTable = MetaModel::DBGetTable('EventNotificationEmail');
-			$sKey = MetaModel::DBGetTable('EventNotificationEmail');
+			$sKey = MetaModel::DBGetKey('EventNotificationEmail');
 
 			$sSqlSearch = "SELECT id from `$sNotificationTable` WHERE `from` like '".$this->Get('email_to_anonymize')."'";
 			$sSqlUpdate = "UPDATE `$sNotificationTable` SET  `from` = REPLACE(`from`, '".$this->Get('email_to_anonymize')."', '".$sEmailAnonymized."'),".
