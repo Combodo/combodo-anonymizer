@@ -65,16 +65,10 @@
           <is_null_allowed>true</is_null_allowed>
           <tracking_level>none</tracking_level>
         </field>
-        <field id="email_to_anonymize" xsi:type="AttributeString">
-          <sql>email_to_anonymize</sql>
+        <field id="needles" xsi:type="AttributeString">
+          <sql>needles</sql>
           <default_value></default_value>
           <is_null_allowed>true</is_null_allowed>
-          <tracking_level>none</tracking_level>
-        </field>
-        <field id="friendlyname_to_anonymize" xsi:type="AttributeString">
-          <sql>friendlyname_to_anonymize</sql>
-          <default_value></default_value>
-          <is_null_allowed>false</is_null_allowed>
           <tracking_level>none</tracking_level>
         </field>
         <field id="anonymized_friendlyname" xsi:type="AttributeString">
@@ -119,11 +113,8 @@
             <item id="id_user_to_anonymize">
               <rank>30</rank>
             </item>
-            <item id="friendlyname_to_anonymize">
+            <item id="needles_to_anonymize">
               <rank>40</rank>
-            </item>
-            <item id="email_to_anonymize">
-              <rank>50</rank>
             </item>
             <item id="function">
               <rank>60</rank>
@@ -155,8 +146,10 @@
           <code><![CDATA[
         public function Anonymize()
         {
-          $sPersonFriendlyName = $this->GetName();
           $sEmail = $this->Get('email');
+          $aDataToAnonymize = [];
+          $aDataToAnonymize['friendlyname'][] = $this->GetName();
+          $aDataToAnonymize['email'][] = $sEmail;
 
           // Cleanup all non mandatory values
           foreach(MetaModel::ListAttributeDefs(get_class($this)) as $sAttCode => $oAttDef)
@@ -200,10 +193,9 @@
 	        $oValues = ['class_to_anonymize' => get_class($this),
                         'id_to_anonymize' => $this->GetKey(),
                         'id_user_to_anonymize' => null,
-                        'friendlyname_to_anonymize' => $sPersonFriendlyName,
-                        'anonymized_friendlyname' => $sAnonymizedFriendlyname,
-                        'email_to_anonymize' => $sEmail];
-          $bUserExist = false;
+                        'needles' => json_encode($aDataToAnonymize),
+                        'anonymized_friendlyname' => $sAnonymizedFriendlyname];
+
           $oSearch = new DBObjectSearch('User');
           $oSearch->AddCondition('contactid', $this->GetKey());
           $oSearch->AllowAllData(true);
@@ -212,6 +204,7 @@
           $aUser = [];
           while($oUser = $oSet->Fetch())
           {
+            $aDataToAnonymize['login'] = $oUser->Get('login');
 	          $oUser->Set('status', 'disabled');
 	          if ($iNbUser == 0) {
 	              $oUser->Set('login', 'Anonymous'.$this->GetKey());
@@ -220,8 +213,6 @@
 	          }
 	          $oUser->AllowWrite(true);
 	          $oUser->DBUpdate();
-
-	          $bUserExist = true;
 
             $aUser[] = $oUser->GetKey();
             $iNbUser++;
@@ -250,25 +241,6 @@
             $oBatchAnonymization = MetaModel::NewObject("BatchAnonymization",$oValues);
             $oBatchAnonymization->DBInsertNoReload();
           }
-
-          if (!$bUserExist) {
-            // Purge the history for this object, otherwise previous values can be retrieved from the history
-            $oValues['function'] =  'PurgeHistoryByBatch';
-	          $oBatchAnonymization = MetaModel::NewObject("BatchAnonymization",$oValues);
-	          $oBatchAnonymization->DBInsertNoReload();
-            if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') >= 0) {
-                $oValues['function'] = 'CleanupOnMentionByBatch';
-                $oBatchAnonymization = MetaModel::NewObject("BatchAnonymization",$oValues);
-                $oBatchAnonymization->DBInsertNoReload();
-	          }
-
-	          if (!empty($sEmail)){
-              $oValues['function'] =  'CleanupEmailByBatch';
-              $oBatchAnonymization = MetaModel::NewObject("BatchAnonymization",$oValues);
-              $oBatchAnonymization->DBInsertNoReload();
-	          }
-          }
-
         }
 ]]></code>
         </method>
