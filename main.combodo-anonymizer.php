@@ -463,7 +463,6 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 			$sIdCurrentPerson = '';
 			$iLocalCounter = 0;
 			while ((time() < $iUnixTimeLimit) && ($oStepForAnonymize = $oSet->Fetch())) {
-				$this->Trace('|  |  |Anonymized cle: '.$oStepForAnonymize->GetKey());
 				if ($sIdCurrentPerson != $oStepForAnonymize->Get('id_to_anonymize')) {
 					if ($sIdCurrentPerson != '') {
 						$iNbPersonAnonymized++;

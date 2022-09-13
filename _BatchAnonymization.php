@@ -302,7 +302,7 @@ abstract class _BatchAnonymization extends DBObject
 	 */
 	protected function CleanupOnMentionByBatch($iTimeLimit)
 	{
-		$sCleanupOnmention = (array)MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer', 'onmention');
+		$sCleanupOnmention = MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer', 'onmention');
 		$bFinish = true;
 		if ($sCleanupOnmention == 'trigger-only') {
 			$oScopeQuery = "SELECT TriggerOnObjectMention";
