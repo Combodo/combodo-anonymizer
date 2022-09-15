@@ -31,6 +31,7 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	// Default values used during anonymization
 	'Anonymization:Person:name' => 'Kontakt',
 	'Anonymization:Person:first_name' => 'Anonym',
+	'Anonymization:Person:email' => '%1$s.%2$s%3$s@anony.mized',
 ));
 
 //

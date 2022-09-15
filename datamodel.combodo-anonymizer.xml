@@ -71,8 +71,8 @@
           <is_null_allowed>true</is_null_allowed>
           <tracking_level>none</tracking_level>
         </field>
-        <field id="anonymized_friendlyname" xsi:type="AttributeString">
-          <sql>anonymized_friendlyname</sql>
+        <field id="anonymized_data" xsi:type="AttributeString">
+          <sql>anonymized_data</sql>
           <default_value></default_value>
           <is_null_allowed>false</is_null_allowed>
           <tracking_level>none</tracking_level>
@@ -187,14 +187,15 @@
          $this->DBWrite();
 
           $this->Reload();
-          $sAnonymizedFriendlyname = $this->GetName();
+          $aAnonymizedData['friendlyname'] = $this->GetName();
+          $aAnonymizedData['email'] = $this->Get('email');
 
            //desactivate linked user
 	        $oValues = ['class_to_anonymize' => get_class($this),
                         'id_to_anonymize' => $this->GetKey(),
                         'id_user_to_anonymize' => null,
                         'needles' => json_encode($aDataToAnonymize),
-                        'anonymized_friendlyname' => $sAnonymizedFriendlyname];
+                        'anonymized_data' => json_encode($aAnonymizedData)];
 
           $oSearch = new DBObjectSearch('User');
           $oSearch->AddCondition('contactid', $this->GetKey());
@@ -250,15 +251,16 @@
           <type>Overload-DBObject</type>
           <code><![CDATA[
         public function SetAnonymousValues()
-        {
-          // Put some more fancy values
-          $this->Set('name', Dict::S('Anonymization:Person:name').' '.$this->GetKey());
-          $this->Set('first_name', Dict::S('Anonymization:Person:first_name'));
-          $this->Set('email',  'anonymous.contact'.$this->GetKey().'@anony.mized');
-          // Mark the contact as obsolete
-          $this->Set('status', 'inactive');
-          $this->Set('picture',null);
-        }
+       {
+           // Put some more fancy values
+           $this->Set('name', Dict::S('Anonymization:Person:name').' '.$this->GetKey());
+           $this->Set('first_name', Dict::S('Anonymization:Person:first_name'));
+           $this->Set('email', Dict::Format('Anonymization:Person:email', Dict::S('Anonymization:Person:first_name'), Dict::S('Anonymization:Person:name'), $this->GetKey()) );
+           // Mark the contact as obsolete
+           $this->Set('status', 'inactive');
+           // Remove picture
+           $this->Set('picture', null);
+       }
 
 ]]></code>
         </method>

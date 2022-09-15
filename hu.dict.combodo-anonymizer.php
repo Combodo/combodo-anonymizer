@@ -29,6 +29,8 @@ Dict::Add('HU HU', 'Hungarian', 'Magyar', array(
 	// Default values used during anonymization
 	'Anonymization:Person:name' => 'Contact~~',
 	'Anonymization:Person:first_name' => 'Anonymous~~',
+	'Anonymization:Person:email' => '%1$s.%2$s%3$s@anony.mized',
+	'Anonymization:Person:email' => '%1$s.%2$s%3$s@anony.mized',
 ));
 
 //
