@@ -69,7 +69,14 @@ abstract class _BatchAnonymization extends DBObject
 		$aObjects = [];
 		$bExecuteQuery = true;
 		while ($bExecuteQuery) {
-			$oResult = CMDBSource::Query($sSqlSearch." LIMIT ".$iMaxChunkSize);
+			try {
+				$sSQL = $sSqlSearch." LIMIT ".$iMaxChunkSize;
+				$oResult = CMDBSource::Query($sSQL);
+			} catch (MySQLException $e) {
+				echo "\n ERROR in ".$sSQL."\n";
+				echo $e->GetMessage()."\n";
+				return false;
+			}
 			//echo("\n\n Search anonymization: ".$sSqlSearch);
 			//foreach ($aSqlUpdate as $sSqlUpdate) {
 			//	echo("\n Update: ".$sSqlUpdate);
@@ -82,7 +89,13 @@ abstract class _BatchAnonymization extends DBObject
 				foreach ($aSqlUpdate as $sSqlUpdate) {
 					$sSQL = $sSqlUpdate." WHERE `$sKey` IN (".implode(', ', $aObjects).");";
 				//echo("\n AnonymizationUpdate: ".$sSQL);
-					CMDBSource::Query($sSQL);
+					try {
+						CMDBSource::Query($sSQL);
+					} catch (MySQLException $e) {
+						echo "\n ERROR in ".$sSQL."\n";
+						echo $e->GetMessage()."\n";
+						return false;
+					}
 				}
 			}
 			if (count($aObjects) < $iMaxChunkSize || (time() >= $iTimeLimit)) {
@@ -205,6 +218,7 @@ abstract class _BatchAnonymization extends DBObject
 				}
 			}
 		}
+		return $bFinish;
 	}
 
 
@@ -333,6 +347,7 @@ abstract class _BatchAnonymization extends DBObject
 				$oPerson->DBWrite();
 			}
 		}
+		return $bFinish;
 	}
 
 	/**
@@ -379,6 +394,7 @@ abstract class _BatchAnonymization extends DBObject
 				$oPerson->DBWrite();
 			}
 		}
+		return $bFinish;
 	}
 
 	/**
@@ -554,5 +570,6 @@ abstract class _BatchAnonymization extends DBObject
 				$oPerson->DBWrite();
 			}
 		}
+		return $bFinish;
 	}
 }

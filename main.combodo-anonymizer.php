@@ -462,6 +462,8 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 			$oSet = new DBObjectSet(DBSearch::FromOQL($sOQL), array(), array(), null, $iMaxChunkSize);
 			$sIdCurrentPerson = '';
 			$iLocalCounter = 0;
+			$bResult = false;
+			$iNotFinish = 0;
 			while ((time() < $iUnixTimeLimit) && ($oStepForAnonymize = $oSet->Fetch())) {
 				if ($sIdCurrentPerson != $oStepForAnonymize->Get('id_to_anonymize')) {
 					if ($sIdCurrentPerson != '') {
@@ -471,19 +473,22 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 					$this->Trace('|  |  |Anonymized idPerson: '.$sIdCurrentPerson);
 				}
 				$this->Trace('|  |  |  | function: '.$oStepForAnonymize->Get('function'));
-				$oStepForAnonymize->ExecuteStep($iUnixTimeLimit);
+				$bResult = $oStepForAnonymize->ExecuteStep($iUnixTimeLimit);
+				if (!$bResult){
+					$iNotFinish++;
+				}
 				$iStepAnonymized++;
 				$iLocalCounter++;
 			}
 
-			if (time() < $iUnixTimeLimit && $sIdCurrentPerson != ''){
+			if (time() < $iUnixTimeLimit && $sIdCurrentPerson != '' && $bResult){
 				$iNbPersonAnonymized++;
 			}
 			if ($iLocalCounter < $iMaxChunkSize) {
 				$bExecuteQuery = false;
 			}
 		}
-		$sMessage = sprintf("Anonymization started for %d person(s). %d person(s) completly anonymized.%d step(s) executed", $iCountAnonymized,  $iNbPersonAnonymized, $iStepAnonymized );
+		$sMessage = sprintf("Anonymization started for %d person(s). %d person(s) completly anonymized.%d step(s) executed.%d step(s) not finish or in error", $iCountAnonymized,  $iNbPersonAnonymized, $iStepAnonymized, $iNotFinish );
 		return $sMessage;
 	}
 	}
