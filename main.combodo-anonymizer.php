@@ -18,6 +18,8 @@
  */
 
 //iBackofficeDictEntriesExtension can only be used since 3.0.1
+use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
+
 if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.1') < 0) {
 	/**
 	 * Class AnonymizationPlugInLegacy
@@ -124,9 +126,9 @@ class AnonymizationMenuPlugIn implements iPopupMenuExtension
 
 		if ( AnonymizationUtils::CanAnonymize()) {
 			if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0') < 0) {
-				$sJSUrl = utils::GetAbsoluteUrlModulesRoot().basename(__DIR__).'/js/anonymize.js';
+				$sJSUrl = utils::GetAbsoluteUrlModulesRoot().basename(__DIR__).'/assets/js/anonymize.js';
 			} else {
-				$sJSUrl = 'env-'.utils::GetCurrentEnvironment().'/'.basename(__DIR__).'/js/anonymize.js';
+				$sJSUrl = 'env-'.utils::GetCurrentEnvironment().'/'.basename(__DIR__).'/assets/js/anonymize.js';
 			}
 			switch ($iMenuId) {
 				case iPopupMenuExtension::MENU_OBJLIST_ACTIONS:
@@ -191,7 +193,7 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 			// iTop version 2.5 or newer, check the rights used when defining the admin menu
 			// We cannot directly check if the admin menu is enabled right now, since we are in the process of building the list of menus
 			if ( UserRights::IsActionAllowed('RessourceAnonymization', UR_ACTION_MODIFY)) {
-				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), $sParentMenuIndex, 15 , 'ResourceAdminMenu', UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
+				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage(AnonymizerHelper::MODULE_NAME, "config.php"), $sParentMenuIndex, 15 , 'ResourceAdminMenu', UR_ACTION_MODIFY, UR_ALLOWED_YES, null);
 			}
 		}
 		else
@@ -200,7 +202,7 @@ class CombodoAnonymizerBackwardCompatMenuHandler extends ModuleHandlerAPI
 			$bConfigMenuEnabled = UserRights::IsAdministrator();
 			if ($bConfigMenuEnabled)
 			{
-				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage('combodo-anonymizer', "config.php"), $sParentMenuIndex, 15 /* fRank */);
+				new WebPageMenuNode('ConfigAnonymizer', utils::GetAbsoluteUrlModulePage(AnonymizerHelper::MODULE_NAME, "config.php"), $sParentMenuIndex, 15 /* fRank */);
 			}
 
 		}
@@ -225,7 +227,7 @@ class PurgeEmailNotification extends AbstractWeeklyScheduledProcess
 	protected $sTimeLimit;
 
 	protected function GetModuleName(){
-		return 'combodo-anonymizer';
+		return AnonymizerHelper::MODULE_NAME;
 	}
 
 	protected function GetDefaultModuleSettingTime(){
@@ -256,7 +258,7 @@ class PurgeEmailNotification extends AbstractWeeklyScheduledProcess
 	public function Process($iUnixTimeLimit)
 	{
 		$this->sTimeLimit = $iUnixTimeLimit;
-		$iMaxChunkSize =   MetaModel::GetModuleSetting('combodo-anonymizer', 'max_chunk_size', 1000);
+		$iMaxChunkSize =   MetaModel::GetModuleSetting($this->GetModuleName(), 'max_chunk_size', 1000);
 		$bCleanupNotification = MetaModel::GetModuleSetting($this->GetModuleName(), 'cleanup_notifications', false);
 		$iCountDeleted = 0;
 		if ($bCleanupNotification)
@@ -404,7 +406,7 @@ class PersonalDataAnonymizer extends PurgeEmailNotification
 	public function Process($iUnixTimeLimit)
 	{
 		$this->sTimeLimit = $iUnixTimeLimit;
-		$iMaxChunkSize =   MetaModel::GetModuleSetting('combodo-anonymizer', 'max_chunk_size', 1000);
+		$iMaxChunkSize =   MetaModel::GetModuleSetting($this->GetModuleName(), 'max_chunk_size', 1000);
 		$sBatchAnonymisation = MetaModel::DBGetTable('BatchAnonymization');
 		$oResult = CMDBSource::Query("SELECT DISTINCT id_to_anonymize FROM $sBatchAnonymisation");
 		$aIdPersonAlreadyInProgress = [] ;

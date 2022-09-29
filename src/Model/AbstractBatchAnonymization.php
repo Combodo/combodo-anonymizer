@@ -18,7 +18,7 @@
  */
 
 
-abstract class _BatchAnonymization extends DBObject
+abstract class AbstractBatchAnonymization extends DBObject
 {
 
 	/**
@@ -365,9 +365,9 @@ abstract class _BatchAnonymization extends DBObject
 	 */
 	protected function CleanupOnMentionByBatch($iTimeLimit)
 	{
-		$sCleanupOnmention = MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer', 'onmention');
+		$sCleanupOnMention = MetaModel::GetConfig()->GetModuleSetting('combodo-anonymizer', 'on_mention');
 		$bFinish = true;
-		if ($sCleanupOnmention == 'trigger-only') {
+		if ($sCleanupOnMention == 'trigger-only') {
 			$oScopeQuery = "SELECT TriggerOnObjectMention";
 			$oSet = new DBObjectSet(DBSearch::FromOQL($oScopeQuery));
 			while ($oTrigger = $oSet->Fetch()) {
@@ -375,7 +375,7 @@ abstract class _BatchAnonymization extends DBObject
 					$bFinish = $this->CleanupOnMentionInAClass($iTimeLimit, $oTrigger->Get('target_class'));
 				}
 			}
-		} elseif ($sCleanupOnmention == 'all') {
+		} elseif ($sCleanupOnMention == 'all') {
 			/* Maybe in the futur
 			foreach (MetaModel::GetClasses() as $sClass) {
 				if ($bFinish) {

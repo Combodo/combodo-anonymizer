@@ -1,0 +1,51 @@
+{# @copyright   Copyright (C) 2010-2022 Combodo SARL #}
+{# @license     http://opensource.org/licenses/AGPL-3.0 #}
+
+<h1>{{ 'Anonymization:Configuration'|dict_s }}</h1>
+
+{% if sMessage is not empty %}
+	{% if sMessageType is empty %}
+		{% set sMessageType = 'error' %}
+	{% endif %}
+
+<div id="save_result" class="header_message message_{{ sMessageType }}">{{ sMessage }}</div>
+
+{% else %}
+
+<form method="post">
+	<input type="hidden" name="operation" value="ApplyConfig"/>
+	<input type="hidden" name="transaction_id" value="{{ sTransactionId }}"/>
+	<fieldset>
+		<legend>{{ 'Anonymization:AutomationParameters'|dict_s }}</legend>
+		<p>
+			<input type="checkbox"{% if bAnonymizeObsoletePersons and  iAnonymizationDelay >= 0 %} checked {% endif %}id="checkbox_anonymize" name=""/>
+			{% if bAnonymizeObsoletePersons and iAnonymizationDelay >= 0 %}
+				{% set sDelay = iAnonymizationDelay %}
+			{% else %}
+				{% set sDelay = '' %}
+			{% endif %}
+			{% set sDelayInput = 'Anonymization:AnonymizationDelay_Input'|dict_format('<input id="anonymization_delay" type="text" size="4" name="anonymization_delay" value="' ~ sDelay ~ '"/>') %}
+			<label for="checkbox_anonymize">{{ sDelayInput|raw }}</label>
+		</p>
+	</fieldset>
+
+	<fieldset>
+		<legend>{{ 'Anonymization:NotificationsPurgeParameters'|dict_s }}</legend>
+		<p>
+			<input type="checkbox"{% if bCleanupNotifications and  iNotificationsPurgeDelay >= 0 %} checked {% endif %}id="checkbox_purge" name=""/>
+			{% if bCleanupNotifications and iNotificationsPurgeDelay >= 0 %}
+				{% set sDelay = iNotificationsPurgeDelay %}
+			{% else %}
+				{% set sDelay = '' %}
+			{% endif %}
+			{% set sDelayInput = 'Anonymization:PurgeDelay_Input'|dict_format('<input id="notifications_purge_delay" type="text" size="4" name="notifications_purge_delay" value="' ~ sDelay ~ '"/>') %}
+			<label for="checkbox_purge">{{ sDelayInput|raw }}</label>
+		</p>
+	</fieldset>
+	<p>
+		<button id="btn_cancel">{{ 'UI:Button:Cancel'|dict_s }}</button>
+		<button id="btn_apply" type="submit">{{ 'UI:Button:Apply'|dict_s }}</button>
+	</p>
+</form>
+
+{% endif %}

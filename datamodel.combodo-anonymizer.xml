@@ -8,7 +8,7 @@
         <field id="1">email</field>
         <field id="2">name</field>
       </caselog_content>
-      <onmention>trigger-only</onmention>
+      <on_mention>trigger-only</on_mention>
       <notification_content type="array">
         <field id="0">friendlyname</field>
         <field id="1">email</field>
@@ -32,10 +32,10 @@
     <class id="BatchAnonymization" _delta="define">
       <parent>DBObject</parent>
       <php_parent>
-        <name>_BatchAnonymization</name>
+        <name>AbstractBatchAnonymization</name>
       </php_parent>
       <properties>
-        <category></category>
+        <category/>
         <abstract>false</abstract>
         <db_table>priv_batch_anonymization</db_table>
         <naming>
@@ -49,31 +49,31 @@
       <fields>
         <field id="class_to_anonymize" xsi:type="AttributeString">
           <sql>class_to_anonymize</sql>
-          <default_value></default_value>
+          <default_value/>
           <is_null_allowed>false</is_null_allowed>
           <tracking_level>none</tracking_level>
         </field>
         <field id="id_to_anonymize" xsi:type="AttributeInteger">
           <sql>id_to_anonymize</sql>
-          <default_value></default_value>
+          <default_value/>
           <is_null_allowed>false</is_null_allowed>
           <tracking_level>none</tracking_level>
         </field>
         <field id="id_user_to_anonymize" xsi:type="AttributeString">
           <sql>id_user_to_anonymize</sql>
-          <default_value></default_value>
+          <default_value/>
           <is_null_allowed>true</is_null_allowed>
           <tracking_level>none</tracking_level>
         </field>
         <field id="needles" xsi:type="AttributeString">
           <sql>needles</sql>
-          <default_value></default_value>
+          <default_value/>
           <is_null_allowed>true</is_null_allowed>
           <tracking_level>none</tracking_level>
         </field>
         <field id="anonymized_data" xsi:type="AttributeString">
           <sql>anonymized_data</sql>
-          <default_value></default_value>
+          <default_value/>
           <is_null_allowed>false</is_null_allowed>
           <tracking_level>none</tracking_level>
         </field>
@@ -93,14 +93,14 @@
             </value>
           </values>
           <sql>function</sql>
-          <default_value></default_value>
+          <default_value/>
           <is_null_allowed>false</is_null_allowed>
           <display_style>list</display_style>
           <is_null_allowed>false</is_null_allowed>
           <tracking_level>none</tracking_level>
         </field>
       </fields>
-      <methods></methods>
+      <methods/>
       <presentation>
         <list>
           <items>
@@ -184,6 +184,8 @@
 
           // Write the object
          $this->AllowWrite(true);
+         // Ignore synchro
+         $this->m_bCheckStatus = true;
          $this->DBWrite();
 
           $this->Reload();
@@ -267,8 +269,7 @@
       </methods>
     </class>
   </classes>
-  <menus>
-  </menus>
+  <menus/>
   <user_rights>
     <groups>
       <group id="RessourceAnonymizationGroup">

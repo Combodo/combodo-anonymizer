@@ -7,6 +7,7 @@
  */
 Dict::Add('FR FR', 'French', 'Français', array(
 	// Dictionary entries go here
+	'combodo-anonymizer/Operation:DisplayConfig/Title' => 'Anonymisation',
 	'Anonymization:AnonymizeAll' => 'Tout anonymiser',
 	'Anonymization:AnonymizeOne' => 'Anonymiser',
 	'Anonymization:OnePersonWarning' => 'Etes vous sûr(e) de vouloir anonymiser cette Personne ? (ceci ne pourra pas être annulé)',
