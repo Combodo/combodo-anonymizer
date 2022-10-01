@@ -8,7 +8,9 @@ $baseDir = dirname($vendorDir);
 return array(
     'Combodo\\iTop\\Anonymizer\\Controller\\AjaxAnonymizerController' => $baseDir . '/src/Controller/AjaxAnonymizerController.php',
     'Combodo\\iTop\\Anonymizer\\Controller\\ConfigAnonymizerController' => $baseDir . '/src/Controller/ConfigAnonymizerController.php',
+    'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerException' => $baseDir . '/src/Helper/AnonymizerException.php',
     'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerHelper' => $baseDir . '/src/Helper/AnonymizerHelper.php',
+    'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerLog' => $baseDir . '/src/Helper/AnonymizerLog.php',
     'Combodo\\iTop\\Anonymizer\\Service\\AnonymizerService' => $baseDir . '/src/Service/AnonymizerService.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
 );

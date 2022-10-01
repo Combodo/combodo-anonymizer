@@ -23,7 +23,9 @@ class ComposerStaticInit9da934a9423c6df2e90dae99265f6022
     public static $classMap = array (
         'Combodo\\iTop\\Anonymizer\\Controller\\AjaxAnonymizerController' => __DIR__ . '/../..' . '/src/Controller/AjaxAnonymizerController.php',
         'Combodo\\iTop\\Anonymizer\\Controller\\ConfigAnonymizerController' => __DIR__ . '/../..' . '/src/Controller/ConfigAnonymizerController.php',
+        'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerException' => __DIR__ . '/../..' . '/src/Helper/AnonymizerException.php',
         'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerHelper' => __DIR__ . '/../..' . '/src/Helper/AnonymizerHelper.php',
+        'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerLog' => __DIR__ . '/../..' . '/src/Helper/AnonymizerLog.php',
         'Combodo\\iTop\\Anonymizer\\Service\\AnonymizerService' => __DIR__ . '/../..' . '/src/Service/AnonymizerService.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
