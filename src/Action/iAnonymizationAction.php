@@ -4,11 +4,11 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
-namespace Combodo\iTop\Anonymizer\Task;
+namespace Combodo\iTop\Anonymizer\Action;
 
 use DBObject;
 
-interface iAnonymizationTask
+interface iAnonymizationAction
 {
 	/**
 	 * @param \DBObject $oTask

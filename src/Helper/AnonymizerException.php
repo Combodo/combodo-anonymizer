@@ -13,6 +13,7 @@ class AnonymizerException extends Exception
 {
 	public function __construct($message = "", $code = 0, Throwable $previous = null)
 	{
+		AnonymizerLog::Error($message);
 		parent::__construct(AnonymizerHelper::MODULE_NAME.': '.$message, $code, $previous);
 	}
 }

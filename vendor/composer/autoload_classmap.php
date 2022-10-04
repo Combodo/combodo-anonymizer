@@ -6,6 +6,9 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Combodo\\iTop\\Anonymizer\\Action\\AnonymizationActionFactory' => $baseDir . '/src/Action/AnonymizationActionFactory.php',
+    'Combodo\\iTop\\Anonymizer\\Action\\PurgeHistory' => $baseDir . '/src/Action/PurgeHistory.php',
+    'Combodo\\iTop\\Anonymizer\\Action\\iAnonymizationAction' => $baseDir . '/src/Action/iAnonymizationAction.php',
     'Combodo\\iTop\\Anonymizer\\Controller\\AjaxAnonymizerController' => $baseDir . '/src/Controller/AjaxAnonymizerController.php',
     'Combodo\\iTop\\Anonymizer\\Controller\\ConfigAnonymizerController' => $baseDir . '/src/Controller/ConfigAnonymizerController.php',
     'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerException' => $baseDir . '/src/Helper/AnonymizerException.php',
@@ -13,7 +16,5 @@ return array(
     'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerLog' => $baseDir . '/src/Helper/AnonymizerLog.php',
     'Combodo\\iTop\\Anonymizer\\Service\\AnonymizerService' => $baseDir . '/src/Service/AnonymizerService.php',
     'Combodo\\iTop\\Anonymizer\\Service\\CleanupService' => $baseDir . '/src/Service/CleanupService.php',
-    'Combodo\\iTop\\Anonymizer\\Task\\PurgeHistory' => $baseDir . '/src/Task/PurgeHistory.php',
-    'Combodo\\iTop\\Anonymizer\\Task\\iAnonymizationTask' => $baseDir . '/src/Task/iAnonymizationTask.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
 );

@@ -4,7 +4,7 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
-namespace Combodo\iTop\Anonymizer\Task;
+namespace Combodo\iTop\Anonymizer\Action;
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
@@ -14,7 +14,7 @@ use MetaModel;
 /**
  * Remove history entries of the selected object
  */
-class PurgeHistory implements iAnonymizationTask
+class PurgeHistory implements iAnonymizationAction
 {
 	private $oTask;
 	private $iEndExecutionTime;

@@ -7,9 +7,9 @@
 namespace Combodo\iTop\Anonymizer\Service;
 
 use CMDBSource;
+use Combodo\iTop\Anonymizer\Action\AnonymizationActionFactory;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
-use Combodo\iTop\Anonymizer\Task\iAnonymizationTask;
 use DBObject;
 use DBObjectSet;
 use DBSearch;
@@ -23,15 +23,17 @@ class AnonymizerService
 	private $iProcessEndTime;
 	/** @var int */
 	private $iMaxChunkSize;
+	/** @var array */
+	private $aActions;
+	/** @var \Combodo\iTop\Anonymizer\Action\AnonymizationActionFactory */
+	private $oActionFactory;
 
-	public function __construct($iMaxExecutionTime, $iMaxChunkSize = null)
+	public function __construct($iMaxExecutionTime)
 	{
 		$this->iProcessEndTime = $iMaxExecutionTime + time();
-		if (is_null($iMaxChunkSize)) {
-			$this->iMaxChunkSize = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
-		} else {
-			$this->iMaxChunkSize = $iMaxChunkSize;
-		}
+		$this->iMaxChunkSize = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
+		$this->aActions = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'actions', []);
+		$this->oActionFactory = new AnonymizationActionFactory();
 	}
 
 
@@ -142,109 +144,101 @@ class AnonymizerService
 			if ($this->IsTimeoutReached()) {
 				return;
 			}
-			$this->ProcessAnonymizationTask($oTask);
+			if ($this->ProcessAnonymizationTask($oTask) == 'finished') {
+				$oTask->DBDelete();
+			}
 		}
 	}
 
 	/**
 	 * @param \DBObject $oTask
 	 *
-	 * @return void
+	 * @return bool
 	 * @throws \ArchivedObjectException
 	 * @throws \CoreException
 	 */
 	protected function ProcessAnonymizationTask(DBObject $oTask)
 	{
 		$sStatus = $oTask->Get('status');
-		/** @var \Combodo\iTop\Anonymizer\Task\iAnonymizationTask $oAction */
+		/** @var \Combodo\iTop\Anonymizer\Action\iAnonymizationAction $oAction */
 		$oAction = null;
 		$sAction = null;
 		$bInProgress = true;
 		while ($bInProgress) {
-			switch ($sStatus) {
-				case 'created':
-				case 'finished':
-					$sAction = $this->GetNextAction($sAction);
-					if (class_exists($sAction) && isset(class_implements($sAction)[iAnonymizationTask::class])) {
-						$oAction = new $sAction($oTask, $this->iProcessEndTime);
-						$oAction->Init();
-					} else {
-						if (!is_null($sAction)) {
-							AnonymizerLog::Error("Class $sAction is not an anonymization class");
+			try {
+				switch ($sStatus) {
+					case 'created':
+					case 'finished':
+						$sAction = $this->GetNextAction($sAction);
+						$oAction = $this->oActionFactory->GetAnonymizationAction($sAction, $oTask, $this->iProcessEndTime);
+						if (is_null($oAction)) {
+							$sStatus = 'finished';
+							$bInProgress = false;
+						} else {
+							$oAction->Init();
 						}
-						$sStatus = 'finished';
-						$bInProgress = false;
-					}
-					break;
+						break;
 
-				case 'running':
-					$sAction = $oTask->Get('action');
-					if (class_exists($sAction) && isset(class_implements($sAction)[iAnonymizationTask::class])) {
-						$oAction = new $sAction($oTask, $this->iProcessEndTime);
-						$oAction->Retry();
-					} else {
-						AnonymizerLog::Error("Class $sAction is not an anonymization class");
-						$sStatus = 'finished';
-						$bInProgress = false;
-					}
-					break;
+					case 'running':
+						$sAction = $oTask->Get('action');
+						$oAction = $this->oActionFactory->GetAnonymizationAction($sAction, $oTask, $this->iProcessEndTime);
+						if (is_null($oAction)) {
+							$sStatus = 'finished';
+							$bInProgress = false;
+						} else {
+							$oAction->Retry();
+						}
+						break;
 
-				case 'paused':
-					$sAction = $oTask->Get('action');
-					if (class_exists($sAction) && isset(class_implements($sAction)[iAnonymizationTask::class])) {
-						$oAction = new $sAction($oTask, $this->iProcessEndTime);
-					} else {
-						AnonymizerLog::Error("Class $sAction is not an anonymization class");
-						$sStatus = 'finished';
-						$bInProgress = false;
-					}
-					break;
-			}
+					case 'paused':
+						$sAction = $oTask->Get('action');
+						$oAction = $this->oActionFactory->GetAnonymizationAction($sAction, $oTask, $this->iProcessEndTime);
+						if (is_null($oAction)) {
+							$sStatus = 'finished';
+							$bInProgress = false;
+						}
+						break;
+				}
 
-			if (!is_null($oAction)) {
-				$sStatus = 'running';
-				$oTask->Set('status', $sStatus);
-				$oTask->Set('action', $sAction);
-				$oTask->DBWrite();
+				if (!is_null($oAction)) {
+					$sStatus = 'running';
+					$oTask->Set('status', $sStatus);
+					$oTask->Set('action', $sAction);
+					$oTask->DBWrite();
 
-				try {
 					$bActionFinished = $oAction->Execute();
 					if ($bActionFinished) {
 						$sStatus = 'finished';
 					} else {
-						$sStatus ='paused';
+						$sStatus = 'paused';
 						$oTask->Set('status', $sStatus);
 						$oTask->DBWrite();
 						$bInProgress = false;
 					}
-				} catch (Exception $e) {
-					// stay in 'running' status
-					AnonymizerLog::Error($e->getMessage());
-					$bInProgress = false;
 				}
-			} else {
+			}
+			catch (Exception $e) {
+				// stay in 'running' status
+				AnonymizerLog::Error($e->getMessage());
 				$bInProgress = false;
 			}
 		}
 
-		if ($sStatus == 'finished') {
-			$oTask->DBDelete();
-		}
+		return $sStatus;
 	}
 
 	protected function GetNextAction($sAction)
 	{
-		$aActions = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'actions', []);
 		if (is_null($sAction)) {
-			if (isset($aActions[0])) {
-				return $aActions[0];
+			if (isset($this->aActions[0])) {
+				return $this->aActions[0];
 			}
 		}
 
-		foreach ($aActions as $key => $sValue) {
+		foreach ($this->aActions as $key => $sValue) {
 			if ($sValue == $sAction) {
-				if (isset($aActions[$key+1])) {
-					return $aActions[$key+1];
+				if (isset($this->aActions[$key + 1])) {
+					return $this->aActions[$key + 1];
 				}
 			}
 		}
@@ -256,4 +250,38 @@ class AnonymizerService
 	{
 		return (time() > $this->iProcessEndTime);
 	}
+
+	/**
+	 * @param int $iProcessEndTime
+	 */
+	public function SetProcessEndTime(int $iProcessEndTime)
+	{
+		$this->iProcessEndTime = $iProcessEndTime;
+	}
+
+	/**
+	 * @param int|mixed|null $iMaxChunkSize
+	 */
+	public function SetMaxChunkSize($iMaxChunkSize)
+	{
+		$this->iMaxChunkSize = $iMaxChunkSize;
+	}
+
+	/**
+	 * @param array|mixed|null $aActions
+	 */
+	public function SetActions($aActions)
+	{
+		$this->aActions = $aActions;
+	}
+
+	/**
+	 * @param \Combodo\iTop\Anonymizer\Action\AnonymizationActionFactory $oAnonymizationTaskFactory
+	 */
+	public function SetAnonymizationActionFactory(AnonymizationActionFactory $oAnonymizationTaskFactory)
+	{
+		$this->oActionFactory = $oAnonymizationTaskFactory;
+	}
+
+
 }

@@ -21,6 +21,9 @@ class ComposerStaticInit9da934a9423c6df2e90dae99265f6022
     );
 
     public static $classMap = array (
+        'Combodo\\iTop\\Anonymizer\\Action\\AnonymizationActionFactory' => __DIR__ . '/../..' . '/src/Action/AnonymizationActionFactory.php',
+        'Combodo\\iTop\\Anonymizer\\Action\\PurgeHistory' => __DIR__ . '/../..' . '/src/Action/PurgeHistory.php',
+        'Combodo\\iTop\\Anonymizer\\Action\\iAnonymizationAction' => __DIR__ . '/../..' . '/src/Action/iAnonymizationAction.php',
         'Combodo\\iTop\\Anonymizer\\Controller\\AjaxAnonymizerController' => __DIR__ . '/../..' . '/src/Controller/AjaxAnonymizerController.php',
         'Combodo\\iTop\\Anonymizer\\Controller\\ConfigAnonymizerController' => __DIR__ . '/../..' . '/src/Controller/ConfigAnonymizerController.php',
         'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerException' => __DIR__ . '/../..' . '/src/Helper/AnonymizerException.php',
@@ -28,8 +31,6 @@ class ComposerStaticInit9da934a9423c6df2e90dae99265f6022
         'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerLog' => __DIR__ . '/../..' . '/src/Helper/AnonymizerLog.php',
         'Combodo\\iTop\\Anonymizer\\Service\\AnonymizerService' => __DIR__ . '/../..' . '/src/Service/AnonymizerService.php',
         'Combodo\\iTop\\Anonymizer\\Service\\CleanupService' => __DIR__ . '/../..' . '/src/Service/CleanupService.php',
-        'Combodo\\iTop\\Anonymizer\\Task\\PurgeHistory' => __DIR__ . '/../..' . '/src/Task/PurgeHistory.php',
-        'Combodo\\iTop\\Anonymizer\\Task\\iAnonymizationTask' => __DIR__ . '/../..' . '/src/Task/iAnonymizationTask.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
 
