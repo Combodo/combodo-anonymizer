@@ -165,7 +165,7 @@ class AnonymizerService
 				case 'created':
 				case 'finished':
 					$sAction = $this->GetNextAction($sAction);
-					if (class_exists($sAction) && in_array('iAnonymizationTask', class_implements($sAction))) {
+					if (class_exists($sAction) && isset(class_implements($sAction)[iAnonymizationTask::class])) {
 						$oAction = new $sAction($oTask, $this->iProcessEndTime);
 						$oAction->Init();
 					} else {
@@ -179,7 +179,7 @@ class AnonymizerService
 
 				case 'running':
 					$sAction = $oTask->Get('action');
-					if (class_exists($sAction) && in_array('iAnonymizationTask', class_implements($sAction))) {
+					if (class_exists($sAction) && isset(class_implements($sAction)[iAnonymizationTask::class])) {
 						$oAction = new $sAction($oTask, $this->iProcessEndTime);
 						$oAction->Retry();
 					} else {
@@ -191,7 +191,7 @@ class AnonymizerService
 
 				case 'paused':
 					$sAction = $oTask->Get('action');
-					if (class_exists($sAction) && in_array(iAnonymizationTask::class, class_implements($sAction))) {
+					if (class_exists($sAction) && isset(class_implements($sAction)[iAnonymizationTask::class])) {
 						$oAction = new $sAction($oTask, $this->iProcessEndTime);
 					} else {
 						AnonymizerLog::Error("Class $sAction is not an anonymization class");

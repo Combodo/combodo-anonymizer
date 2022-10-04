@@ -38,7 +38,7 @@ function AnonymizeOnePerson(iPersonId) {
 				oInProgressModal.remove();
 			}
 		});
-		$.post(GetAbsoluteUrlModulesRoot()+'combodo-anonymizer/ajax.php', {operation: 'AnonymizeOne', id: iPersonId}, function (data) {
+		$.post(GetAbsoluteUrlAppRoot()+'/pages/exec.php?exec_module=combodo-anonymizer&exec_page=ajax.php', {operation: 'AnonymizeOne', id: iPersonId}, function (data) {
 			$('body').append(data);
 			oInProgressModal.dialog('close');
 		});

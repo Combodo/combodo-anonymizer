@@ -15,7 +15,7 @@
         <field id="2">name</field>
       </notification_content>
       <actions type="array">
-        <action id="0">Combodo\iTop\Anonymizer\Task\PurgeHistory</action>
+        <action id="0">\Combodo\iTop\Anonymizer\Task\PurgeHistory</action>
       </actions>
     </parameters>
   </module_parameters>

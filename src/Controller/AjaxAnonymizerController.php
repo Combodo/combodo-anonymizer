@@ -25,10 +25,11 @@ class AjaxAnonymizerController extends Controller
 
 		$iMaxExecutionTime = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_interactive_anonymization_time_in_s', 30);
 		$oService = new AnonymizerService($iMaxExecutionTime);
-		$oService->AnonymizeOneObject($sClass, $sId);
+		$oService->AnonymizeOneObject($sClass, $sId, true);
 
 		cmdbAbstractObject::SetSessionMessage($sClass, $sId, 'anonymization', Dict::S('Anonymization:DoneOnePerson'), 'ok', 1);
 		$aParams['sURL'] = utils::GetAbsoluteUrlAppRoot()."pages/UI.php?operation=details&class=$sClass&id=$sId";
+
 		$this->DisplayAjaxPage($aParams);
 	}
 
@@ -42,7 +43,7 @@ class AjaxAnonymizerController extends Controller
 
 		$iMaxExecutionTime = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_interactive_anonymization_time_in_s', 30);
 		$oService = new AnonymizerService($iMaxExecutionTime);
-		$oService->AnonymizeObjectList($sFilter);
+		$oService->AnonymizeObjectList($sFilter, true);
 
 		$this->DisplayAjaxPage($aParams);
 	}
