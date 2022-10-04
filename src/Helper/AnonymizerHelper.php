@@ -7,17 +7,24 @@
 namespace Combodo\iTop\Anonymizer\Helper;
 
 use MetaModel;
+use UserRights;
 use utils;
 
 class AnonymizerHelper
 {
 	const MODULE_NAME = 'combodo-anonymizer';
+	const MENU_ID = 'ConfigAnonymizer';
+
+	public function CanAnonymize()
+	{
+		return (UserRights::IsAdministrator() || UserRights::IsActionAllowed('RessourceAnonymization', UR_ACTION_MODIFY)) ;
+	}
 
 	/**
 	 * @return void
 	 * @throws \ConfigException
 	 */
-	public static function SaveItopConfiguration()
+	public function SaveItopConfiguration()
 	{
 		$oConfig = MetaModel::GetConfig();
 		$sConfigFile = APPROOT.'conf/'.utils::GetCurrentEnvironment().'/config-itop.php';

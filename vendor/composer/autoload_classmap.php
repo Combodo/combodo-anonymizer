@@ -12,5 +12,8 @@ return array(
     'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerHelper' => $baseDir . '/src/Helper/AnonymizerHelper.php',
     'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerLog' => $baseDir . '/src/Helper/AnonymizerLog.php',
     'Combodo\\iTop\\Anonymizer\\Service\\AnonymizerService' => $baseDir . '/src/Service/AnonymizerService.php',
+    'Combodo\\iTop\\Anonymizer\\Service\\CleanupService' => $baseDir . '/src/Service/CleanupService.php',
+    'Combodo\\iTop\\Anonymizer\\Task\\PurgeHistory' => $baseDir . '/src/Task/PurgeHistory.php',
+    'Combodo\\iTop\\Anonymizer\\Task\\iAnonymizationTask' => $baseDir . '/src/Task/iAnonymizationTask.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
 );

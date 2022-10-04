@@ -17,7 +17,7 @@ if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') >= 0) {
 }
 
 $oUpdateController = new ConfigAnonymizerController($sTemplates, AnonymizerHelper::MODULE_NAME);
-$oUpdateController->SetMenuId('ConfigAnonymizer');
+$oUpdateController->SetMenuId(AnonymizerHelper::MENU_ID);
 $oUpdateController->SetDefaultOperation('DisplayConfig');
 $oUpdateController->DisableInDemoMode();
 $oUpdateController->HandleOperation();

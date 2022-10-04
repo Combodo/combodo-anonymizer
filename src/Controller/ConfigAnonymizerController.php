@@ -65,7 +65,8 @@ class ConfigAnonymizerController extends Controller
 			$aParams = $this->GetConfigParameters();
 
 			try {
-				AnonymizerHelper::SaveItopConfiguration();
+				$oHelper = new AnonymizerHelper();
+				$oHelper->SaveItopConfiguration();
 
 				$aParams['$sMessageType'] = 'ok';
 				$aParams['$sMessage'] = Dict::S('config-saved');

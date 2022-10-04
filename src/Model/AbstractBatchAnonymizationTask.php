@@ -18,7 +18,7 @@
  */
 
 
-abstract class AbstractBatchAnonymization extends DBObject
+abstract class AbstractBatchAnonymizationTask extends DBObject
 {
 
 	/**

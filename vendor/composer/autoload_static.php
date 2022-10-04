@@ -27,6 +27,9 @@ class ComposerStaticInit9da934a9423c6df2e90dae99265f6022
         'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerHelper' => __DIR__ . '/../..' . '/src/Helper/AnonymizerHelper.php',
         'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerLog' => __DIR__ . '/../..' . '/src/Helper/AnonymizerLog.php',
         'Combodo\\iTop\\Anonymizer\\Service\\AnonymizerService' => __DIR__ . '/../..' . '/src/Service/AnonymizerService.php',
+        'Combodo\\iTop\\Anonymizer\\Service\\CleanupService' => __DIR__ . '/../..' . '/src/Service/CleanupService.php',
+        'Combodo\\iTop\\Anonymizer\\Task\\PurgeHistory' => __DIR__ . '/../..' . '/src/Task/PurgeHistory.php',
+        'Combodo\\iTop\\Anonymizer\\Task\\iAnonymizationTask' => __DIR__ . '/../..' . '/src/Task/iAnonymizationTask.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
 

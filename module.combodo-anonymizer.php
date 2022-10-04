@@ -25,7 +25,7 @@
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
 	'combodo-anonymizer/1.3.0-dev',
-	array(
+	[
 		// Identification
 		//
 		'label'        => 'Personal data anonymizer',
@@ -33,32 +33,36 @@ SetupWebPage::AddModule(
 
 		// Setup
 		//
-		'dependencies' => array(
+		'dependencies' => [
 			'itop-config-mgmt/2.4.0',
 			'itop-config/2.4.0',
-		),
+			'combodo-background-task/1.0.0',
+		],
 		'mandatory' => false,
 		'visible' => true,
 		'installer' => 'AnonymizerInstaller',
 
 		// Components
 		//
-		'datamodel' => array(
+		'datamodel' => [
 			'vendor/autoload.php',
-			'src/Model/AbstractBatchAnonymization.php',
+			'src/Model/AbstractBatchAnonymizationTask.php',
+			'src/Model/PersonalDataAnonymizer.php',
+			'src/Hook/AnonymizationMenuPlugIn.php',
+			'src/Hook/AnonymizationJsPlugin.php',
 			'model.combodo-anonymizer.php',
 			'main.combodo-anonymizer.php',
-		),
-		'webservice' => array(
-			
-		),
-		'data.struct' => array(
+		],
+		'webservice' => [
+
+		],
+		'data.struct' => [
 			// add your 'structure' definition XML files here,
-		),
-		'data.sample' => array(
+		],
+		'data.sample' => [
 			// add your sample data XML files here,
-		),
-		
+		],
+
 		// Documentation
 		//
 		'doc.manual_setup' => '', // hyperlink to manual setup documentation, if any
@@ -66,16 +70,16 @@ SetupWebPage::AddModule(
 
 		// Default settings
 		//
-		'settings' => array(
+		'settings' => [
 			// Module specific settings go here, if any
 			'week_days' => 'monday, tuesday, wednesday, thursday, friday, saturday, sunday',
 			'time' => '00:30',
-			'endtime' => '05:30',
+			'end_time' => '05:30',
 			'enabled' => true,
 			'debug' => true,
 			'max_chunk_size' => 1000,
-		),
-	)
+		],
+	]
 );
 
 
@@ -87,9 +91,14 @@ if (!class_exists('AnonymizerInstaller'))
 	{
 		/**
 		 * Handler called before creating or upgrading the database schema
+		 *
 		 * @param $oConfiguration Config The new configuration of the application
-		 * @param $sPreviousVersion string PRevious version number of the module (empty string in case of first install)
+		 * @param $sPreviousVersion string Previous version number of the module (empty string in case of first install)
 		 * @param $sCurrentVersion string Current version number of the module
+		 *
+		 * @throws \CoreException
+		 * @throws \MySQLException
+		 * @throws \MySQLHasGoneAwayException
 		 */
 		public static function BeforeDatabaseCreation(Config $oConfiguration, $sPreviousVersion, $sCurrentVersion)
 		{

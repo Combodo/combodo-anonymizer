@@ -20,7 +20,7 @@ function AnonymizeAListOfPersons(sSerializedFilter, iCount)
 				oInProgressModal.remove();
 			}
 		});
-		$.post(GetAbsoluteUrlModulesRoot()+'combodo-anonymizer/ajax.php', {operation: 'anonymize_list', filter: sSerializedFilter}, function (data) {
+		$.post(GetAbsoluteUrlModulesRoot()+'combodo-anonymizer/ajax.php', {operation: 'AnonymizeList', filter: sSerializedFilter}, function (data) {
 			$('body').append(data);
 			oInProgressModal.dialog('close');
 		});
@@ -38,7 +38,7 @@ function AnonymizeOnePerson(iPersonId) {
 				oInProgressModal.remove();
 			}
 		});
-		$.post(GetAbsoluteUrlModulesRoot()+'combodo-anonymizer/ajax.php', {operation: 'anonymize_one', id: iPersonId}, function (data) {
+		$.post(GetAbsoluteUrlModulesRoot()+'combodo-anonymizer/ajax.php', {operation: 'AnonymizeOne', id: iPersonId}, function (data) {
 			$('body').append(data);
 			oInProgressModal.dialog('close');
 		});
