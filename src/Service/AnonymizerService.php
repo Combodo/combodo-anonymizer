@@ -124,30 +124,60 @@ class AnonymizerService
 		$oTask->DBInsert();
 	}
 
+	/**
+	 * @throws \CoreException
+	 * @throws \DeleteException
+	 * @throws \CoreCannotSaveObjectException
+	 * @throws \MySQLException
+	 * @throws \MySQLHasGoneAwayException
+	 * @throws \CoreUnexpectedValue
+	 * @throws \OQLException
+	 * @throws \ArchivedObjectException
+	 */
 	public function ProcessAnonymization()
 	{
 		// Process Error tasks first
-		$this->ProcessTaskList('SELECT '.self::BATCH_ANONYMIZATION_TASK." WHERE status = 'running'");
+		if (!$this->ProcessTaskList('SELECT '.self::BATCH_ANONYMIZATION_TASK." WHERE status = 'running'")) {
+			return;
+		}
 
 		// Process paused tasks
-		$this->ProcessTaskList('SELECT '.self::BATCH_ANONYMIZATION_TASK." WHERE status = 'paused'");
+		if (!$this->ProcessTaskList('SELECT '.self::BATCH_ANONYMIZATION_TASK." WHERE status = 'paused'")) {
+			return;
+		}
 
 		// New tasks to process
 		$this->ProcessTaskList('SELECT '.self::BATCH_ANONYMIZATION_TASK." WHERE status = 'created'");
 	}
 
-	protected function ProcessTaskList($sOQL)
+	/**
+	 * @param string $sOQL
+	 *
+	 * @return bool
+	 * @throws \ArchivedObjectException
+	 * @throws \CoreCannotSaveObjectException
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 * @throws \DeleteException
+	 * @throws \MySQLException
+	 * @throws \MySQLHasGoneAwayException
+	 * @throws \OQLException
+	 */
+	protected function ProcessTaskList(string $sOQL): bool
 	{
 		$oSearch = DBSearch::FromOQL($sOQL);
 		$oSet = new DBObjectSet($oSearch);
 		while ($oTask = $oSet->Fetch()) {
 			if ($this->IsTimeoutReached()) {
-				return;
+				return false;
 			}
 			if ($this->ProcessAnonymizationTask($oTask) == 'finished') {
 				$oTask->DBDelete();
+			} else {
+				return false;
 			}
 		}
+		return true;
 	}
 
 	/**

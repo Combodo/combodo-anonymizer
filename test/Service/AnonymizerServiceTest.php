@@ -159,7 +159,7 @@ class AnonymizerServiceTest extends ItopDataTestCase
 					],
 				],
 			],
-			'one action retry' => [
+			'one action continue' => [
 				'finished',
 				'paused',
 				'\Combodo\iTop\Anonymizer\Test\Service\AnonymizationTestAction',
