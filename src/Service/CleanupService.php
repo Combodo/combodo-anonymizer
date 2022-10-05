@@ -13,6 +13,7 @@ use DBObjectSearch;
 use DBObjectSet;
 use MetaModel;
 use ormPassword;
+use User;
 
 class CleanupService
 {
@@ -131,16 +132,16 @@ class CleanupService
 	}
 
 	/**
-	 * @throws \CoreException
-	 * @throws \CoreUnexpectedValue
+	 * @param \User $oUser
+	 *
 	 * @throws \ArchivedObjectException
 	 * @throws \CoreCannotSaveObjectException
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
 	 * @throws \Exception
 	 */
-	public function CleanupUser()
+	public function CleanupUser(User $oUser)
 	{
-		/** @var \User $oUser */
-		$oUser = MetaModel::GetObject($this->sClass, $this->sId);
 		$oUser->Set('status', 'disabled');
 		$iContactId = $oUser->Get('contactid');
 		$oUser->Set('login', 'Anonymous-'.$iContactId.'-'.$this->sId);

@@ -68,9 +68,11 @@ class CleanupUsers extends AbstractAnonymizationAction
 		}
 
 		while ($iUserId !== false) {
-			$oService = new CleanupService(self::USER_CLASS, $iUserId, $this->iEndExecutionTime);
+			/** @var \User $oUser */
+			$oUser = MetaModel::GetObject(self::USER_CLASS, $iUserId);
+			$oService = new CleanupService(get_class($oUser), $iUserId, $this->iEndExecutionTime);
 			// Disable User, reset login and password
-			$oService->CleanupUser();
+			$oService->CleanupUser($oUser);
 			if (!$oService->PurgeHistory($aParams['iChunkSize'])) {
 				return false;
 			}

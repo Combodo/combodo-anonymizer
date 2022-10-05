@@ -7,6 +7,6 @@ AnonymizationDialog({{ 'Anonymization:Error' | dict_s }}, {{ sErrorMessage }});
 
 {% else %}
 
-window.location.href={{ sUrl }};
+window.location.href='{{ sUrl|raw }}';
 
 {% endif %}
