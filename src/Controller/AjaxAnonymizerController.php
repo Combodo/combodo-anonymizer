@@ -28,7 +28,7 @@ class AjaxAnonymizerController extends Controller
 		$oService->AnonymizeOneObject($sClass, $sId, true);
 
 		cmdbAbstractObject::SetSessionMessage($sClass, $sId, 'anonymization', Dict::S('Anonymization:DoneOnePerson'), 'ok', 1);
-		$aParams['sURL'] = utils::GetAbsoluteUrlAppRoot()."pages/UI.php?operation=details&class=$sClass&id=$sId";
+		$aParams['sUrl'] = utils::GetAbsoluteUrlAppRoot()."pages/UI.php?operation=details&class=$sClass&id=$sId";
 
 		$this->DisplayAjaxPage($aParams);
 	}
