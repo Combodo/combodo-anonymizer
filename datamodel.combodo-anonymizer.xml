@@ -111,7 +111,7 @@
         </list>
       </presentation>
     </class>
-    <class id="Person">
+    <class id="Person" _delta="must_exist">
       <properties>
         <uniqueness_rules>
           <rule id="name" _delta="if_exists">
@@ -127,6 +127,22 @@
         </field>
       </fields>
       <methods>
+        <method id="DisplayBareHeader" _delta="define">
+          <static>false</static>
+          <access>public</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[
+        public function DisplayBareHeader(WebPage $oPage, $bEditMode = false)
+        {
+          $oSet = new DBObjectSet(DBSearch::FromOQL("SELECT BatchAnonymizationTask WHERE class_to_anonymize='Person' AND id_to_anonymize=:id"), [], ["id" => $this->GetKey()]);
+          if ($oSet->Count() > 0) {
+            $sMessage = Dict::S('Anonymization:InProgress');
+            $this::SetSessionMessage(get_class($this), $this->GetKey(), 1, $sMessage, 'info', 1);
+          }
+          parent::DisplayBareHeader($oPage, $bEditMode);
+        }
+          ]]></code>
+        </method>
         <method id="Anonymize" _delta="define">
           <static>false</static>
           <access>public</access>
