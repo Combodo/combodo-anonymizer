@@ -8,23 +8,13 @@ namespace Combodo\iTop\Anonymizer\Action;
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
-use DBObject;
 use MetaModel;
 
 /**
  * Remove history entries of the selected object
  */
-class PurgeHistory implements iAnonymizationAction
+class PurgeHistory extends AbstractAnonymizationAction
 {
-	private $oTask;
-	private $iEndExecutionTime;
-
-	public function __construct(DBObject $oTask, $iEndExecutionTime)
-	{
-		$this->oTask = $oTask;
-		$this->iEndExecutionTime = $iEndExecutionTime;
-	}
-
 	public function Init()
 	{
 		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
@@ -42,6 +32,18 @@ class PurgeHistory implements iAnonymizationAction
 		$this->oTask->DBWrite();
 	}
 
+	/**
+	 * Delete history entries, no need to keep track of the progress.
+	 *
+	 * @return bool
+	 * @throws \ArchivedObjectException
+	 * @throws \CoreCannotSaveObjectException
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 * @throws \CoreWarning
+	 * @throws \MySQLException
+	 * @throws \OQLException
+	 */
 	public function Execute(): bool
 	{
 		$aParams = json_decode($this->oTask->Get('action_params'), true);
@@ -50,8 +52,7 @@ class PurgeHistory implements iAnonymizationAction
 		$sId = $this->oTask->Get('id_to_anonymize');
 
 		$oService = new CleanupService($sClass, $sId, $this->iEndExecutionTime);
-		$oService->PurgeHistory($aParams['iChunkSize']);
 
-		return true;
+		return $oService->PurgeHistory($aParams['iChunkSize']);
 	}
 }

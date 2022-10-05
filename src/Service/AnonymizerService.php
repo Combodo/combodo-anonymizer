@@ -8,6 +8,7 @@ namespace Combodo\iTop\Anonymizer\Service;
 
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Action\AnonymizationActionFactory;
+use Combodo\iTop\Anonymizer\Helper\AnonymizerException;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use DBObject;
@@ -246,6 +247,9 @@ class AnonymizerService
 						$bInProgress = false;
 					}
 				}
+			}
+			catch (AnonymizerException $e) {
+				$bInProgress = false;
 			}
 			catch (Exception $e) {
 				// stay in 'running' status

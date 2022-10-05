@@ -12,6 +12,7 @@ use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use DBObjectSearch;
 use DBObjectSet;
 use MetaModel;
+use ormPassword;
 
 class CleanupService
 {
@@ -91,6 +92,71 @@ class CleanupService
 	}
 
 	/**
+	 * Cleanup all non-mandatory values //end of job
+	 *
+	 * @return bool
+	 * @throws \ArchivedObjectException
+	 * @throws \CoreCannotSaveObjectException
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 */
+	public function ResetObjectFields(): bool
+	{
+		/** @var \cmdbAbstractObject $oObject */
+		$oObject = MetaModel::GetObject($this->sClass, $this->sId);
+		foreach (MetaModel::ListAttributeDefs($this->sClass) as $sAttCode => $oAttDef) {
+			if (!$oAttDef->IsWritable()) {
+				continue;
+			}
+
+			if ($oAttDef->IsScalar()) {
+				if (!$oAttDef->IsNullAllowed()) {
+					// Try to put the default value is a suitable one exists
+					$value = $oAttDef->GetDefaultValue($oObject);
+					if (!$oAttDef->IsNull($value)) {
+						$oObject->Set($sAttCode, $value);
+					}
+				} else {
+					$oObject->Set($sAttCode, null);
+				}
+			} elseif ($oAttDef instanceof AttributeLinkedSetIndirect) {
+				$oValue = DBObjectSet::FromScratch($oAttDef->GetLinkedClass());
+				$oObject->Set($sAttCode, $oValue);
+			}
+		}
+		$oObject->AllowWrite();
+		$oObject->DBWrite();
+
+		return true;
+	}
+
+	/**
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 * @throws \ArchivedObjectException
+	 * @throws \CoreCannotSaveObjectException
+	 * @throws \Exception
+	 */
+	public function CleanupUser()
+	{
+		/** @var \User $oUser */
+		$oUser = MetaModel::GetObject($this->sClass, $this->sId);
+		$oUser->Set('status', 'disabled');
+		$iContactId = $oUser->Get('contactid');
+		$oUser->Set('login', 'Anonymous-'.$iContactId.'-'.$this->sId);
+
+		if (MetaModel::IsValidAttCode(get_class($oUser), 'password')) {
+			$rawToken = random_bytes(32);
+			$sToken = bin2hex($rawToken);
+			$oPassword = new ormPassword();
+			$oPassword->SetPassword($sToken);
+			$oUser->Set('password', $oPassword);
+		}
+		$oUser->AllowWrite();
+		$oUser->DBWrite();
+	}
+
+	/**
 	 * Helper to remove selected objects without calling any handler
 	 * Surpasses BulkDelete as it can handle abstract classes, but has the other limitation as it bypasses standard
 	 * objects handlers
@@ -100,7 +166,7 @@ class CleanupService
 	 * @return int The count of deleted objects
 	 * @throws \CoreException
 	 */
-	public function PurgeData($oFilter, $iChunkSize)
+	protected function PurgeData($oFilter, $iChunkSize)
 	{
 		$sTargetClass = $oFilter->GetClass();
 		$oSet = new DBObjectSet($oFilter);
@@ -109,16 +175,14 @@ class CleanupService
 		$aIdToClass = $oSet->GetColumnAsArray('finalclass');
 
 		$aIds = array_keys($aIdToClass);
-		if (count($aIds) > 0)
-		{
+		if (count($aIds) > 0) {
 			$aQuotedIds = CMDBSource::Quote($aIds);
 			$sIdList = implode(',', $aQuotedIds);
 			$aTargetClasses = array_merge(
 				MetaModel::EnumChildClasses($sTargetClass, ENUM_CHILD_CLASSES_ALL),
 				MetaModel::EnumParentClasses($sTargetClass)
 			);
-			foreach($aTargetClasses as $sSomeClass)
-			{
+			foreach ($aTargetClasses as $sSomeClass) {
 				$sTable = MetaModel::DBGetTable($sSomeClass);
 				$sPKField = MetaModel::DBGetKey($sSomeClass);
 
@@ -126,6 +190,7 @@ class CleanupService
 				CMDBSource::DeleteFrom($sDeleteSQL);
 			}
 		}
+
 		return count($aIds);
 	}
 }

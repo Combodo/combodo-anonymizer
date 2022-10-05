@@ -6,8 +6,11 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Combodo\\iTop\\Anonymizer\\Action\\AbstractAnonymizationAction' => $baseDir . '/src/Action/AbstractAnonymizationAction.php',
     'Combodo\\iTop\\Anonymizer\\Action\\AnonymizationActionFactory' => $baseDir . '/src/Action/AnonymizationActionFactory.php',
+    'Combodo\\iTop\\Anonymizer\\Action\\CleanupUsers' => $baseDir . '/src/Action/CleanupUsers.php',
     'Combodo\\iTop\\Anonymizer\\Action\\PurgeHistory' => $baseDir . '/src/Action/PurgeHistory.php',
+    'Combodo\\iTop\\Anonymizer\\Action\\ResetObjectFields' => $baseDir . '/src/Action/ResetObjectFields.php',
     'Combodo\\iTop\\Anonymizer\\Action\\iAnonymizationAction' => $baseDir . '/src/Action/iAnonymizationAction.php',
     'Combodo\\iTop\\Anonymizer\\Controller\\AjaxAnonymizerController' => $baseDir . '/src/Controller/AjaxAnonymizerController.php',
     'Combodo\\iTop\\Anonymizer\\Controller\\ConfigAnonymizerController' => $baseDir . '/src/Controller/ConfigAnonymizerController.php',

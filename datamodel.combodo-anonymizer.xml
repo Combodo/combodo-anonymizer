@@ -15,7 +15,9 @@
         <field id="2">name</field>
       </notification_content>
       <actions type="array">
-        <action id="0">\Combodo\iTop\Anonymizer\Task\PurgeHistory</action>
+        <action id="0">\Combodo\iTop\Anonymizer\Action\PurgeHistory</action>
+        <action id="1">\Combodo\iTop\Anonymizer\Action\CleanupUsers</action>
+        <action id="100">\Combodo\iTop\Anonymizer\Action\ResetObjectFields</action>
       </actions>
     </parameters>
   </module_parameters>
@@ -137,28 +139,6 @@
           $aDataToAnonymize['friendlyname'][] = $this->GetName();
           $aDataToAnonymize['email'][] = $sEmail;
 
-          // Cleanup all non mandatory values
-          foreach(MetaModel::ListAttributeDefs(get_class($this)) as $sAttCode => $oAttDef)
-          {
-            if (!$oAttDef->IsWritable()) continue;
-
-            if ($oAttDef->IsScalar())
-            {
-              if (!$oAttDef->IsNullAllowed())
-              {
-                // Try to put the default value is a suitable one exists
-                $value = $oAttDef->GetDefaultValue($this);
-                if (!$oAttDef->IsNull($value))
-                {
-                  $this->Set($sAttCode, $value);
-                }
-              }
-              else
-              {
-                $this->Set($sAttCode, null);
-              }
-            }
-          }
 
           // Put some more fancy values
           $this->SetAnonymousValues();
