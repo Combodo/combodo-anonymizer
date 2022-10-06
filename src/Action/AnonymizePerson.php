@@ -6,7 +6,10 @@
 
 namespace Combodo\iTop\Anonymizer\Action;
 
+use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
+use DBObjectSet;
+use DBSearch;
 use MetaModel;
 
 class AnonymizePerson extends AbstractAnonymizationAction
@@ -24,6 +27,17 @@ class AnonymizePerson extends AbstractAnonymizationAction
 				'friendlyname' => $oObject->Get('friendlyname'),
 			],
 		];
+
+		$oSet = new DBObjectSet(
+			DBSearch::FromOQL("SELECT CMDBChangeOpCreate WHERE objclass=:class AND objkey=:id"),
+			[],
+			['class' => $sClass, 'id' => $sId]
+		);
+
+		$oChangeCreate = $oSet->Fetch();
+		if ($oChangeCreate) {
+			$aContext['origin']['date_create'] = $oChangeCreate->Get('date');
+		}
 
 		$this->oTask->Set('anonymization_context', json_encode($aContext));
 		$this->oTask->DBWrite();
@@ -45,6 +59,8 @@ class AnonymizePerson extends AbstractAnonymizationAction
 
 		$aContext = json_decode($this->oTask->Get('anonymization_context'), true);
 		$aContext['anonymized']['friendlyname'] = $oPerson->Get('friendlyname');
+		AnonymizerLog::Debug('Anonymization context: '.var_export($aContext, true));
+
 		$this->oTask->Set('anonymization_context', json_encode($aContext));
 		$this->oTask->DBWrite();
 

@@ -16,7 +16,7 @@
       </notification_content>
       <actions type="array">
         <action id="0">\Combodo\iTop\Anonymizer\Action\AnonymizePerson</action>
-        <action id="1">\Combodo\iTop\Anonymizer\Action\PurgeHistory</action>
+        <action id="1">\Combodo\iTop\Anonymizer\Action\PurgePersonHistory</action>
         <action id="2">\Combodo\iTop\Anonymizer\Action\CleanupUsers</action>
         <action id="3">\Combodo\iTop\Anonymizer\Action\CleanupCaseLogs</action>
         <action id="100">\Combodo\iTop\Anonymizer\Action\ResetObjectFields</action>

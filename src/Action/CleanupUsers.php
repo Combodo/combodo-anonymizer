@@ -71,15 +71,26 @@ class CleanupUsers extends AbstractAnonymizationAction
 				// Timeout stop here
 				return false;
 			}
-			$iChangesCleanupProgress = isset($aParams['iChangesProgress']) ? $aParams['iChangesProgress'] : 0;
-			$iProgress = $oService->CleanupChangesFromUser($aContext, $iChangesCleanupProgress, $aParams['iChunkSize']);
-			if ($iProgress !== 0) {
-				// Timeout stop here
-				// Save progression
-				$aParams['iChangesProgress'] = $iProgress;
 
-				return false;
+			// Get all the request set to execute for every user
+			$aRequests = $oService->GetCleanupChangesRequests($aContext);
+
+			foreach ($aRequests as $sName => $aRequest) {
+				$iProgress = $aParams['aChangesProgress'][$sName] ?? 0;
+				$bCompleted = ($iProgress == -1);
+				while (!$bCompleted && time() < $this->iEndExecutionTime) {
+					$bCompleted = $oService->ExecuteActionWithQueriesByChunk($aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
+					// Save progression
+					$aParams['aChangesProgress'][$sName] = $iProgress;
+					$this->oTask->Set('action_params', json_encode($aParams));
+					$this->oTask->DBWrite();
+				}
+				if (!$bCompleted) {
+					// Timeout
+					return false;
+				}
 			}
+
 
 			$iUserId = next($aParams['aUserIds']);
 

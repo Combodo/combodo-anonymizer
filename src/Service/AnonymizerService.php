@@ -208,7 +208,7 @@ class AnonymizerService
 		$aFields['first_name'] = vsprintf($sTemplate, $sId);
 
 		$sTemplate = $this->aAnonymizedFields['email'] ?? 'xxxx@xxxx.xxx';
-		$aFields['email'] = vsprintf($sTemplate, [$aFields['first_name'], $aFields['name'], $sId]);
+		$aFields['email'] = str_replace(' ', '' ,vsprintf($sTemplate, [$aFields['first_name'], $aFields['name'], $sId]));
 
 		return $aFields;
 	}
@@ -264,6 +264,7 @@ class AnonymizerService
 					case 'created':
 					case 'finished':
 						$sAction = $this->GetNextAction($sAction);
+						AnonymizerLog::Debug("ProcessAnonymizationTask: status: $sStatus, action: $sAction");
 						$oAction = $this->oActionFactory->GetAnonymizationAction($sAction, $oTask, $this->iProcessEndTime);
 						if (is_null($oAction)) {
 							$sStatus = 'finished';
@@ -275,6 +276,7 @@ class AnonymizerService
 
 					case 'running':
 						$sAction = $oTask->Get('action');
+						AnonymizerLog::Debug("ProcessAnonymizationTask: status: $sStatus, action: $sAction");
 						$oAction = $this->oActionFactory->GetAnonymizationAction($sAction, $oTask, $this->iProcessEndTime);
 						if (is_null($oAction)) {
 							$sStatus = 'finished';
@@ -286,6 +288,7 @@ class AnonymizerService
 
 					case 'paused':
 						$sAction = $oTask->Get('action');
+						AnonymizerLog::Debug("ProcessAnonymizationTask: status: $sStatus, action: $sAction");
 						$oAction = $this->oActionFactory->GetAnonymizationAction($sAction, $oTask, $this->iProcessEndTime);
 						if (is_null($oAction)) {
 							$sStatus = 'finished';
