@@ -131,6 +131,7 @@ class AnonymizerService
 	{
 		if (!$this->IsAllowedToAnonymize($sClass, $sId)) {
 			AnonymizerLog::Error("Trying to anonymize administrator user with contact id $sId");
+
 			return;
 		}
 		$oTask = MetaModel::NewObject(self::BATCH_ANONYMIZATION_TASK);

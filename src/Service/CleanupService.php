@@ -9,10 +9,6 @@ namespace Combodo\iTop\Anonymizer\Service;
 use AttributeLinkedSetIndirect;
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
-use Combodo\iTop\Anonymizer\Helper\limit;
-use Combodo\iTop\Anonymizer\Helper\MySQLException;
-use Combodo\iTop\Anonymizer\Helper\primary;
-use Combodo\iTop\Anonymizer\Helper\start;
 use DBObjectSearch;
 use DBObjectSet;
 use Exception;
@@ -43,9 +39,9 @@ class CleanupService
 	/**
 	 * @param $sSqlSearch
 	 * @param $aSqlUpdate array to update elements found by $sSqlSearch, don't specify the where close
-	 * @param $sKey primary key of updated table
-	 * @param $sIdMin start the search at this value
-	 * @param $iMaxChunkSize limit size of processed data
+	 * @param string $sKey primary key of updated table
+	 * @param string $sIdMin start the search at this value
+	 * @param int $iMaxChunkSize limit size of processed data
 	 * Search objects to update and execute update by lot of  max_chunk_size elements
 	 * return true if all objects where updated, false if the function don't have the time to finish
 	 *
@@ -221,7 +217,8 @@ class CleanupService
 					CMDBSource::DeleteFrom($sDeleteSQL);
 				}
 				CMDBSource::Query('COMMIT');
-			} catch (Exception $e) {
+			}
+			catch (Exception $e) {
 				CMDBSource::Query('ROLLBACK');
 				throw $e;
 			}

@@ -22,7 +22,7 @@ class AnonymizePerson extends AbstractAnonymizationAction
 		$aContext = [
 			'origin' => [
 				'friendlyname' => $oObject->Get('friendlyname'),
-			]
+			],
 		];
 
 		$this->oTask->Set('anonymization_context', json_encode($aContext));

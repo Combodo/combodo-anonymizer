@@ -70,7 +70,8 @@ class ConfigAnonymizerController extends Controller
 
 				$aParams['$sMessageType'] = 'ok';
 				$aParams['$sMessage'] = Dict::S('config-saved');
-			} catch (Exception $e) {
+			}
+			catch (Exception $e) {
 				$aParams['$sMessageType'] = 'error';
 				$aParams['$sMessage'] = $e->getMessage();
 			}

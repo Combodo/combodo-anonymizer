@@ -72,9 +72,11 @@ abstract class AbstractBatchAnonymizationTask extends DBObject
 			try {
 				$sSQL = $sSqlSearch." LIMIT ".$iMaxChunkSize;
 				$oResult = CMDBSource::Query($sSQL);
-			} catch (MySQLException $e) {
+			}
+			catch (MySQLException $e) {
 				echo "\n ERROR in ".$sSQL."\n";
 				echo $e->GetMessage()."\n";
+
 				return false;
 			}
 			//echo("\n\n Search anonymization: ".$sSqlSearch);
@@ -88,12 +90,14 @@ abstract class AbstractBatchAnonymizationTask extends DBObject
 				}
 				foreach ($aSqlUpdate as $sSqlUpdate) {
 					$sSQL = $sSqlUpdate." WHERE `$sKey` IN (".implode(', ', $aObjects).");";
-				//echo("\n AnonymizationUpdate: ".$sSQL);
+					//echo("\n AnonymizationUpdate: ".$sSQL);
 					try {
 						CMDBSource::Query($sSQL);
-					} catch (MySQLException $e) {
+					}
+					catch (MySQLException $e) {
 						echo "\n ERROR in ".$sSQL."\n";
 						echo $e->GetMessage()."\n";
+
 						return false;
 					}
 				}
@@ -194,6 +198,7 @@ abstract class AbstractBatchAnonymizationTask extends DBObject
 				}
 			}
 		}
+
 		return $bFinish;
 	}
 
@@ -323,6 +328,7 @@ abstract class AbstractBatchAnonymizationTask extends DBObject
 				$oPerson->DBWrite();
 			}
 		}
+
 		return $bFinish;
 	}
 
@@ -370,6 +376,7 @@ abstract class AbstractBatchAnonymizationTask extends DBObject
 				$oPerson->DBWrite();
 			}
 		}
+
 		return $bFinish;
 	}
 
@@ -546,6 +553,7 @@ abstract class AbstractBatchAnonymizationTask extends DBObject
 				$oPerson->DBWrite();
 			}
 		}
+
 		return $bFinish;
 	}
 }

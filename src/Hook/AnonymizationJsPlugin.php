@@ -4,7 +4,7 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
-if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.1') < 0) {
+if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.1') < 0) {
 	/**
 	 * Class AnonymizationPlugInLegacy
 	 *
@@ -93,7 +93,7 @@ if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.1') < 0) {
 				'Anonymization:PurgeDelay_Input',
 				'Anonymization:Person:name',
 				'Anonymization:Person:first_name',
-				'UI:Button:Ok'
+				'UI:Button:Ok',
 			];
 		}
 	}

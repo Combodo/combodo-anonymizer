@@ -77,6 +77,7 @@ class CleanupUsers extends AbstractAnonymizationAction
 				// Timeout stop here
 				// Save progression
 				$aParams['iChangesProgress'] = $iProgress;
+
 				return false;
 			}
 

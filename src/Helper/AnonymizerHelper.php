@@ -17,7 +17,7 @@ class AnonymizerHelper
 
 	public function CanAnonymize()
 	{
-		return (UserRights::IsAdministrator() || UserRights::IsActionAllowed('RessourceAnonymization', UR_ACTION_MODIFY)) ;
+		return (UserRights::IsAdministrator() || UserRights::IsActionAllowed('RessourceAnonymization', UR_ACTION_MODIFY));
 	}
 
 	/**
