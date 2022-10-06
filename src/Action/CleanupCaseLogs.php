@@ -6,8 +6,13 @@
 
 namespace Combodo\iTop\Anonymizer\Action;
 
+use AttributeCaseLog;
+use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
+use DBObjectSearch;
+use DBObjectSet;
+use MetaModel;
 
 class CleanupCaseLogs extends AbstractAnonymizationAction
 {
@@ -154,7 +159,7 @@ class CleanupCaseLogs extends AbstractAnonymizationAction
 	public function Execute(): bool
 	{
 
-		return ExecuteQueries($this->oTask);
+		return $this->ExecuteQueries($this->oTask);
 	}
 
 	public function ExecuteQueries($oTask)
@@ -175,7 +180,7 @@ class CleanupCaseLogs extends AbstractAnonymizationAction
 			if ($sId == -1) {
 				array_shift($aListOfActions);
 				if (count($aListOfActions) == 0) {
-					return;
+					return true;
 				}
 				$aAction = $aListOfActions[0];
 			} else {
