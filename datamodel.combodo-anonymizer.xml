@@ -15,11 +15,17 @@
         <field id="2">name</field>
       </notification_content>
       <actions type="array">
-        <action id="0">\Combodo\iTop\Anonymizer\Action\PurgeHistory</action>
-        <action id="1">\Combodo\iTop\Anonymizer\Action\CleanupUsers</action>
+        <action id="0">\Combodo\iTop\Anonymizer\Action\AnonymizePerson</action>
+        <action id="1">\Combodo\iTop\Anonymizer\Action\PurgeHistory</action>
+        <action id="2">\Combodo\iTop\Anonymizer\Action\CleanupUsers</action>
         <action id="3">\Combodo\iTop\Anonymizer\Action\CleanupCaseLogs</action>
         <action id="100">\Combodo\iTop\Anonymizer\Action\ResetObjectFields</action>
       </actions>
+      <anonymized_fields type="hash">
+        <name>Contact %1$s</name>
+        <first_name>Anonymous</first_name>
+        <email>%1$s.%2$s%3$s@anony.mized</email>
+      </anonymized_fields>
     </parameters>
   </module_parameters>
   <constants>
@@ -73,6 +79,12 @@
         </field>
         <field id="action_params" xsi:type="AttributeText">
           <sql>action_params</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+          <tracking_level>none</tracking_level>
+        </field>
+        <field id="anonymization_context" xsi:type="AttributeText">
+          <sql>anonymization_context</sql>
           <default_value/>
           <is_null_allowed>true</is_null_allowed>
           <tracking_level>none</tracking_level>

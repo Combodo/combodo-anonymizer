@@ -23,8 +23,10 @@ class ComposerStaticInit9da934a9423c6df2e90dae99265f6022
     public static $classMap = array (
         'Combodo\\iTop\\Anonymizer\\Action\\AbstractAnonymizationAction' => __DIR__ . '/../..' . '/src/Action/AbstractAnonymizationAction.php',
         'Combodo\\iTop\\Anonymizer\\Action\\AnonymizationActionFactory' => __DIR__ . '/../..' . '/src/Action/AnonymizationActionFactory.php',
+        'Combodo\\iTop\\Anonymizer\\Action\\AnonymizePerson' => __DIR__ . '/../..' . '/src/Action/AnonymizePerson.php',
+        'Combodo\\iTop\\Anonymizer\\Action\\CleanupCaseLogs' => __DIR__ . '/../..' . '/src/Action/CleanupCaseLogs.php',
         'Combodo\\iTop\\Anonymizer\\Action\\CleanupUsers' => __DIR__ . '/../..' . '/src/Action/CleanupUsers.php',
-        'Combodo\\iTop\\Anonymizer\\Action\\PurgeHistory' => __DIR__ . '/../..' . '/src/Action/PurgeHistory.php',
+        'Combodo\\iTop\\Anonymizer\\Action\\PurgePersonHistory' => __DIR__ . '/../..' . '/src/Action/PurgePersonHistory.php',
         'Combodo\\iTop\\Anonymizer\\Action\\ResetObjectFields' => __DIR__ . '/../..' . '/src/Action/ResetObjectFields.php',
         'Combodo\\iTop\\Anonymizer\\Action\\iAnonymizationAction' => __DIR__ . '/../..' . '/src/Action/iAnonymizationAction.php',
         'Combodo\\iTop\\Anonymizer\\Controller\\AjaxAnonymizerController' => __DIR__ . '/../..' . '/src/Controller/AjaxAnonymizerController.php',

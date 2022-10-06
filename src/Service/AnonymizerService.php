@@ -12,10 +12,12 @@ use Combodo\iTop\Anonymizer\Helper\AnonymizerException;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use DBObject;
+use DBObjectSearch;
 use DBObjectSet;
 use DBSearch;
 use Exception;
 use MetaModel;
+use UserRights;
 
 class AnonymizerService
 {
@@ -28,12 +30,15 @@ class AnonymizerService
 	private $aActions;
 	/** @var \Combodo\iTop\Anonymizer\Action\AnonymizationActionFactory */
 	private $oActionFactory;
+	/** @var array */
+	private $aAnonymizedFields;
 
-	public function __construct($iMaxExecutionTime)
+	public function __construct()
 	{
-		$this->iProcessEndTime = $iMaxExecutionTime + time();
+		$this->iProcessEndTime = time() + MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_interactive_anonymization_time_in_s', 30);
 		$this->iMaxChunkSize = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
 		$this->aActions = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'actions', []);
+		$this->aAnonymizedFields = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'anonymized_fields', []);
 		$this->oActionFactory = new AnonymizationActionFactory();
 	}
 
@@ -41,6 +46,7 @@ class AnonymizerService
 	/**
 	 * @param $sClass
 	 * @param $sId
+	 * @param bool $bInteractive
 	 *
 	 * @return void
 	 * @throws \ArchivedObjectException
@@ -48,7 +54,9 @@ class AnonymizerService
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
 	 * @throws \CoreWarning
+	 * @throws \DeleteException
 	 * @throws \MySQLException
+	 * @throws \MySQLHasGoneAwayException
 	 * @throws \OQLException
 	 */
 	public function AnonymizeOneObject($sClass, $sId, $bInteractive = false)
@@ -63,12 +71,14 @@ class AnonymizerService
 
 	/**
 	 * @param $sFilter
+	 * @param bool $bInteractive
 	 *
 	 * @throws \ArchivedObjectException
 	 * @throws \CoreCannotSaveObjectException
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
 	 * @throws \CoreWarning
+	 * @throws \DeleteException
 	 * @throws \MySQLException
 	 * @throws \MySQLHasGoneAwayException
 	 * @throws \OQLException
@@ -119,6 +129,10 @@ class AnonymizerService
 	 */
 	protected function AddAnonymizationToProcessList($sClass, $sId)
 	{
+		if (!$this->IsAllowedToAnonymize($sClass, $sId)) {
+			AnonymizerLog::Error("Trying to anonymize administrator user with contact id $sId");
+			return;
+		}
 		$oTask = MetaModel::NewObject(self::BATCH_ANONYMIZATION_TASK);
 		$oTask->Set('class_to_anonymize', $sClass);
 		$oTask->Set('id_to_anonymize', $sId);
@@ -151,6 +165,53 @@ class AnonymizerService
 		$this->ProcessTaskList('SELECT '.self::BATCH_ANONYMIZATION_TASK." WHERE status = 'created'");
 	}
 
+	public function IsAllowedToAnonymize($sClass, $sId)
+	{
+		if (!UserRights::IsAdministrator() && $sClass == 'Person') {
+			// Cannot anonymize a person having an admin User
+			foreach ($this->GetUserIdListFromContact($sId) as $sUserId) {
+				if (UserRights::IsAdministrator(MetaModel::GetObject('User', $sUserId))) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param $sContactId
+	 *
+	 * @return int[]|string[]
+	 * @throws \CoreException
+	 */
+	public function GetUserIdListFromContact($sContactId)
+	{
+		$oSearch = new DBObjectSearch('User');
+		$oSearch->AddCondition('contactid', $sContactId);
+		$oSearch->AllowAllData();
+		$oSet = new DBObjectSet($oSearch);
+		$oSet->OptimizeColumnLoad(['User' => ['finalclass']]);
+		$aIdToClass = $oSet->GetColumnAsArray('finalclass');
+
+		return array_keys($aIdToClass);
+	}
+
+	public function GetAnonymizedFields($sId)
+	{
+		$aFields = [];
+		$sTemplate = $this->aAnonymizedFields['name'] ?? 'xxxx';
+		$aFields['name'] = vsprintf($sTemplate, $sId);
+
+		$sTemplate = $this->aAnonymizedFields['first_name'] ?? 'xxxx';
+		$aFields['first_name'] = vsprintf($sTemplate, $sId);
+
+		$sTemplate = $this->aAnonymizedFields['email'] ?? 'xxxx@xxxx.xxx';
+		$aFields['email'] = vsprintf($sTemplate, [$aFields['first_name'], $aFields['name'], $sId]);
+
+		return $aFields;
+	}
+
 	/**
 	 * @param string $sOQL
 	 *
@@ -178,6 +239,7 @@ class AnonymizerService
 				return false;
 			}
 		}
+
 		return true;
 	}
 
@@ -249,6 +311,7 @@ class AnonymizerService
 				}
 			}
 			catch (AnonymizerException $e) {
+				// stay in 'running' status
 				$bInProgress = false;
 			}
 			catch (Exception $e) {
@@ -317,5 +380,12 @@ class AnonymizerService
 		$this->oActionFactory = $oAnonymizationTaskFactory;
 	}
 
+	/**
+	 * @param array|mixed|null $aAnonymizedFields
+	 */
+	public function SetAnonymizedFields($aAnonymizedFields)
+	{
+		$this->aAnonymizedFields = $aAnonymizedFields;
+	}
 
 }

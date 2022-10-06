@@ -7,9 +7,8 @@
 namespace Combodo\iTop\Anonymizer\Action;
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
+use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
-use DBObjectSearch;
-use DBObjectSet;
 use MetaModel;
 
 class CleanupUsers extends AbstractAnonymizationAction
@@ -20,13 +19,8 @@ class CleanupUsers extends AbstractAnonymizationAction
 		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
 
 		$sId = $this->oTask->Get('id_to_anonymize');
-		$oSearch = new DBObjectSearch(self::USER_CLASS);
-		$oSearch->AddCondition('contactid', $sId);
-		$oSearch->AllowAllData();
-		$oSet = new DBObjectSet($oSearch);
-		$oSet->OptimizeColumnLoad(array(self::USER_CLASS => array('finalclass')));
-		$aIdToClass = $oSet->GetColumnAsArray('finalclass');
-		$aParams['aUserIds'] = array_keys($aIdToClass);
+		$oService = new AnonymizerService();
+		$aParams['aUserIds'] = $oService->GetUserIdListFromContact($sId);
 		$aParams['sCurrentUserId'] = reset($aParams['aUserIds']);
 
 		$this->oTask->Set('action_params', json_encode($aParams));
@@ -57,6 +51,7 @@ class CleanupUsers extends AbstractAnonymizationAction
 	public function Execute(): bool
 	{
 		$aParams = json_decode($this->oTask->Get('action_params'), true);
+		$aContext = json_decode($this->oTask->Get('anonymization_context'), true);
 
 		// Progress until the current user
 		$iUserId = false;
@@ -73,8 +68,18 @@ class CleanupUsers extends AbstractAnonymizationAction
 			// Disable User, reset login and password
 			$oService->CleanupUser($oUser);
 			if (!$oService->PurgeHistory($aParams['iChunkSize'])) {
+				// Timeout stop here
 				return false;
 			}
+			$iChangesCleanupProgress = isset($aParams['iChangesProgress']) ? $aParams['iChangesProgress'] : 0;
+			$iProgress = $oService->CleanupChangesFromUser($aContext, $iChangesCleanupProgress, $aParams['iChunkSize']);
+			if ($iProgress !== 0) {
+				// Timeout stop here
+				// Save progression
+				$aParams['iChangesProgress'] = $iProgress;
+				return false;
+			}
+
 			$iUserId = next($aParams['aUserIds']);
 
 			// Save progression

@@ -13,7 +13,7 @@ use MetaModel;
 /**
  * Remove history entries of the selected object
  */
-class PurgeHistory extends AbstractAnonymizationAction
+class PurgePersonHistory extends AbstractAnonymizationAction
 {
 	public function Init()
 	{

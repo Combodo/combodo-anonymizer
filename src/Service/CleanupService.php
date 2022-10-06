@@ -15,6 +15,7 @@ use Combodo\iTop\Anonymizer\Helper\primary;
 use Combodo\iTop\Anonymizer\Helper\start;
 use DBObjectSearch;
 use DBObjectSet;
+use Exception;
 use MetaModel;
 use ormPassword;
 use User;
@@ -75,24 +76,6 @@ class CleanupService
 		}
 
 		return $sId;
-	}
-
-
-	public function PurgeLinks()
-	{
-		$oPerson = MetaModel::GetObject($this->sClass, $this->sId);
-		// Cleanup all non mandatory values //end of job
-		foreach (MetaModel::ListAttributeDefs($this->sClass) as $sAttCode => $oAttDef) {
-			if (!$oAttDef->IsWritable()) {
-				continue;
-			}
-
-			if ($oAttDef instanceof AttributeLinkedSetIndirect) {
-				$oValue = DBObjectSet::FromScratch($oAttDef->GetLinkedClass());
-				$oPerson->Set($sAttCode, $oValue);
-			}
-		}
-		$oPerson->DBWrite();
 	}
 
 	/**
@@ -205,9 +188,12 @@ class CleanupService
 	 * objects handlers
 	 *
 	 * @param \DBSearch $oFilter Scope of objects to wipe out
+	 * @param $iChunkSize
 	 *
 	 * @return int The count of deleted objects
 	 * @throws \CoreException
+	 * @throws \MySQLException
+	 * @throws \MySQLHasGoneAwayException
 	 */
 	protected function PurgeData($oFilter, $iChunkSize)
 	{
@@ -225,16 +211,51 @@ class CleanupService
 				MetaModel::EnumChildClasses($sTargetClass, ENUM_CHILD_CLASSES_ALL),
 				MetaModel::EnumParentClasses($sTargetClass)
 			);
-			foreach ($aTargetClasses as $sSomeClass) {
-				$sTable = MetaModel::DBGetTable($sSomeClass);
-				$sPKField = MetaModel::DBGetKey($sSomeClass);
+			CMDBSource::Query('START TRANSACTION');
+			try {
+				foreach ($aTargetClasses as $sSomeClass) {
+					$sTable = MetaModel::DBGetTable($sSomeClass);
+					$sPKField = MetaModel::DBGetKey($sSomeClass);
 
-				$sDeleteSQL = "DELETE FROM `$sTable` WHERE `$sPKField` IN ($sIdList)";
-				CMDBSource::DeleteFrom($sDeleteSQL);
+					$sDeleteSQL = "DELETE FROM `$sTable` WHERE `$sPKField` IN ($sIdList)";
+					CMDBSource::DeleteFrom($sDeleteSQL);
+				}
+				CMDBSource::Query('COMMIT');
+			} catch (Exception $e) {
+				CMDBSource::Query('ROLLBACK');
+				throw $e;
 			}
 		}
 
 		return count($aIds);
 	}
 
+	public function AnonymizePerson(\Person $oPerson)
+	{
+		$oService = new AnonymizerService();
+		$aAnonymizedFields = $oService->GetAnonymizedFields($oPerson->GetKey());
+		$oPerson->Set('name', $aAnonymizedFields['name']);
+		$oPerson->Set('first_name', $aAnonymizedFields['first_name']);
+		$oPerson->Set('email', $aAnonymizedFields['email']);
+		// Mark the contact as obsolete
+		$oPerson->Set('status', 'inactive');
+		// Remove picture
+		$oPerson->Set('picture', null);
+	}
+
+	/**
+	 * Cleanup all references to the Person's name as an author in changes
+	 *
+	 * @param $aContext
+	 * @param $iProgress
+	 * @param $iChunkSize
+	 *
+	 * @return int
+	 */
+	public function CleanupChangesFromUser($aContext, $iProgress, $iChunkSize)
+	{
+
+
+		return 0;
+	}
 }

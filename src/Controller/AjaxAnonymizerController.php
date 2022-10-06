@@ -7,12 +7,10 @@
 namespace Combodo\iTop\Anonymizer\Controller;
 
 use cmdbAbstractObject;
-use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 use Combodo\iTop\Application\TwigBase\Controller\Controller;
 use CoreUnexpectedValue;
 use Dict;
-use MetaModel;
 use utils;
 
 class AjaxAnonymizerController extends Controller
@@ -23,8 +21,7 @@ class AjaxAnonymizerController extends Controller
 		$sId = utils::ReadParam('id');
 		$sClass = utils::ReadParam('class', 'Person');
 
-		$iMaxExecutionTime = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_interactive_anonymization_time_in_s', 30);
-		$oService = new AnonymizerService($iMaxExecutionTime);
+		$oService = new AnonymizerService();
 		$oService->AnonymizeOneObject($sClass, $sId, true);
 
 		cmdbAbstractObject::SetSessionMessage($sClass, $sId, 'anonymization', Dict::S('Anonymization:DoneOnePerson'), 'ok', 1);
@@ -41,8 +38,7 @@ class AjaxAnonymizerController extends Controller
 			throw new CoreUnexpectedValue('mandatory filter parameter is empty !');
 		}
 
-		$iMaxExecutionTime = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_interactive_anonymization_time_in_s', 30);
-		$oService = new AnonymizerService($iMaxExecutionTime);
+		$oService = new AnonymizerService();
 		$oService->AnonymizeObjectList($sFilter, true);
 
 		$this->DisplayAjaxPage($aParams);

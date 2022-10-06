@@ -5,6 +5,7 @@
  */
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
+use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 
 
 /**
@@ -24,20 +25,19 @@ class AnonymizationMenuPlugIn implements iPopupMenuExtension
 			}
 			switch ($iMenuId) {
 				case iPopupMenuExtension::MENU_OBJLIST_ACTIONS:
-					/**
-					 * @var DBObjectSet $param
-					 */
+					/** @var DBObjectSet $param */
 					if ($param->GetClass() == 'Person') {
 						$aExtraMenus[] = new JSPopupMenuItem('Anonymize', Dict::S('Anonymization:AnonymizeAll'), 'AnonymizeAListOfPersons('.json_encode($param->GetFilter()->serialize()).', '.$param->Count().');', [$sJSUrl]);
 					}
 					break;
 
 				case iPopupMenuExtension::MENU_OBJDETAILS_ACTIONS:
-					/**
-					 * @var DBObject $param
-					 */
+					/** @var DBObject $param */
 					if ($param instanceof Person) {
-						$aExtraMenus[] = new JSPopupMenuItem('Anonymize', Dict::S('Anonymization:AnonymizeOne'), 'AnonymizeOnePerson('.$param->GetKey().');', [$sJSUrl]);
+						$oService = new AnonymizerService();
+						if ($oService->IsAllowedToAnonymize(get_class($param), $param->GetKey())) {
+							$aExtraMenus[] = new JSPopupMenuItem('Anonymize', Dict::S('Anonymization:AnonymizeOne'), 'AnonymizeOnePerson('.$param->GetKey().');', [$sJSUrl]);
+						}
 					}
 					break;
 

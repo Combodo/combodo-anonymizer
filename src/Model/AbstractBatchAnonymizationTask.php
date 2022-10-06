@@ -123,30 +123,6 @@ abstract class AbstractBatchAnonymizationTask extends DBObject
 	protected function PurgeHistoryByBatch($iTimeLimit)
 	{
 		$oPerson = MetaModel::GetObject('Person', $this->Get('id_to_anonymize'), true);
-		// Cleanup all non mandatory values //end of job
-		foreach (MetaModel::ListAttributeDefs('Person') as $sAttCode => $oAttDef) {
-			if (!$oAttDef->IsWritable()) {
-				continue;
-			}
-
-			if ($oAttDef instanceof AttributeLinkedSetIndirect) {
-				$oValue = DBObjectSet::FromScratch($oAttDef->GetLinkedClass());
-				$oPerson->Set($sAttCode, $oValue);
-			}
-		}
-		$oPerson->DBWrite();
-
-		// Delete any existing change tracking about the current object
-		$oFilter = new DBObjectSearch('CMDBChangeOp');
-		$oFilter->AddCondition('objclass', $this->Get('class_to_anonymize'), '=');
-		$oFilter->AddCondition('objkey', $this->Get('id_to_anonymize'), '=');
-		MetaModel::PurgeData($oFilter);
-
-		$oMyChangeOp = MetaModel::NewObject("CMDBChangeOpPlugin");
-		$oMyChangeOp->Set("objclass", $this->Get('class_to_anonymize'));
-		$oMyChangeOp->Set("objkey", $this->Get('id_to_anonymize'));
-		$oMyChangeOp->Set("description", 'Anonymization');
-		$iId = $oMyChangeOp->DBInsertNoReload();
 
 		// Now remove the name of the contact from all the changes she/he made
 		$sChangeTable = MetaModel::DBGetTable('CMDBChange');
