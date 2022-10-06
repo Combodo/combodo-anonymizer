@@ -9,6 +9,10 @@ namespace Combodo\iTop\Anonymizer\Service;
 use AttributeLinkedSetIndirect;
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
+use Combodo\iTop\Anonymizer\Helper\limit;
+use Combodo\iTop\Anonymizer\Helper\MySQLException;
+use Combodo\iTop\Anonymizer\Helper\primary;
+use Combodo\iTop\Anonymizer\Helper\start;
 use DBObjectSearch;
 use DBObjectSet;
 use MetaModel;
@@ -33,6 +37,44 @@ class CleanupService
 		$this->sId = $sId;
 		$this->iProcessEndTime = $iProcessEndTime;
 		$this->iMaxChunkSize = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
+	}
+
+	/**
+	 * @param $sSqlSearch
+	 * @param $aSqlUpdate array to update elements found by $sSqlSearch, don't specify the where close
+	 * @param $sKey primary key of updated table
+	 * @param $sIdMin start the search at this value
+	 * @param $iMaxChunkSize limit size of processed data
+	 * Search objects to update and execute update by lot of  max_chunk_size elements
+	 * return true if all objects where updated, false if the function don't have the time to finish
+	 *
+	 * @return int max id processed if finish or no data found, return -1
+	 * @throws \CoreException
+	 * @throws \MySQLException
+	 * @throws \MySQLHasGoneAwayException
+	 */
+	public function ExecuteActionWithQueriesByChunk($sSqlSearch, $aSqlUpdate, $sKey, $sIdMin, $iMaxChunkSize)
+	{
+		$sSQL = $sSqlSearch." AND $sKey > $sIdMin ORDER BY $sKey LIMIT ".$iMaxChunkSize;
+		$oResult = CMDBSource::Query($sSQL);
+
+		$aObjects = [];
+		$sId = -1;
+		if ($oResult->num_rows > 0) {
+			while ($oRaw = $oResult->fetch_assoc()) {
+				$sId = $oRaw[$sKey];
+				$aObjects[] = $sId;
+			}
+			foreach ($aSqlUpdate as $sSqlUpdate) {
+				$sSQL = $sSqlUpdate." WHERE `$sKey` IN (".implode(', ', $aObjects).");";
+				CMDBSource::Query($sSQL);
+			}
+		}
+		if (count($aObjects) < $iMaxChunkSize) {
+			return -1;
+		}
+
+		return $sId;
 	}
 
 
@@ -194,4 +236,5 @@ class CleanupService
 
 		return count($aIds);
 	}
+
 }

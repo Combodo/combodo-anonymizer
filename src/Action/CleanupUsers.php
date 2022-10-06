@@ -14,7 +14,6 @@ use MetaModel;
 
 class CleanupUsers extends AbstractAnonymizationAction
 {
-	const USER_CLASS = 'User';
 
 	public function Init()
 	{

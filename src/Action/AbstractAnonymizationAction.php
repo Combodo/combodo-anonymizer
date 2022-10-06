@@ -10,6 +10,8 @@ use DBObject;
 
 abstract class AbstractAnonymizationAction implements iAnonymizationAction
 {
+	const USER_CLASS = 'User';
+
 	protected $oTask;
 	protected $iEndExecutionTime;
 
