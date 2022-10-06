@@ -13,6 +13,7 @@ use DBObjectSet;
 use Exception;
 use MetaModel;
 use ormPassword;
+use Person;
 use User;
 
 class CleanupService
@@ -75,8 +76,12 @@ class CleanupService
 			}
 			if (count($aObjects) < $iMaxChunkSize) {
 				// completed
+				$sProgressId = -1;
 				return true;
 			}
+		} else {
+			$sProgressId = -1;
+			return true;
 		}
 
 		// not completed yet
@@ -236,7 +241,7 @@ class CleanupService
 		return count($aIds);
 	}
 
-	public function AnonymizePerson(\Person $oPerson)
+	public function AnonymizePerson(Person $oPerson)
 	{
 		$oService = new AnonymizerService();
 		$aAnonymizedFields = $oService->GetAnonymizedFields($oPerson->GetKey());

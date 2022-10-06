@@ -7,6 +7,7 @@
 namespace Combodo\iTop\Anonymizer\Action;
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
+use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
 use MetaModel;
@@ -84,14 +85,14 @@ class CleanupUsers extends AbstractAnonymizationAction
 					$aParams['aChangesProgress'][$sName] = $iProgress;
 					$this->oTask->Set('action_params', json_encode($aParams));
 					$this->oTask->DBWrite();
+					AnonymizerLog::Debug("ExecuteActionWithQueriesByChunk: name: $sName progress: $iProgress completed: $bCompleted");
 				}
 				if (!$bCompleted) {
 					// Timeout
 					return false;
 				}
 			}
-
-
+			$aParams['aChangesProgress'] = [];
 			$iUserId = next($aParams['aUserIds']);
 
 			// Save progression

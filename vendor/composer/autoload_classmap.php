@@ -12,7 +12,7 @@ return array(
     'Combodo\\iTop\\Anonymizer\\Action\\CleanupCaseLogs' => $baseDir . '/src/Action/CleanupCaseLogs.php',
     'Combodo\\iTop\\Anonymizer\\Action\\CleanupUsers' => $baseDir . '/src/Action/CleanupUsers.php',
     'Combodo\\iTop\\Anonymizer\\Action\\PurgePersonHistory' => $baseDir . '/src/Action/PurgePersonHistory.php',
-    'Combodo\\iTop\\Anonymizer\\Action\\ResetObjectFields' => $baseDir . '/src/Action/ResetObjectFields.php',
+    'Combodo\\iTop\\Anonymizer\\Action\\ResetPersonFields' => $baseDir . '/src/Action/ResetPersonFields.php',
     'Combodo\\iTop\\Anonymizer\\Action\\iAnonymizationAction' => $baseDir . '/src/Action/iAnonymizationAction.php',
     'Combodo\\iTop\\Anonymizer\\Controller\\AjaxAnonymizerController' => $baseDir . '/src/Controller/AjaxAnonymizerController.php',
     'Combodo\\iTop\\Anonymizer\\Controller\\ConfigAnonymizerController' => $baseDir . '/src/Controller/ConfigAnonymizerController.php',
