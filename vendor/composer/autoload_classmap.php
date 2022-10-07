@@ -9,6 +9,7 @@ return array(
     'Combodo\\iTop\\Anonymizer\\Action\\AnonymizePerson' => $baseDir . '/src/Action/AnonymizePerson.php',
     'Combodo\\iTop\\Anonymizer\\Action\\CleanupCaseLogs' => $baseDir . '/src/Action/CleanupCaseLogs.php',
     'Combodo\\iTop\\Anonymizer\\Action\\CleanupEmailNotification' => $baseDir . '/src/Action/CleanupEmailNotification.php',
+    'Combodo\\iTop\\Anonymizer\\Action\\CleanupOnMention' => $baseDir . '/src/Action/CleanupOnMention.php',
     'Combodo\\iTop\\Anonymizer\\Action\\CleanupUsers' => $baseDir . '/src/Action/CleanupUsers.php',
     'Combodo\\iTop\\Anonymizer\\Action\\PurgePersonHistory' => $baseDir . '/src/Action/PurgePersonHistory.php',
     'Combodo\\iTop\\Anonymizer\\Action\\ResetPersonFields' => $baseDir . '/src/Action/ResetPersonFields.php',

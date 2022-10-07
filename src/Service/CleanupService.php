@@ -7,6 +7,7 @@
 namespace Combodo\iTop\Anonymizer\Service;
 
 use AttributeLinkedSetIndirect;
+use CMDBObject;
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerException;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
@@ -188,6 +189,8 @@ class CleanupService
 		}
 		$oObject->AllowWrite();
 		$oObject->DBWrite();
+		CMDBObject::SetCurrentChangeFromParams(null);
+		CMDBObject::SetCurrentChange(null);
 
 		return true;
 	}
