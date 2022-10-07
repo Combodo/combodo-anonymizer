@@ -10,7 +10,9 @@ use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
+use Exception;
 use MetaModel;
+use MySQLHasGoneAwayException;
 
 class CleanupUsers extends AbstractAnonymizationAction
 {
@@ -32,12 +34,14 @@ class CleanupUsers extends AbstractAnonymizationAction
 	{
 		$aParams = json_decode($this->oTask->Get('action_params'), true);
 		$iChunkSize = $aParams['iChunkSize'];
-		if($iChunkSize == 1){
+		if ($iChunkSize == 1) {
 			AnonymizerLog::Debug('Stop retry action CleanupUsers with params '.json_encode($aParams));
 			$this->oTask->Set('action_params', '');
 			$this->oTask->DBWrite();
+
+			return;
 		}
-		$aParams['iChunkSize'] = (int) $iChunkSize/2 + 1;
+		$aParams['iChunkSize'] = (int)$iChunkSize / 2 + 1;
 
 		$this->oTask->Set('action_params', json_encode($aParams));
 		$this->oTask->DBWrite();
@@ -92,14 +96,17 @@ class CleanupUsers extends AbstractAnonymizationAction
 						$aParams['aChangesProgress'][$sName] = $iProgress;
 						$this->oTask->Set('action_params', json_encode($aParams));
 						$this->oTask->DBWrite();
-					} catch (MySQLHasGoneAwayException $e){
+					}
+					catch (MySQLHasGoneAwayException $e) {
 						//in this case retry is possible
 						AnonymizerLog::Error('Error MySQLHasGoneAwayException during CleanupUsers try again later');
+
 						return false;
-					} catch (\Exception $e){
+					}
+					catch (Exception $e) {
 						AnonymizerLog::Error('Error during CleanupUsers with params '.$this->oTask->Get('action_params').' with message :'.$e->getMessage());
 						AnonymizerLog::Error('Go to next update');
-						$aParams['aChangesProgress'][$sName]= -1;
+						$aParams['aChangesProgress'][$sName] = -1;
 					}
 					AnonymizerLog::Debug("ExecuteActionWithQueriesByChunk: name: $sName progress: $iProgress completed: $bCompleted");
 				}

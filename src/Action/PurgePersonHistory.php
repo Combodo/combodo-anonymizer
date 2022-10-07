@@ -7,6 +7,7 @@
 namespace Combodo\iTop\Anonymizer\Action;
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
+use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
 use MetaModel;
 
@@ -27,12 +28,14 @@ class PurgePersonHistory extends AbstractAnonymizationAction
 	{
 		$aParams = json_decode($this->oTask->Get('action_params'), true);
 		$iChunkSize = $aParams['iChunkSize'];
-		if($iChunkSize == 1){
+		if ($iChunkSize == 1) {
 			AnonymizerLog::Debug('Stop retry action PurgePersonHistory with params '.json_encode($aParams));
 			$this->oTask->Set('action_params', '');
 			$this->oTask->DBWrite();
+
+			return;
 		}
-		$aParams['iChunkSize'] = (int) $iChunkSize/2 + 1;
+		$aParams['iChunkSize'] = (int)$iChunkSize / 2 + 1;
 
 		$this->oTask->Set('action_params', json_encode($aParams));
 		$this->oTask->DBWrite();
@@ -52,7 +55,11 @@ class PurgePersonHistory extends AbstractAnonymizationAction
 	 */
 	public function Execute(): bool
 	{
-		$aParams = json_decode($this->oTask->Get('action_params'), true);
+		$sParams = $this->oTask->Get('action_params');
+		if ($sParams == '') {
+			return true;
+		}
+		$aParams = json_decode($sParams, true);
 
 		$sClass = $this->oTask->Get('class_to_anonymize');
 		$sId = $this->oTask->Get('id_to_anonymize');

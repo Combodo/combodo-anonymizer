@@ -8,11 +8,13 @@ namespace Combodo\iTop\Anonymizer\Service;
 
 use AttributeLinkedSetIndirect;
 use CMDBSource;
+use Combodo\iTop\Anonymizer\Helper\AnonymizerException;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use DBObjectSearch;
 use DBObjectSet;
 use Exception;
 use MetaModel;
+use MySQLHasGoneAwayException;
 use ormPassword;
 use Person;
 use User;
@@ -48,6 +50,7 @@ class CleanupService
 	 * @throws \CoreException
 	 * @throws \MySQLException
 	 * @throws \MySQLHasGoneAwayException
+	 * @throws \Combodo\iTop\Anonymizer\Helper\AnonymizerException
 	 */
 	public function ExecuteActionWithQueriesByChunk($sSqlSearch, $aSqlUpdate, $sKey, &$sProgressId, $iMaxChunkSize): bool
 	{
@@ -71,19 +74,39 @@ class CleanupService
 				}
 				CMDBSource::Query('COMMIT');
 				// Save progression
-				$sProgressId = $sId;
+				$sProgressId = $sId + 1;
+			}
+			catch (MySQLHasGoneAwayException $e) {
+				// Allow to retry the same set
+				CMDBSource::Query('ROLLBACK');
+				if ($iMaxChunkSize == 1) {
+					// This is hopeless for this entry
+					throw new AnonymizerException($e->getMessage());
+				}
+				throw $e;
 			}
 			catch (Exception $e) {
 				CMDBSource::Query('ROLLBACK');
+				if ($iMaxChunkSize == 1) {
+					// Ignore current entries and skip to the next ones
+					$sProgressId = $sId + 1;
+					AnonymizerLog::Error($e->getMessage());
+
+					return false;
+				}
+
+				// Try with a reduced set in order to find the entries in error
 				throw $e;
 			}
 			if (count($aObjects) < $iMaxChunkSize) {
 				// completed
 				$sProgressId = -1;
+
 				return true;
 			}
 		} else {
 			$sProgressId = -1;
+
 			return true;
 		}
 
@@ -281,29 +304,29 @@ class CleanupService
 
 		if (MetaModel::IsValidAttCode('CMDBChange', 'user_id')) {
 			$aRequests['req1'] = [
-				'key' => $sKey,
-				'select' => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).' AND user_id IS NULL'.$sDateCreateCondition,
+				'key'     => $sKey,
+				'select'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).' AND user_id IS NULL'.$sDateCreateCondition,
 				'updates' => ["UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
 			];
 			$aRequests['req2'] = [
-				'key' => $sKey,
-				'select' => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').' AND user_id IS NULL'.$sDateCreateCondition,
+				'key'     => $sKey,
+				'select'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').' AND user_id IS NULL'.$sDateCreateCondition,
 				'updates' => ["UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname.' (CSV)')],
 			];
 			$aRequests['req3'] = [
-				'key' => $sKey,
-				'select' => "SELECT `$sKey` from `$sChangeTable` WHERE user_id in (".$this->sId.')',
+				'key'     => $sKey,
+				'select'  => "SELECT `$sKey` from `$sChangeTable` WHERE user_id in (".$this->sId.')',
 				'updates' => ["UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
 			];
 		} else {
 			$aRequests['req1'] = [
-				'key' => $sKey,
-				'select' => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).$sDateCreateCondition,
+				'key'     => $sKey,
+				'select'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).$sDateCreateCondition,
 				'updates' => ["UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
 			];
 			$aRequests['req2'] = [
-				'key' => $sKey,
-				'select' => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').$sDateCreateCondition,
+				'key'     => $sKey,
+				'select'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').$sDateCreateCondition,
 				'updates' => ["UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname.' (CSV)')],
 			];
 		}

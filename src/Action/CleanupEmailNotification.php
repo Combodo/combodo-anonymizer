@@ -6,12 +6,10 @@
 
 namespace Combodo\iTop\Anonymizer\Action;
 
-use AttributeCaseLog;
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
-use DBObjectSet;
 use MetaModel;
 use MySQLHasGoneAwayException;
 
@@ -28,6 +26,7 @@ class CleanupEmailNotification extends AbstractAnonymizationAction
 			//nothing to do. We can skip the current action
 			$this->oTask->Set('action_params', '');
 			$this->oTask->DBWrite();
+
 			return;
 		}
 
@@ -44,23 +43,23 @@ class CleanupEmailNotification extends AbstractAnonymizationAction
 		$sEndReplaceEmail = "";
 
 		if (in_array('friendlyname', $aCleanupEmail)) {
-		//	foreach ($sOrigFriendlyname as $sFriendlyName) {
-				$sStartReplace = "REPLACE(";
-				$sEndReplace = $sEndReplace.", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sTargetFriendlyname).")";
-		//	}
+			//	foreach ($sOrigFriendlyname as $sFriendlyName) {
+			$sStartReplace = "REPLACE(";
+			$sEndReplace = $sEndReplace.", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sTargetFriendlyname).")";
+			//	}
 		}
 //		foreach ($sOrigEmail as $sEmail) {
-			$aConditions[] = "`from` like '".$sOrigEmail."'";
-			$aConditions[] = "`to` like '%".$sOrigEmail."%'";
-			$aConditions[] = "`cc` like '%".$sOrigEmail."%'";
-			$aConditions[] = "`bcc` like '%".$sOrigEmail."%'";
+		$aConditions[] = "`from` like '".$sOrigEmail."'";
+		$aConditions[] = "`to` like '%".$sOrigEmail."%'";
+		$aConditions[] = "`cc` like '%".$sOrigEmail."%'";
+		$aConditions[] = "`bcc` like '%".$sOrigEmail."%'";
 
-			if (in_array('email', $aCleanupEmail)) {
-				$sStartReplace = "REPLACE(".$sStartReplace;
-				$sEndReplace = $sEndReplace.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
-			}
-			$sStartReplaceEmail = "REPLACE(".$sStartReplaceEmail;
-			$sEndReplaceEmail = $sEndReplaceEmail.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
+		if (in_array('email', $aCleanupEmail)) {
+			$sStartReplace = "REPLACE(".$sStartReplace;
+			$sEndReplace = $sEndReplace.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
+		}
+		$sStartReplaceEmail = "REPLACE(".$sStartReplaceEmail;
+		$sEndReplaceEmail = $sEndReplaceEmail.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
 //		}
 
 		// Now change email adress
@@ -91,12 +90,12 @@ class CleanupEmailNotification extends AbstractAnonymizationAction
 	{
 		$aParams = json_decode($this->oTask->Get('action_params'), true);
 		$iChunkSize = $aParams['iChunkSize'];
-		if($iChunkSize == 1){
+		if ($iChunkSize == 1) {
 			AnonymizerLog::Debug('Stop retry action CleanupEmailNotification with params '.json_encode($aParams));
 			$this->oTask->Set('action_params', '');
 			$this->oTask->DBWrite();
 		}
-		$aParams['iChunkSize'] = (int) $iChunkSize/2 + 1;
+		$aParams['iChunkSize'] = (int)$iChunkSize / 2 + 1;
 
 		$this->oTask->Set('action_params', json_encode($aParams));
 		$this->oTask->DBWrite();
@@ -113,12 +112,16 @@ class CleanupEmailNotification extends AbstractAnonymizationAction
 	{
 		try {
 			return $this->ExecuteQueries($this->oTask);
-		} catch (MySQLHasGoneAwayException $e){
+		}
+		catch (MySQLHasGoneAwayException $e) {
 			//in this case retry is possible
 			AnonymizerLog::Error('Error MySQLHasGoneAwayException during CleanupEmailNotification try again later');
+
 			return false;
-		} catch (\Exception $e){
+		}
+		catch (\Exception $e) {
 			AnonymizerLog::Error('Error during CleanupEmailNotification with params '.$this->oTask->Get('action_params').' with message :'.$e->getMessage());
+
 			return true;
 		}
 	}

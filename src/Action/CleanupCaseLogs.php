@@ -7,12 +7,14 @@
 namespace Combodo\iTop\Anonymizer\Action;
 
 use AttributeCaseLog;
+use AttributeText;
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
 use DBObjectSearch;
 use DBObjectSet;
+use Exception;
 use MetaModel;
 use MySQLHasGoneAwayException;
 
@@ -143,12 +145,12 @@ class CleanupCaseLogs extends AbstractAnonymizationAction
 	{
 		$aParams = json_decode($this->oTask->Get('action_params'), true);
 		$iChunkSize = $aParams['iChunkSize'];
-		if($iChunkSize == 1){
+		if ($iChunkSize == 1) {
 			AnonymizerLog::Debug('Stop retry action CleanupCaseLogs with params '.json_encode($aParams));
 			$this->oTask->Set('action_params', '');
 			$this->oTask->DBWrite();
 		}
-		$aParams['iChunkSize'] = (int) $iChunkSize/2 + 1;
+		$aParams['iChunkSize'] = (int)$iChunkSize / 2 + 1;
 
 		$this->oTask->Set('action_params', json_encode($aParams));
 		$this->oTask->DBWrite();
@@ -182,14 +184,17 @@ class CleanupCaseLogs extends AbstractAnonymizationAction
 				try {
 					$bCompleted = $oService->ExecuteActionWithQueriesByChunk($aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
 					$aParams['aChangesProgress'][$sName] = $iProgress;
-				} catch (MySQLHasGoneAwayException $e){
+				}
+				catch (MySQLHasGoneAwayException $e) {
 					//in this case retry is possible
 					AnonymizerLog::Error('Error MySQLHasGoneAwayException during CleanupCaseLogs try again later');
+
 					return false;
-				} catch (Exception $e){
+				}
+				catch (Exception $e) {
 					AnonymizerLog::Error('Error during CleanupCaseLogs with params '.$this->oTask->Get('action_params').' with message :'.$e->getMessage());
 					AnonymizerLog::Error('Go to next update');
-					$aParams['aChangesProgress'][$sName]= -1;
+					$aParams['aChangesProgress'][$sName] = -1;
 				}
 				// Save progression
 				$this->oTask->Set('action_params', json_encode($aParams));
@@ -198,10 +203,12 @@ class CleanupCaseLogs extends AbstractAnonymizationAction
 			if (!$bCompleted) {
 				// Timeout
 				AnonymizerLog::Debug('timeout');
+
 				return false;
 			}
 		}
 		AnonymizerLog::Debug('return true');
+
 		return true;
 	}
 }
