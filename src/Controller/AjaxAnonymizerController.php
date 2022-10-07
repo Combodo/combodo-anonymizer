@@ -7,6 +7,7 @@
 namespace Combodo\iTop\Anonymizer\Controller;
 
 use cmdbAbstractObject;
+use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 use Combodo\iTop\Application\TwigBase\Controller\Controller;
 use CoreUnexpectedValue;

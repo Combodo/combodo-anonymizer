@@ -19,6 +19,8 @@
         <action id="10">\Combodo\iTop\Anonymizer\Action\AnonymizePerson</action>
         <action id="20">\Combodo\iTop\Anonymizer\Action\CleanupUsers</action>
         <action id="30">\Combodo\iTop\Anonymizer\Action\CleanupCaseLogs</action>
+        <action id="40">\Combodo\iTop\Anonymizer\Action\CleanupOnMention</action>
+        <action id="50">\Combodo\iTop\Anonymizer\Action\CleanupEmailNotification</action>
         <action id="1000">\Combodo\iTop\Anonymizer\Action\PurgePersonHistory</action>
       </actions>
       <anonymized_fields type="hash">

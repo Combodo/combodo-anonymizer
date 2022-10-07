@@ -25,6 +25,7 @@ class AnonymizePerson extends AbstractAnonymizationAction
 		$aContext = [
 			'origin' => [
 				'friendlyname' => $oObject->Get('friendlyname'),
+				'email'        => $oObject->Get('email'),
 			],
 		];
 
@@ -58,7 +59,10 @@ class AnonymizePerson extends AbstractAnonymizationAction
 		$oPerson->Reload();
 
 		$aContext = json_decode($this->oTask->Get('anonymization_context'), true);
-		$aContext['anonymized']['friendlyname'] = $oPerson->Get('friendlyname');
+		$aContext['anonymized'] = [
+			'friendlyname' => $oPerson->Get('friendlyname'),
+			'email'        => $oPerson->Get('email'),
+		];
 		AnonymizerLog::Debug('Anonymization context: '.var_export($aContext, true));
 
 		$this->oTask->Set('anonymization_context', json_encode($aContext));

@@ -315,6 +315,7 @@ class AnonymizerService
 				}
 			}
 			catch (AnonymizerException $e) {
+				AnonymizerLog::Error('AnonymizerException'.$e->getMessage());
 				// stay in 'running' status
 				$bInProgress = false;
 			}

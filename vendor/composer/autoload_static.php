@@ -25,6 +25,8 @@ class ComposerStaticInit9da934a9423c6df2e90dae99265f6022
         'Combodo\\iTop\\Anonymizer\\Action\\AnonymizationActionFactory' => __DIR__ . '/../..' . '/src/Action/AnonymizationActionFactory.php',
         'Combodo\\iTop\\Anonymizer\\Action\\AnonymizePerson' => __DIR__ . '/../..' . '/src/Action/AnonymizePerson.php',
         'Combodo\\iTop\\Anonymizer\\Action\\CleanupCaseLogs' => __DIR__ . '/../..' . '/src/Action/CleanupCaseLogs.php',
+        'Combodo\\iTop\\Anonymizer\\Action\\CleanupEmailNotification' => __DIR__ . '/../..' . '/src/Action/CleanupEmailNotification.php',
+        'Combodo\\iTop\\Anonymizer\\Action\\CleanupOnMention' => __DIR__ . '/../..' . '/src/Action/CleanupOnMention.php',
         'Combodo\\iTop\\Anonymizer\\Action\\CleanupUsers' => __DIR__ . '/../..' . '/src/Action/CleanupUsers.php',
         'Combodo\\iTop\\Anonymizer\\Action\\PurgePersonHistory' => __DIR__ . '/../..' . '/src/Action/PurgePersonHistory.php',
         'Combodo\\iTop\\Anonymizer\\Action\\ResetPersonFields' => __DIR__ . '/../..' . '/src/Action/ResetPersonFields.php',

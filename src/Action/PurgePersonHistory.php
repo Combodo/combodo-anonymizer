@@ -26,7 +26,13 @@ class PurgePersonHistory extends AbstractAnonymizationAction
 	public function Retry()
 	{
 		$aParams = json_decode($this->oTask->Get('action_params'), true);
-		$aParams['iChunkSize'] /= 2 + 1;
+		$iChunkSize = $aParams['iChunkSize'];
+		if($iChunkSize == 1){
+			AnonymizerLog::Debug('Stop retry action PurgePersonHistory with params '.json_encode($aParams));
+			$this->oTask->Set('action_params', '');
+			$this->oTask->DBWrite();
+		}
+		$aParams['iChunkSize'] = (int) $iChunkSize/2 + 1;
 
 		$this->oTask->Set('action_params', json_encode($aParams));
 		$this->oTask->DBWrite();

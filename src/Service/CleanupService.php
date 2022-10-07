@@ -8,6 +8,7 @@ namespace Combodo\iTop\Anonymizer\Service;
 
 use AttributeLinkedSetIndirect;
 use CMDBSource;
+use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use DBObjectSearch;
 use DBObjectSet;
 use Exception;
@@ -35,8 +36,8 @@ class CleanupService
 	}
 
 	/**
-	 * @param $sSqlSearch
-	 * @param $aSqlUpdate array to update elements found by $sSqlSearch, don't specify the where close
+	 * @param string $sSqlSearch
+	 * @param array $aSqlUpdate array to update elements found by $sSqlSearch, don't specify the where close
 	 * @param string $sKey primary key of updated table
 	 * @param string $sProgressId start the search at this value => updated with the last id computed
 	 * @param int $iMaxChunkSize limit size of processed data
@@ -48,10 +49,11 @@ class CleanupService
 	 * @throws \MySQLException
 	 * @throws \MySQLHasGoneAwayException
 	 */
-	public function ExecuteActionWithQueriesByChunk($sSqlSearch, $aSqlUpdate, $sKey, &$sProgressId, $iMaxChunkSize)
+	public function ExecuteActionWithQueriesByChunk($sSqlSearch, $aSqlUpdate, $sKey, &$sProgressId, $iMaxChunkSize): bool
 	{
 		$sId = $sProgressId;
 		$sSQL = $sSqlSearch." AND $sKey > $sProgressId ORDER BY $sKey LIMIT ".$iMaxChunkSize;
+		AnonymizerLog::Debug($sSQL);
 		$oResult = CMDBSource::Query($sSQL);
 
 		$aObjects = [];
@@ -64,6 +66,7 @@ class CleanupService
 			try {
 				foreach ($aSqlUpdate as $sSqlUpdate) {
 					$sSQL = $sSqlUpdate." WHERE `$sKey` IN (".implode(', ', $aObjects).");";
+					AnonymizerLog::Debug($sSQL);
 					CMDBSource::Query($sSQL);
 				}
 				CMDBSource::Query('COMMIT');
