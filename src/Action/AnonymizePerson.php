@@ -8,11 +8,12 @@ namespace Combodo\iTop\Anonymizer\Action;
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
+use Combodo\iTop\ComplexBackgroundTask\Action\AbstractAction;
 use DBObjectSet;
 use DBSearch;
 use MetaModel;
 
-class AnonymizePerson extends AbstractAnonymizationAction
+class AnonymizePerson extends AbstractAction
 {
 
 	public function Init()

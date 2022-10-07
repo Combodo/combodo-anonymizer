@@ -9,12 +9,13 @@ namespace Combodo\iTop\Anonymizer\Action;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
+use Combodo\iTop\ComplexBackgroundTask\Action\AbstractAction;
 use MetaModel;
 
 /**
  * Remove history entries of the selected object
  */
-class PurgePersonHistory extends AbstractAnonymizationAction
+class PurgePersonHistory extends AbstractAction
 {
 	public function Init()
 	{

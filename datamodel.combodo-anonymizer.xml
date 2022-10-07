@@ -44,10 +44,7 @@
       <methods/>
     </class>
     <class id="BatchAnonymizationTask" _delta="define">
-      <parent>DBObject</parent>
-      <php_parent>
-        <name>AbstractBatchAnonymizationTask</name>
-      </php_parent>
+      <parent>ComplexBackgroundTask</parent>
       <properties>
         <category/>
         <abstract>false</abstract>
@@ -73,42 +70,13 @@
           <is_null_allowed>false</is_null_allowed>
           <tracking_level>none</tracking_level>
         </field>
-        <field id="action" xsi:type="AttributeString">
-          <sql>action</sql>
-          <default_value/>
-          <is_null_allowed>true</is_null_allowed>
-          <tracking_level>none</tracking_level>
-        </field>
-        <field id="action_params" xsi:type="AttributeText">
-          <sql>action_params</sql>
-          <default_value/>
-          <is_null_allowed>true</is_null_allowed>
-          <tracking_level>none</tracking_level>
-        </field>
         <field id="anonymization_context" xsi:type="AttributeText">
           <sql>anonymization_context</sql>
           <default_value/>
           <is_null_allowed>true</is_null_allowed>
           <tracking_level>none</tracking_level>
         </field>
-        <field id="status" xsi:type="AttributeEnum">
-          <sql>status</sql>
-          <is_null_allowed>false</is_null_allowed>
-          <default_value>created</default_value>
-          <tracking_level>none</tracking_level>
-          <values>
-            <value id="created">
-              <code>created</code>
-            </value>
-            <value id="running">
-              <code>running</code>
-            </value>
-            <value id="paused">
-              <code>paused</code>
-            </value>
-          </values>
-        </field>
-      </fields>
+       </fields>
       <methods/>
       <presentation>
         <list>

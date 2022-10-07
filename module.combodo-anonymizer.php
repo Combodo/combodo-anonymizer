@@ -34,9 +34,7 @@ SetupWebPage::AddModule(
 		// Setup
 		//
 		'dependencies' => [
-			'itop-config-mgmt/2.4.0',
-			'itop-config/2.4.0',
-			'combodo-background-task/1.0.0',
+			'combodo-complex-background-task/1.0.0',
 		],
 		'mandatory' => false,
 		'visible' => true,

@@ -7,8 +7,9 @@
 namespace Combodo\iTop\Anonymizer\Action;
 
 use Combodo\iTop\Anonymizer\Service\CleanupService;
+use Combodo\iTop\ComplexBackgroundTask\Action\AbstractAction;
 
-class ResetPersonFields extends AbstractAnonymizationAction
+class ResetPersonFields extends AbstractAction
 {
 	/**
 	 * @return bool

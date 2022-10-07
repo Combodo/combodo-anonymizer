@@ -1,7 +1,7 @@
 <?php
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
-use Combodo\iTop\BackgroundTask\Model\AbstractTimeRangeWeeklyScheduledProcess;
+
 
 /**
  * @copyright   Copyright (C) 2010-2022 Combodo SARL

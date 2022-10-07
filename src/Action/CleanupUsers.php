@@ -10,12 +10,14 @@ use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
+use Combodo\iTop\ComplexBackgroundTask\Action\AbstractAction;
 use Exception;
 use MetaModel;
 use MySQLHasGoneAwayException;
 
-class CleanupUsers extends AbstractAnonymizationAction
+class CleanupUsers extends AbstractAction
 {
+	const USER_CLASS = 'User';
 
 	public function Init()
 	{

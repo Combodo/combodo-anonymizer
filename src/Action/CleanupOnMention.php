@@ -11,11 +11,12 @@ use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
+use Combodo\iTop\ComplexBackgroundTask\Action\AbstractAction;
 use DBObjectSet;
 use MetaModel;
 use MySQLHasGoneAwayException;
 
-class CleanupOnMention extends AbstractAnonymizationAction
+class CleanupOnMention extends AbstractAction
 {
 	const USER_CLASS = 'User';
 
