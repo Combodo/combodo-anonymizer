@@ -37,52 +37,50 @@ class CleanupEmailNotification extends AbstractAnonymizationAction
 		$sOrigEmail = $aContext['origin']['email'];
 		$sTargetEmail = $aContext['anonymized']['email'];
 
-		$sStartReplace = "";
-		$sEndReplace = "";
-		$sStartReplaceEmail = "";
-		$sEndReplaceEmail = "";
+		if ($sOrigEmail != '') {
+			$sStartReplace = "";
+			$sEndReplace = "";
+			$sStartReplaceEmail = "";
+			$sEndReplaceEmail = "";
 
-		if (in_array('friendlyname', $aCleanupEmail)) {
-			//	foreach ($sOrigFriendlyname as $sFriendlyName) {
-			$sStartReplace = "REPLACE(";
-			$sEndReplace = $sEndReplace.", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sTargetFriendlyname).")";
-			//	}
+			if (in_array('friendlyname', $aCleanupEmail)) {
+				$sStartReplace = "REPLACE(";
+				$sEndReplace = $sEndReplace.", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sTargetFriendlyname).")";
+			}
+			$aConditions[] = "`from` like '".$sOrigEmail."'";
+			$aConditions[] = "`to` like '%".$sOrigEmail."%'";
+			$aConditions[] = "`cc` like '%".$sOrigEmail."%'";
+			$aConditions[] = "`bcc` like '%".$sOrigEmail."%'";
+
+			if (in_array('email', $aCleanupEmail)) {
+				$sStartReplace = "REPLACE(".$sStartReplace;
+				$sEndReplace = $sEndReplace.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
+			}
+			$sStartReplaceEmail = "REPLACE(".$sStartReplaceEmail;
+			$sEndReplaceEmail = $sEndReplaceEmail.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
+
+			// Now change email adress
+			$sNotificationTable = MetaModel::DBGetTable('EventNotificationEmail');
+			$sKey = MetaModel::DBGetKey('EventNotificationEmail');
+
+			$sSqlSearch = "SELECT `$sKey` from `$sNotificationTable` WHERE ".implode(' OR ', $aConditions);
+			$sSqlUpdate = "UPDATE `$sNotificationTable` SET".
+				"  `from` =  ".$sStartReplaceEmail."`from`".$sEndReplaceEmail.",".
+				"  `to` = ".$sStartReplaceEmail."`to`".$sEndReplaceEmail.",".
+				"  `cc` = ".$sStartReplaceEmail."`cc`".$sEndReplaceEmail.",".
+				"  `bcc` = ".$sStartReplaceEmail."`bcc`".$sEndReplaceEmail.",".
+				"  `subject` = ".$sStartReplace."`subject`".$sEndReplace.",".
+				"  `body` = ".$sStartReplace."`body`".$sEndReplace." ";
+
+			$aRequest = [];
+			$aRequest['select'] = $sSqlSearch;
+			$aRequest['updates'] = [$sSqlUpdate];
+			$aRequest['key'] = $sKey;
+
+			$aParams['aRequest'] = $aRequest;
+			$this->oTask->Set('action_params', json_encode($aParams));
+			$this->oTask->DBWrite();
 		}
-//		foreach ($sOrigEmail as $sEmail) {
-		$aConditions[] = "`from` like '".$sOrigEmail."'";
-		$aConditions[] = "`to` like '%".$sOrigEmail."%'";
-		$aConditions[] = "`cc` like '%".$sOrigEmail."%'";
-		$aConditions[] = "`bcc` like '%".$sOrigEmail."%'";
-
-		if (in_array('email', $aCleanupEmail)) {
-			$sStartReplace = "REPLACE(".$sStartReplace;
-			$sEndReplace = $sEndReplace.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
-		}
-		$sStartReplaceEmail = "REPLACE(".$sStartReplaceEmail;
-		$sEndReplaceEmail = $sEndReplaceEmail.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
-//		}
-
-		// Now change email adress
-		$sNotificationTable = MetaModel::DBGetTable('EventNotificationEmail');
-		$sKey = MetaModel::DBGetKey('EventNotificationEmail');
-
-		$sSqlSearch = "SELECT `$sKey` from `$sNotificationTable` WHERE ".implode(' OR ', $aConditions);
-		$sSqlUpdate = "UPDATE `$sNotificationTable` SET".
-			"  `from` =  ".$sStartReplaceEmail."`from`".$sEndReplaceEmail.",".
-			"  `to` = ".$sStartReplaceEmail."`to`".$sEndReplaceEmail.",".
-			"  `cc` = ".$sStartReplaceEmail."`cc`".$sEndReplaceEmail.",".
-			"  `bcc` = ".$sStartReplaceEmail."`bcc`".$sEndReplaceEmail.",".
-			"  `subject` = ".$sStartReplace."`subject`".$sEndReplace.",".
-			"  `body` = ".$sStartReplace."`body`".$sEndReplace." ";
-
-		$aRequest = [];
-		$aRequest['select'] = $sSqlSearch;
-		$aRequest['updates'] = [$sSqlUpdate];
-		$aRequest['key'] = $sKey;
-
-		$aParams['aRequest'] = $aRequest;
-		$this->oTask->Set('action_params', json_encode($aParams));
-		$this->oTask->DBWrite();
 	}
 
 

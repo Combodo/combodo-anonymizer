@@ -74,14 +74,12 @@ class CleanupCaseLogs extends AbstractAnonymizationAction
 		}
 		//}
 
-		if (in_array('email', $aCleanupCaseLog)) {
-			foreach ($sOrigEmail as $sEmail) {
-				$sReplace = str_repeat('*', strlen($sEmail));
+		if ($sOrigEmail!='' && in_array('email', $aCleanupCaseLog)) {
+			$sReplace = str_repeat('*', strlen($sOrigEmail));
 
-				$sStartReplace = "REPLACE(".$sStartReplace;
-				$sEndReplaceInCaseLog = $sEndReplaceInCaseLog.", ".CMDBSource::Quote($sEmail).", ".CMDBSource::Quote($sReplace).")";
-				$sEndReplaceInTxt = $sEndReplaceInTxt.", ".CMDBSource::Quote($sEmail).", ".CMDBSource::Quote($sTargetEmail).")";
-			}
+			$sStartReplace = "REPLACE(".$sStartReplace;
+			$sEndReplaceInCaseLog = $sEndReplaceInCaseLog.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sReplace).")";
+			$sEndReplaceInTxt = $sEndReplaceInTxt.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
 		}
 
 		// 2) Find all classes containing case logs
@@ -95,11 +93,9 @@ class CleanupCaseLogs extends AbstractAnonymizationAction
 					$sColumnIdx = array_keys($aSQLColumns)[1]; // We assume that the second column is the index
 
 					$aConditions = [];
-					//foreach ($aDataToAnonymize['friendlyname'] as $sFriendlyName) {
 					foreach ($aIdUser as $sIdUser) {
 						$aConditions[] = " `$sColumn1` LIKE ".CMDBSource::Quote('%'.sprintf($sPattern, $sOrigFriendlyname, $sIdUser).'%');
 					}
-					//}
 					$sCondition = implode(' OR ', $aConditions);
 					$sSqlSearch = "SELECT  `$sKey` FROM `$sTable` WHERE $sCondition";
 
