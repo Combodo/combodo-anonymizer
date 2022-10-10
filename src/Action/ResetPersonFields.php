@@ -6,10 +6,10 @@
 
 namespace Combodo\iTop\Anonymizer\Action;
 
+use BatchAnonymizationTaskAction;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
-use Combodo\iTop\ComplexBackgroundTask\Action\AbstractAction;
 
-class ResetPersonFields extends AbstractAction
+class ResetPersonFields extends BatchAnonymizationTaskAction
 {
 	/**
 	 * @return bool
@@ -18,12 +18,14 @@ class ResetPersonFields extends AbstractAction
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
 	 */
-	public function Execute(): bool
+	public function ExecuteAction($iEndExecutionTime): bool
 	{
-		$sClass = $this->oTask->Get('class_to_anonymize');
-		$sId = $this->oTask->Get('id_to_anonymize');
+		$oTask = $this->GetTask();
 
-		$oService = new CleanupService($sClass, $sId, $this->iEndExecutionTime);
+		$sClass = $oTask->Get('class_to_anonymize');
+		$sId = $oTask->Get('id_to_anonymize');
+
+		$oService = new CleanupService($sClass, $sId, $iEndExecutionTime);
 
 		return $oService->ResetObjectFields();
 	}

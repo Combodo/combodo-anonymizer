@@ -6,20 +6,25 @@
 
 namespace Combodo\iTop\Anonymizer\Action;
 
+use BatchAnonymizationTaskAction;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
-use Combodo\iTop\ComplexBackgroundTask\Action\AbstractAction;
 use DBObjectSet;
 use DBSearch;
 use MetaModel;
 
-class AnonymizePerson extends AbstractAction
+class AnonymizePerson extends BatchAnonymizationTaskAction
 {
-
-	public function Init()
+	public static function Init()
 	{
-		$sClass = $this->oTask->Get('class_to_anonymize');
-		$sId = $this->oTask->Get('id_to_anonymize');
+
+	}
+
+	public function InitActionParams()
+	{
+		$oTask = $this->GetTask();
+		$sClass = $oTask->Get('class_to_anonymize');
+		$sId = $oTask->Get('id_to_anonymize');
 
 		$oObject = MetaModel::GetObject($sClass, $sId);
 
@@ -41,33 +46,34 @@ class AnonymizePerson extends AbstractAction
 			$aContext['origin']['date_create'] = $oChangeCreate->Get('date');
 		}
 
-		$this->oTask->Set('anonymization_context', json_encode($aContext));
-		$this->oTask->DBWrite();
+		$oTask->Set('anonymization_context', json_encode($aContext));
+		$oTask->DBWrite();
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function Execute(): bool
+	public function ExecuteAction($iEndExecutionTime): bool
 	{
-		$sClass = $this->oTask->Get('class_to_anonymize');
-		$sId = $this->oTask->Get('id_to_anonymize');
-		$oCleanupService = new CleanupService($sClass, $sId, $this->iEndExecutionTime);
+		$oTask = $this->GetTask();
+		$sClass = $oTask->Get('class_to_anonymize');
+		$sId = $oTask->Get('id_to_anonymize');
+		$oCleanupService = new CleanupService($sClass, $sId, $iEndExecutionTime);
 		/** @var \Person $oPerson */
 		$oPerson = MetaModel::GetObject($sClass, $sId);
 		$oCleanupService->AnonymizePerson($oPerson);
 		$oPerson->DBWrite();
 		$oPerson->Reload();
 
-		$aContext = json_decode($this->oTask->Get('anonymization_context'), true);
+		$aContext = json_decode($oTask->Get('anonymization_context'), true);
 		$aContext['anonymized'] = [
 			'friendlyname' => $oPerson->Get('friendlyname'),
 			'email'        => $oPerson->Get('email'),
 		];
 		AnonymizerLog::Debug('Anonymization context: '.var_export($aContext, true));
 
-		$this->oTask->Set('anonymization_context', json_encode($aContext));
-		$this->oTask->DBWrite();
+		$oTask->Set('anonymization_context', json_encode($aContext));
+		$oTask->DBWrite();
 
 		return true;
 	}

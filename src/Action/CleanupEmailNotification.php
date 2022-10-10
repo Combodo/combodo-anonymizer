@@ -6,32 +6,40 @@
 
 namespace Combodo\iTop\Anonymizer\Action;
 
+use BatchAnonymizationTaskAction;
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
-use Combodo\iTop\ComplexBackgroundTask\Action\AbstractAction;
+use Exception;
 use MetaModel;
 use MySQLHasGoneAwayException;
 
-class CleanupEmailNotification extends AbstractAction
+class CleanupEmailNotification extends BatchAnonymizationTaskAction
 {
-	const USER_CLASS = 'User';
-
-	public function Init()
+	/**
+	 * @return void
+	 * @throws \ArchivedObjectException
+	 * @throws \CoreCannotSaveObjectException
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 */
+	public function InitActionParams()
 	{
+		$oTask = $this->GetTask();
+
 		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
 		$aCleanupEmail = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'notification_content');
 
 		if (sizeof($aCleanupEmail) == 0) {
 			//nothing to do. We can skip the current action
-			$this->oTask->Set('action_params', '');
-			$this->oTask->DBWrite();
+			$this->Set('action_params', '');
+			$this->DBWrite();
 
 			return;
 		}
 
-		$aContext = json_decode($this->oTask->Get('anonymization_context'), true);
+		$aContext = json_decode($oTask->Get('anonymization_context'), true);
 		$sOrigFriendlyname = $aContext['origin']['friendlyname'];
 		$sTargetFriendlyname = $aContext['anonymized']['friendlyname'];
 
@@ -79,38 +87,38 @@ class CleanupEmailNotification extends AbstractAction
 			$aRequest['key'] = $sKey;
 
 			$aParams['aRequest'] = $aRequest;
-			$this->oTask->Set('action_params', json_encode($aParams));
-			$this->oTask->DBWrite();
+			$this->Set('action_params', json_encode($aParams));
+			$this->DBWrite();
 		}
 	}
 
 
-	public function Retry()
+	public function ChangeActionParamsOnError()
 	{
-		$aParams = json_decode($this->oTask->Get('action_params'), true);
+		$aParams = json_decode($this->Get('action_params'), true);
 		$iChunkSize = $aParams['iChunkSize'];
 		if ($iChunkSize == 1) {
 			AnonymizerLog::Debug('Stop retry action CleanupEmailNotification with params '.json_encode($aParams));
-			$this->oTask->Set('action_params', '');
-			$this->oTask->DBWrite();
+			$this->Set('action_params', '');
+			$this->DBWrite();
 		}
 		$aParams['iChunkSize'] = (int)$iChunkSize / 2 + 1;
 
-		$this->oTask->Set('action_params', json_encode($aParams));
-		$this->oTask->DBWrite();
+		$this->Set('action_params', json_encode($aParams));
+		$this->DBWrite();
 	}
 
 	/**
+	 * @param $iEndExecutionTime
+	 *
 	 * @return bool
 	 * @throws \ArchivedObjectException
-	 * @throws \CoreCannotSaveObjectException
 	 * @throws \CoreException
-	 * @throws \CoreUnexpectedValue
 	 */
-	public function Execute(): bool
+	public function ExecuteAction($iEndExecutionTime): bool
 	{
 		try {
-			return $this->ExecuteQueries($this->oTask);
+			return $this->ExecuteQueries($iEndExecutionTime);
 		}
 		catch (MySQLHasGoneAwayException $e) {
 			//in this case retry is possible
@@ -118,33 +126,46 @@ class CleanupEmailNotification extends AbstractAction
 
 			return false;
 		}
-		catch (\Exception $e) {
-			AnonymizerLog::Error('Error during CleanupEmailNotification with params '.$this->oTask->Get('action_params').' with message :'.$e->getMessage());
+		catch (Exception $e) {
+			AnonymizerLog::Error('Error during CleanupEmailNotification with params '.$this->Get('action_params').' with message :'.$e->getMessage());
 
 			return true;
 		}
 	}
 
-	public function ExecuteQueries($oTask)
+	/**
+	 * @param $iEndExecutionTime
+	 *
+	 * @return bool
+	 * @throws \ArchivedObjectException
+	 * @throws \Combodo\iTop\Anonymizer\Helper\AnonymizerException
+	 * @throws \CoreCannotSaveObjectException
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 * @throws \MySQLException
+	 * @throws \MySQLHasGoneAwayException
+	 */
+	public function ExecuteQueries($iEndExecutionTime): bool
 	{
-		if ($oTask->Get('action_params') == '') {
+		$oTask = $this->GetTask();
+		if ($this->Get('action_params') == '') {
 			return true;
 		}
-		$sClass = $this->oTask->Get('class_to_anonymize');
-		$sId = $this->oTask->Get('id_to_anonymize');
+		$sClass = $oTask->Get('class_to_anonymize');
+		$sId = $oTask->Get('id_to_anonymize');
 
-		$oService = new CleanupService($sClass, $sId, $this->iEndExecutionTime);
-		$aParams = json_decode($oTask->Get('action_params'), true);
+		$oService = new CleanupService($sClass, $sId, $iEndExecutionTime);
+		$aParams = json_decode($this->Get('action_params'), true);
 		$aRequest = $aParams['aRequest'];
 
 		$iProgress = $aParams['aChangesProgress'] ?? 0;
 		$bCompleted = ($iProgress == -1);
-		while (!$bCompleted && time() < $this->iEndExecutionTime) {
+		while (!$bCompleted && time() < $iEndExecutionTime) {
 			$bCompleted = $oService->ExecuteActionWithQueriesByChunk($aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
 			// Save progression
 			$aParams['aChangesProgress'] = $iProgress;
-			$this->oTask->Set('action_params', json_encode($aParams));
-			$this->oTask->DBWrite();
+			$this->Set('action_params', json_encode($aParams));
+			$this->DBWrite();
 		}
 
 		return $bCompleted;

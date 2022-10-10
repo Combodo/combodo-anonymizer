@@ -3,6 +3,12 @@
              version="1.0">
   <module_parameters>
     <parameters  id="combodo-anonymizer" _delta="define">
+      <enabled>true</enabled>
+      <debug>true</debug>
+      <max_chunk_size>1000</max_chunk_size>
+      <week_days>monday, tuesday, wednesday, thursday, friday, saturday, sunday</week_days>
+      <time>00:30</time>
+      <end_time>05:30</end_time>
       <caselog_content type="array">
         <field id="0">friendlyname</field>
         <field id="1">email</field>
@@ -15,13 +21,13 @@
         <field id="2">name</field>
       </notification_content>
       <actions type="array">
-        <action id="0">\Combodo\iTop\Anonymizer\Action\ResetPersonFields</action>
-        <action id="10">\Combodo\iTop\Anonymizer\Action\AnonymizePerson</action>
-        <action id="20">\Combodo\iTop\Anonymizer\Action\CleanupUsers</action>
-        <action id="30">\Combodo\iTop\Anonymizer\Action\CleanupCaseLogs</action>
-        <action id="40">\Combodo\iTop\Anonymizer\Action\CleanupOnMention</action>
-        <action id="50">\Combodo\iTop\Anonymizer\Action\CleanupEmailNotification</action>
-        <action id="1000">\Combodo\iTop\Anonymizer\Action\PurgePersonHistory</action>
+        <action id="0">Combodo\iTop\Anonymizer\Action\ResetPersonFields</action>
+        <action id="10">Combodo\iTop\Anonymizer\Action\AnonymizePerson</action>
+        <action id="20">Combodo\iTop\Anonymizer\Action\CleanupUsers</action>
+        <action id="30">Combodo\iTop\Anonymizer\Action\CleanupCaseLogs</action>
+        <action id="40">Combodo\iTop\Anonymizer\Action\CleanupOnMention</action>
+        <action id="50">Combodo\iTop\Anonymizer\Action\CleanupEmailNotification</action>
+        <action id="1000">Combodo\iTop\Anonymizer\Action\PurgePersonHistory</action>
       </actions>
       <anonymized_fields type="hash">
         <name>Contact %1$s</name>
@@ -77,7 +83,32 @@
           <tracking_level>none</tracking_level>
         </field>
        </fields>
-      <methods/>
+      <methods>
+        <method id="GetNextAction">
+          <static>false</static>
+          <access>public</access>
+          <type>Overload-cmdbAbstractObject</type>
+          <code><![CDATA[
+       public function GetNextAction()
+       {
+            $sCurrentActionId = $this->Get('current_action_id');
+            if (!$sCurrentActionId) {
+                // Create actions
+                $aActions = MetaModel::GetConfig()->GetModuleParameter(\Combodo\iTop\Anonymizer\Helper\AnonymizerHelper::MODULE_NAME, 'actions', []);
+                foreach ($aActions as $iRank => $sActionClass) {
+                    if (MetaModel::IsValidClass($sActionClass)) {
+                        $oAction = MetaModel::NewObject($sActionClass, ['name' => $sActionClass, 'rank' => $iRank, 'task_id' => $this->GetKey()]);
+                        $oAction->DBWrite();
+                    } else {
+                        \Combodo\iTop\Anonymizer\Helper\AnonymizerLog::Error("$sActionClass is not an action");
+                    }
+                }
+            }
+            return parent::GetNextAction();
+       }
+]]></code>
+        </method>
+      </methods>
       <presentation>
         <list>
           <items>
@@ -93,6 +124,24 @@
           </items>
         </list>
       </presentation>
+    </class>
+    <class id="BatchAnonymizationTaskAction" _delta="define">
+      <parent>ComplexBackgroundTaskAction</parent>
+      <properties>
+        <abstract>false</abstract>
+        <db_table>priv_batch_anonymization_task_action</db_table>
+        <category/>
+      </properties>
+      <fields>
+        <field id="action_params" xsi:type="AttributeText">
+          <sql>action_params</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+          <tracking_level>none</tracking_level>
+        </field>
+      </fields>
+      <presentation/>
+      <methods/>
     </class>
     <class id="Person" _delta="must_exist">
       <properties>

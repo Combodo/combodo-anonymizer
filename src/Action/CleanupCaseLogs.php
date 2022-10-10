@@ -8,30 +8,39 @@ namespace Combodo\iTop\Anonymizer\Action;
 
 use AttributeCaseLog;
 use AttributeText;
+use BatchAnonymizationTaskAction;
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
-use Combodo\iTop\ComplexBackgroundTask\Action\AbstractAction;
 use DBObjectSearch;
 use DBObjectSet;
 use Exception;
 use MetaModel;
 use MySQLHasGoneAwayException;
 
-class CleanupCaseLogs extends AbstractAction
+class CleanupCaseLogs extends BatchAnonymizationTaskAction
 {
 	const USER_CLASS = 'User';
 
-	public function Init()
+	/**
+	 * @return void
+	 * @throws \ArchivedObjectException
+	 * @throws \CoreCannotSaveObjectException
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 */
+	public function InitActionParams()
 	{
+		$oTask = $this->GetTask();
+
 		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
 		$aCleanupCaseLog = (array)MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'caselog_content');
 
 		$aRequests = [];
 
-		$aContext = json_decode($this->oTask->Get('anonymization_context'), true);
-		$sId = $this->oTask->Get('id_to_anonymize');
+		$aContext = json_decode($oTask->Get('anonymization_context'), true);
+		$sId = $oTask->Get('id_to_anonymize');
 
 		$oSearch = new DBObjectSearch(self::USER_CLASS);
 		$oSearch->AddCondition('contactid', $sId);
@@ -91,7 +100,6 @@ class CleanupCaseLogs extends AbstractAction
 				if ((MetaModel::GetAttributeOrigin($sClass, $sAttCode) == $sClass) && $oAttDef instanceof AttributeCaseLog) {
 					$aSQLColumns = $oAttDef->GetSQLColumns();
 					$sColumn1 = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
-					$sColumnIdx = array_keys($aSQLColumns)[1]; // We assume that the second column is the index
 
 					$aConditions = [];
 					foreach ($aIdUser as $sIdUser) {
@@ -133,51 +141,57 @@ class CleanupCaseLogs extends AbstractAction
 			}
 		}
 		$aParams['aRequests'] = $aRequests;
-		$this->oTask->Set('action_params', json_encode($aParams));
-		$this->oTask->DBWrite();
+		$this->Set('action_params', json_encode($aParams));
+		$this->DBWrite();
 	}
 
 
-	public function Retry()
+	/**
+	 * @return void
+	 * @throws \ArchivedObjectException
+	 * @throws \CoreCannotSaveObjectException
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 */
+	public function ChangeActionParamsOnError()
 	{
-		$aParams = json_decode($this->oTask->Get('action_params'), true);
+		$aParams = json_decode($this->Get('action_params'), true);
 		$iChunkSize = $aParams['iChunkSize'];
 		if ($iChunkSize == 1) {
 			AnonymizerLog::Debug('Stop retry action CleanupCaseLogs with params '.json_encode($aParams));
-			$this->oTask->Set('action_params', '');
-			$this->oTask->DBWrite();
+			$this->Set('action_params', '');
+			$this->DBWrite();
 		}
 		$aParams['iChunkSize'] = (int)$iChunkSize / 2 + 1;
 
-		$this->oTask->Set('action_params', json_encode($aParams));
-		$this->oTask->DBWrite();
+		$this->Set('action_params', json_encode($aParams));
+		$this->DBWrite();
 	}
 
 	/**
+	 * @param $iEndExecutionTime
+	 *
 	 * @return bool
 	 * @throws \ArchivedObjectException
 	 * @throws \CoreCannotSaveObjectException
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
 	 */
-	public function Execute(): bool
+	public function ExecuteAction($iEndExecutionTime): bool
 	{
-		return $this->ExecuteQueries($this->oTask);
-	}
+		$oTask = $this->GetTask();
 
-	public function ExecuteQueries($oTask)
-	{
-		$sClass = $this->oTask->Get('class_to_anonymize');
-		$sId = $this->oTask->Get('id_to_anonymize');
+		$sClass = $oTask->Get('class_to_anonymize');
+		$sId = $oTask->Get('id_to_anonymize');
 
-		$oService = new CleanupService($sClass, $sId, $this->iEndExecutionTime);
-		$aParams = json_decode($oTask->Get('action_params'), true);
+		$oService = new CleanupService($sClass, $sId, $iEndExecutionTime);
+		$aParams = json_decode($this->Get('action_params'), true);
 		$aRequests = $aParams['aRequests'];
 
 		foreach ($aRequests as $sName => $aRequest) {
 			$iProgress = $aParams['aChangesProgress'][$sName] ?? 0;
 			$bCompleted = ($iProgress == -1);
-			while (!$bCompleted && time() < $this->iEndExecutionTime) {
+			while (!$bCompleted && time() < $iEndExecutionTime) {
 				try {
 					$bCompleted = $oService->ExecuteActionWithQueriesByChunk($aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
 					$aParams['aChangesProgress'][$sName] = $iProgress;
@@ -189,13 +203,13 @@ class CleanupCaseLogs extends AbstractAction
 					return false;
 				}
 				catch (Exception $e) {
-					AnonymizerLog::Error('Error during CleanupCaseLogs with params '.$this->oTask->Get('action_params').' with message :'.$e->getMessage());
+					AnonymizerLog::Error('Error during CleanupCaseLogs with params '.$this->Get('action_params').' with message :'.$e->getMessage());
 					AnonymizerLog::Error('Go to next update');
 					$aParams['aChangesProgress'][$sName] = -1;
 				}
 				// Save progression
-				$this->oTask->Set('action_params', json_encode($aParams));
-				$this->oTask->DBWrite();
+				$this->Set('action_params', json_encode($aParams));
+				$this->DBWrite();
 			}
 			if (!$bCompleted) {
 				// Timeout

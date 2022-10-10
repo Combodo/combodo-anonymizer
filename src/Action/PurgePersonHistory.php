@@ -6,44 +6,59 @@
 
 namespace Combodo\iTop\Anonymizer\Action;
 
+use BatchAnonymizationTaskAction;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
-use Combodo\iTop\ComplexBackgroundTask\Action\AbstractAction;
 use MetaModel;
 
 /**
  * Remove history entries of the selected object
  */
-class PurgePersonHistory extends AbstractAction
+class PurgePersonHistory extends BatchAnonymizationTaskAction
 {
-	public function Init()
+	/**
+	 * @return void
+	 * @throws \CoreCannotSaveObjectException
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 */
+	public function InitActionParams()
 	{
 		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
 
-		$this->oTask->Set('action_params', json_encode($aParams));
-		$this->oTask->DBWrite();
+		$this->Set('action_params', json_encode($aParams));
+		$this->DBWrite();
 	}
 
-	public function Retry()
+	/**
+	 * @return void
+	 * @throws \ArchivedObjectException
+	 * @throws \CoreCannotSaveObjectException
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 */
+	public function ChangeActionParamsOnError()
 	{
-		$aParams = json_decode($this->oTask->Get('action_params'), true);
+		$aParams = json_decode($this->Get('action_params'), true);
 		$iChunkSize = $aParams['iChunkSize'];
 		if ($iChunkSize == 1) {
 			AnonymizerLog::Debug('Stop retry action PurgePersonHistory with params '.json_encode($aParams));
-			$this->oTask->Set('action_params', '');
-			$this->oTask->DBWrite();
+			$this->Set('action_params', '');
+			$this->DBWrite();
 
 			return;
 		}
 		$aParams['iChunkSize'] = (int)$iChunkSize / 2 + 1;
 
-		$this->oTask->Set('action_params', json_encode($aParams));
-		$this->oTask->DBWrite();
+		$this->Set('action_params', json_encode($aParams));
+		$this->DBWrite();
 	}
 
 	/**
 	 * Delete history entries, no need to keep track of the progress.
+	 *
+	 * @param $iEndExecutionTime
 	 *
 	 * @return bool
 	 * @throws \ArchivedObjectException
@@ -54,18 +69,20 @@ class PurgePersonHistory extends AbstractAction
 	 * @throws \MySQLException
 	 * @throws \OQLException
 	 */
-	public function Execute(): bool
+	public function ExecuteAction($iEndExecutionTime): bool
 	{
-		$sParams = $this->oTask->Get('action_params');
+		$oTask = $this->GetTask();
+
+		$sParams = $this->Get('action_params');
 		if ($sParams == '') {
 			return true;
 		}
 		$aParams = json_decode($sParams, true);
 
-		$sClass = $this->oTask->Get('class_to_anonymize');
-		$sId = $this->oTask->Get('id_to_anonymize');
+		$sClass = $oTask->Get('class_to_anonymize');
+		$sId = $oTask->Get('id_to_anonymize');
 
-		$oService = new CleanupService($sClass, $sId, $this->iEndExecutionTime);
+		$oService = new CleanupService($sClass, $sId, $iEndExecutionTime);
 
 		return $oService->PurgeHistory($aParams['iChunkSize']);
 	}

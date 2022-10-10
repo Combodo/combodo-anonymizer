@@ -49,6 +49,13 @@ SetupWebPage::AddModule(
 			'src/Hook/AnonymizationMenuPlugIn.php',
 			'src/Hook/AnonymizationJsPlugin.php',
 			'model.combodo-anonymizer.php',
+			'src/Action/AnonymizePerson.php',
+			'src/Action/CleanupCaseLogs.php',
+			'src/Action/CleanupEmailNotification.php',
+			'src/Action/CleanupOnMention.php',
+			'src/Action/CleanupUsers.php',
+			'src/Action/PurgePersonHistory.php',
+			'src/Action/ResetPersonFields.php',
 			'main.combodo-anonymizer.php',
 		],
 		'webservice' => [
@@ -69,13 +76,7 @@ SetupWebPage::AddModule(
 		// Default settings
 		//
 		'settings' => [
-			// Module specific settings go here, if any
-			'week_days' => 'monday, tuesday, wednesday, thursday, friday, saturday, sunday',
-			'time' => '00:30',
-			'end_time' => '05:30',
-			'enabled' => true,
-			'debug' => true,
-			'max_chunk_size' => 1000,
+			// datamodel module_parameters
 		],
 	]
 );

@@ -26,14 +26,11 @@ class AnonymizerService
 	private $iMaxChunkSize;
 	/** @var array */
 	private $aAnonymizedFields;
-	/** @var array */
-	private $aActions;
 
 	public function __construct()
 	{
 		$this->iProcessEndTime = time() + MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_interactive_anonymization_time_in_s', 30);
 		$this->iMaxChunkSize = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
-		$this->aActions = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'actions', []);
 		$this->aAnonymizedFields = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'anonymized_fields', []);
 	}
 
@@ -149,7 +146,6 @@ class AnonymizerService
 	public function ProcessAnonymization()
 	{
 		$oComplexService = new ComplexBackgroundTaskService();
-		$oComplexService->SetActions($this->aActions);
 		$oComplexService->SetProcessEndTime($this->iProcessEndTime);
 
 		$oComplexService->ProcessTasks(self::BATCH_ANONYMIZATION_TASK);
@@ -221,14 +217,6 @@ class AnonymizerService
 	public function SetMaxChunkSize($iMaxChunkSize)
 	{
 		$this->iMaxChunkSize = $iMaxChunkSize;
-	}
-
-	/**
-	 * @param array|mixed|null $aActions
-	 */
-	public function SetActions($aActions)
-	{
-		$this->aActions = $aActions;
 	}
 
 	/**
