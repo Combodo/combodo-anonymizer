@@ -21,6 +21,12 @@ class ComposerStaticInit9da934a9423c6df2e90dae99265f6022
     );
 
     public static $classMap = array (
+        'Combodo\\iTop\\Anonymizer\\Action\\ActionAnonymizePerson' => __DIR__ . '/../..' . '/src/Action/ActionAnonymizePerson.php',
+        'Combodo\\iTop\\Anonymizer\\Action\\ActionCleanupCaseLogs' => __DIR__ . '/../..' . '/src/Action/ActionCleanupCaseLogs.php',
+        'Combodo\\iTop\\Anonymizer\\Action\\ActionCleanupEmailNotification' => __DIR__ . '/../..' . '/src/Action/ActionCleanupEmailNotification.php',
+        'Combodo\\iTop\\Anonymizer\\Action\\ActionCleanupOnMention' => __DIR__ . '/../..' . '/src/Action/ActionCleanupOnMention.php',
+        'Combodo\\iTop\\Anonymizer\\Action\\ActionCleanupUsers' => __DIR__ . '/../..' . '/src/Action/ActionCleanupUsers.php',
+        'Combodo\\iTop\\Anonymizer\\Action\\ActionPurgePersonHistory' => __DIR__ . '/../..' . '/src/Action/ActionPurgePersonHistory.php',
         'Combodo\\iTop\\Anonymizer\\Controller\\AjaxAnonymizerController' => __DIR__ . '/../..' . '/src/Controller/AjaxAnonymizerController.php',
         'Combodo\\iTop\\Anonymizer\\Controller\\ConfigAnonymizerController' => __DIR__ . '/../..' . '/src/Controller/ConfigAnonymizerController.php',
         'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerException' => __DIR__ . '/../..' . '/src/Helper/AnonymizerException.php',

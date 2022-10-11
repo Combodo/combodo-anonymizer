@@ -4,19 +4,39 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
-namespace Combodo\iTop\Anonymizer\Action;
-
-use BatchAnonymizationTaskAction;
-use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
-use Exception;
-use MetaModel;
-use MySQLHasGoneAwayException;
 
-class CleanupEmailNotification extends BatchAnonymizationTaskAction
+class ActionCleanupEmailNotification extends AnonymizationTaskAction
 {
+	/**
+	 * @throws \CoreException
+	 */
+	public static function Init()
+	{
+		$aParams = array
+		(
+			'category'            => '',
+			'key_type'            => 'autoincrement',
+			'name_attcode'        => 'name',
+			'state_attcode'       => '',
+			'reconc_keys'         => array('name'),
+			'db_table'            => 'priv_anonymization_task_action_cleanup_email_notification',
+			'db_key_field'        => 'id',
+			'db_finalclass_field' => '',
+			'display_template'    => '',
+		);
+		MetaModel::Init_Params($aParams);
+		MetaModel::Init_InheritAttributes();
+
+		// Display lists
+		MetaModel::Init_SetZListItems('details', array('name', 'rank')); // Attributes to be displayed for the complete details
+		MetaModel::Init_SetZListItems('list', array('name', 'rank')); // Attributes to be displayed for a list
+		// Search criteria
+		MetaModel::Init_SetZListItems('standard_search', array('name')); // Criteria of the std search form
+	}
+
 	/**
 	 * @return void
 	 * @throws \ArchivedObjectException
@@ -98,7 +118,7 @@ class CleanupEmailNotification extends BatchAnonymizationTaskAction
 		$aParams = json_decode($this->Get('action_params'), true);
 		$iChunkSize = $aParams['iChunkSize'];
 		if ($iChunkSize == 1) {
-			AnonymizerLog::Debug('Stop retry action CleanupEmailNotification with params '.json_encode($aParams));
+			AnonymizerLog::Debug('Stop retry action ActionCleanupEmailNotification with params '.json_encode($aParams));
 			$this->Set('action_params', '');
 			$this->DBWrite();
 		}
@@ -122,12 +142,12 @@ class CleanupEmailNotification extends BatchAnonymizationTaskAction
 		}
 		catch (MySQLHasGoneAwayException $e) {
 			//in this case retry is possible
-			AnonymizerLog::Error('Error MySQLHasGoneAwayException during CleanupEmailNotification try again later');
+			AnonymizerLog::Error('Error MySQLHasGoneAwayException during ActionCleanupEmailNotification try again later');
 
 			return false;
 		}
 		catch (Exception $e) {
-			AnonymizerLog::Error('Error during CleanupEmailNotification with params '.$this->Get('action_params').' with message :'.$e->getMessage());
+			AnonymizerLog::Error('Error during ActionCleanupEmailNotification with params '.$this->Get('action_params').' with message :'.$e->getMessage());
 
 			return true;
 		}

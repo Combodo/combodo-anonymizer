@@ -21,13 +21,13 @@
         <field id="2">name</field>
       </notification_content>
       <actions type="array">
-        <action id="0">Combodo\iTop\Anonymizer\Action\ResetPersonFields</action>
-        <action id="10">Combodo\iTop\Anonymizer\Action\AnonymizePerson</action>
-        <action id="20">Combodo\iTop\Anonymizer\Action\CleanupUsers</action>
-        <action id="30">Combodo\iTop\Anonymizer\Action\CleanupCaseLogs</action>
-        <action id="40">Combodo\iTop\Anonymizer\Action\CleanupOnMention</action>
-        <action id="50">Combodo\iTop\Anonymizer\Action\CleanupEmailNotification</action>
-        <action id="1000">Combodo\iTop\Anonymizer\Action\PurgePersonHistory</action>
+        <action id="0">ActionResetPersonFields</action>
+        <action id="10">ActionAnonymizePerson</action>
+        <action id="20">ActionCleanupUsers</action>
+        <action id="30">ActionCleanupCaseLogs</action>
+        <action id="40">ActionCleanupOnMention</action>
+        <action id="50">ActionCleanupEmailNotification</action>
+        <action id="1000">ActionPurgePersonHistory</action>
       </actions>
       <anonymized_fields type="hash">
         <name>Contact %1$s</name>
@@ -49,12 +49,12 @@
       <presentation/>
       <methods/>
     </class>
-    <class id="BatchAnonymizationTask" _delta="define">
+    <class id="AnonymizationTask" _delta="define">
       <parent>ComplexBackgroundTask</parent>
       <properties>
         <category/>
         <abstract>false</abstract>
-        <db_table>priv_batch_anonymization_task</db_table>
+        <db_table>priv_anonymization_task</db_table>
         <naming>
           <format>%1$s %2$s</format>
           <attributes>
@@ -125,11 +125,11 @@
         </list>
       </presentation>
     </class>
-    <class id="BatchAnonymizationTaskAction" _delta="define">
+    <class id="AnonymizationTaskAction" _delta="define">
       <parent>ComplexBackgroundTaskAction</parent>
       <properties>
         <abstract>false</abstract>
-        <db_table>priv_batch_anonymization_task_action</db_table>
+        <db_table>priv_anonymization_task_action</db_table>
         <category/>
       </properties>
       <fields>
@@ -166,7 +166,7 @@
           <code><![CDATA[
         public function DisplayBareHeader(WebPage $oPage, $bEditMode = false)
         {
-          $oSet = new DBObjectSet(DBSearch::FromOQL("SELECT BatchAnonymizationTask WHERE class_to_anonymize='Person' AND id_to_anonymize=:id"), [], ["id" => $this->GetKey()]);
+          $oSet = new DBObjectSet(DBSearch::FromOQL("SELECT AnonymizationTask WHERE class_to_anonymize='Person' AND id_to_anonymize=:id"), [], ["id" => $this->GetKey()]);
           if ($oSet->Count() > 0) {
             $sMessage = Dict::S('Anonymization:InProgress');
             $this::SetSessionMessage(get_class($this), $this->GetKey(), 1, $sMessage, 'info', 1);

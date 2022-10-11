@@ -19,7 +19,7 @@ use UserRights;
 
 class AnonymizerService
 {
-	const BATCH_ANONYMIZATION_TASK = 'BatchAnonymizationTask';
+	const ANONYMIZATION_TASK = 'AnonymizationTask';
 	/** @var int */
 	private $iProcessEndTime;
 	/** @var int */
@@ -126,7 +126,7 @@ class AnonymizerService
 
 			return;
 		}
-		$oTask = MetaModel::NewObject(self::BATCH_ANONYMIZATION_TASK);
+		$oTask = MetaModel::NewObject(self::ANONYMIZATION_TASK);
 		$oTask->Set('name', 'Anonymizer');
 		$oTask->Set('class_to_anonymize', $sClass);
 		$oTask->Set('id_to_anonymize', $sId);
@@ -148,7 +148,7 @@ class AnonymizerService
 		$oComplexService = new ComplexBackgroundTaskService();
 		$oComplexService->SetProcessEndTime($this->iProcessEndTime);
 
-		$oComplexService->ProcessTasks(self::BATCH_ANONYMIZATION_TASK);
+		$oComplexService->ProcessTasks(self::ANONYMIZATION_TASK);
 	}
 
 	public function IsAllowedToAnonymize($sClass, $sId)

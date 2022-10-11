@@ -4,19 +4,43 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
-namespace Combodo\iTop\Anonymizer\Action;
 
-use BatchAnonymizationTaskAction;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
-use MetaModel;
 
 /**
  * Remove history entries of the selected object
  */
-class PurgePersonHistory extends BatchAnonymizationTaskAction
+class ActionPurgePersonHistory extends AnonymizationTaskAction
 {
+	/**
+	 * @throws \CoreException
+	 */
+	public static function Init()
+	{
+		$aParams = array
+		(
+			'category'            => '',
+			'key_type'            => 'autoincrement',
+			'name_attcode'        => 'name',
+			'state_attcode'       => '',
+			'reconc_keys'         => array('name'),
+			'db_table'            => 'priv_anonymization_task_action_purge_person_history',
+			'db_key_field'        => 'id',
+			'db_finalclass_field' => '',
+			'display_template'    => '',
+		);
+		MetaModel::Init_Params($aParams);
+		MetaModel::Init_InheritAttributes();
+
+		// Display lists
+		MetaModel::Init_SetZListItems('details', array('name', 'rank')); // Attributes to be displayed for the complete details
+		MetaModel::Init_SetZListItems('list', array('name', 'rank')); // Attributes to be displayed for a list
+		// Search criteria
+		MetaModel::Init_SetZListItems('standard_search', array('name')); // Criteria of the std search form
+	}
+
 	/**
 	 * @return void
 	 * @throws \CoreCannotSaveObjectException
@@ -43,7 +67,7 @@ class PurgePersonHistory extends BatchAnonymizationTaskAction
 		$aParams = json_decode($this->Get('action_params'), true);
 		$iChunkSize = $aParams['iChunkSize'];
 		if ($iChunkSize == 1) {
-			AnonymizerLog::Debug('Stop retry action PurgePersonHistory with params '.json_encode($aParams));
+			AnonymizerLog::Debug('Stop retry action ActionPurgePersonHistory with params '.json_encode($aParams));
 			$this->Set('action_params', '');
 			$this->DBWrite();
 

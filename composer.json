@@ -6,15 +6,6 @@
     "classmap-authoritative": true
   },
   "autoload": {
-    "exclude-from-classmap": [
-      "src/Action/AnonymizePerson.php",
-      "src/Action/CleanupCaseLogs.php",
-      "src/Action/CleanupEmailNotification.php",
-      "src/Action/CleanupOnMention.php",
-      "src/Action/CleanupUsers.php",
-      "src/Action/PurgePersonHistory.php",
-      "src/Action/ResetPersonFields.php"
-    ],
       "psr-4": {
       "Combodo\\iTop\\Anonymizer\\": "src"
     }
