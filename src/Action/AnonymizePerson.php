@@ -15,10 +15,6 @@ use MetaModel;
 
 class AnonymizePerson extends BatchAnonymizationTaskAction
 {
-	public static function Init()
-	{
-
-	}
 
 	public function InitActionParams()
 	{
