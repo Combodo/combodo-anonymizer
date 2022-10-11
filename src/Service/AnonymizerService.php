@@ -156,7 +156,7 @@ class AnonymizerService
 		if (!UserRights::IsAdministrator() && $sClass == 'Person') {
 			// Cannot anonymize a person having an admin User
 			foreach ($this->GetUserIdListFromContact($sId) as $sUserId) {
-				if (UserRights::IsAdministrator(MetaModel::GetObject('User', $sUserId))) {
+				if (UserRights::IsAdministrator(MetaModel::GetObject('User', $sUserId, false, true))) {
 					return false;
 				}
 			}
@@ -193,7 +193,7 @@ class AnonymizerService
 		$aFields['first_name'] = vsprintf($sTemplate, $sId);
 
 		$sTemplate = $this->aAnonymizedFields['email'] ?? 'xxxx@xxxx.xxx';
-		$aFields['email'] = str_replace(' ', '', vsprintf($sTemplate, [$aFields['first_name'], $aFields['name'], $sId]));
+		$aFields['email'] = str_replace(' ', '', vsprintf($sTemplate,$sId));
 
 		return $aFields;
 	}

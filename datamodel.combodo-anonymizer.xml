@@ -32,7 +32,7 @@
       <anonymized_fields type="hash">
         <name>Contact %1$s</name>
         <first_name>Anonymous</first_name>
-        <email>%1$s.%2$s%3$s@anony.mized</email>
+        <email>Anonymous.Contact%1$s@anony.mized</email>
       </anonymized_fields>
     </parameters>
   </module_parameters>
@@ -297,7 +297,8 @@
       <group id="RessourceAnonymizationGroup">
         <classes>
           <class id="RessourceAnonymization"/>
-          <class id="BatchAnonymization"/>
+          <class id="ComplexBackgroundTask"/>
+          <class id="ComplexBackgroundTaskAction"/>
         </classes>
       </group>
       <group id="RessourcePersonGroup">

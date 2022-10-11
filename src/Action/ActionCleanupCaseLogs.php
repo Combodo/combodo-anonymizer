@@ -116,11 +116,11 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 				$sKey = MetaModel::DBGetKey($sClass);
 				if ((MetaModel::GetAttributeOrigin($sClass, $sAttCode) == $sClass) && $oAttDef instanceof AttributeCaseLog) {
 					$aSQLColumns = $oAttDef->GetSQLColumns();
-					$sColumn1 = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
+					$sColumn = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
 
 					$aConditions = [];
 					foreach ($aIdUser as $sIdUser) {
-						$aConditions[] = " `$sColumn1` LIKE ".CMDBSource::Quote('%'.sprintf($sPattern, $sOrigFriendlyname, $sIdUser).'%');
+						$aConditions[] = " `$sColumn` LIKE ".CMDBSource::Quote('%'.sprintf($sPattern, $sOrigFriendlyname, $sIdUser).'%');
 					}
 					$sCondition = implode(' OR ', $aConditions);
 					$sSqlSearch = "SELECT  `$sKey` FROM `$sTable` WHERE $sCondition";
@@ -132,14 +132,14 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 							$sTable = MetaModel::DBGetTable($sClass, $sAttCode);
 							if ($oAttDef instanceof AttributeCaseLog) {
 								$aSQLColumns = $oAttDef->GetSQLColumns();
-								$sColumn1 = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
+								$sColumn = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
 								$sColumnIdx = array_keys($aSQLColumns)[1]; // We assume that the second column is the index
-								$aColumnsToUpdate[$sTable][] = " `$sColumn1` = ".$sStartReplace."`$sColumn1`".$sEndReplaceInCaseLog;
-								$aColumnsToUpdate[$sTable][] = " `$sColumnIdx` = ".$sStartReplaceInIdx."`$sColumnIdx`".$sEndReplaceInIdx." ";
-							} elseif ($oAttDef instanceof AttributeText) {
+								$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInCaseLog;
+								$aColumnsToUpdate[$sTable][$sColumnIdx] = " `$sColumnIdx` = ".$sStartReplaceInIdx."`$sColumnIdx`".$sEndReplaceInIdx." ";
+							} elseif ($oAttDef instanceof AttributeText || ($oAttDef instanceof AttributeString && !($oAttDef instanceof AttributeFinalClass))) {
 								$aSQLColumns = $oAttDef->GetSQLColumns();
 								$sColumn = array_keys($aSQLColumns)[0]; //
-								$aColumnsToUpdate[$sTable][] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInTxt;
+								$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInTxt;
 							}
 						}
 					}

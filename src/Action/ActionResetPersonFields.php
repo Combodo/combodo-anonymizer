@@ -5,6 +5,7 @@
  */
 
 
+use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
 
 class ActionResetPersonFields extends AnonymizationTaskAction
@@ -36,6 +37,36 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 		MetaModel::Init_SetZListItems('standard_search', array('name')); // Criteria of the std search form
 	}
 
+	public function InitActionParams()
+	{
+		$oTask = $this->GetTask();
+		$sClass = $oTask->Get('class_to_anonymize');
+		$sId = $oTask->Get('id_to_anonymize');
+
+		$oObject = MetaModel::GetObject($sClass, $sId);
+
+		AnonymizerLog::Debug('email'. $oObject->Get('email'));
+		$aContext = [
+			'origin' => [
+				'friendlyname' => $oObject->Get('friendlyname'),
+				'email'        => $oObject->Get('email'),
+			],
+		];
+
+		$oSet = new DBObjectSet(
+			DBSearch::FromOQL("SELECT CMDBChangeOpCreate WHERE objclass=:class AND objkey=:id"),
+			[],
+			['class' => $sClass, 'id' => $sId]
+		);
+
+		$oChangeCreate = $oSet->Fetch();
+		if ($oChangeCreate) {
+			$aContext['origin']['date_create'] = $oChangeCreate->Get('date');
+		}
+
+		$oTask->Set('anonymization_context', json_encode($aContext));
+		$oTask->DBWrite();
+	}
 	/**
 	 * @param $iEndExecutionTime
 	 *
