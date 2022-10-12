@@ -6,12 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Combodo\\iTop\\Anonymizer\\Action\\ActionAnonymizePerson' => $baseDir . '/src/Action/ActionAnonymizePerson.php',
-    'Combodo\\iTop\\Anonymizer\\Action\\ActionCleanupCaseLogs' => $baseDir . '/src/Action/ActionCleanupCaseLogs.php',
-    'Combodo\\iTop\\Anonymizer\\Action\\ActionCleanupEmailNotification' => $baseDir . '/src/Action/ActionCleanupEmailNotification.php',
-    'Combodo\\iTop\\Anonymizer\\Action\\ActionCleanupOnMention' => $baseDir . '/src/Action/ActionCleanupOnMention.php',
-    'Combodo\\iTop\\Anonymizer\\Action\\ActionCleanupUsers' => $baseDir . '/src/Action/ActionCleanupUsers.php',
-    'Combodo\\iTop\\Anonymizer\\Action\\ActionPurgePersonHistory' => $baseDir . '/src/Action/ActionPurgePersonHistory.php',
     'Combodo\\iTop\\Anonymizer\\Controller\\AjaxAnonymizerController' => $baseDir . '/src/Controller/AjaxAnonymizerController.php',
     'Combodo\\iTop\\Anonymizer\\Controller\\ConfigAnonymizerController' => $baseDir . '/src/Controller/ConfigAnonymizerController.php',
     'Combodo\\iTop\\Anonymizer\\Helper\\AnonymizerException' => $baseDir . '/src/Helper/AnonymizerException.php',

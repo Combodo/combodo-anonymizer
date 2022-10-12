@@ -40,7 +40,7 @@ class PersonalDataAnonymizer extends AbstractWeeklyScheduledProcess
 
 		$aBackGroundTaskService = new ComplexBackgroundTaskService();
 		$aBackGroundTaskService->SetProcessEndTime($iUnixTimeLimit);
-		$aBackGroundTaskService->ProcessTasks('AnonymizationTask');
+		$aBackGroundTaskService->ProcessTasks('AnonymizationTask', $sMessage);
 
 		$oSet = new CMDBObjectSet($DBSearch);
 		$iCount = $oSet->Count();
