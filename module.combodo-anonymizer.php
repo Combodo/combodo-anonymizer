@@ -55,7 +55,6 @@ SetupWebPage::AddModule(
 			'src/Action/ActionCleanupUsers.php',
 			'src/Action/ActionPurgePersonHistory.php',
 			'src/Action/ActionResetPersonFields.php',
-			'main.combodo-anonymizer.php',
 		],
 		'webservice' => [
 
