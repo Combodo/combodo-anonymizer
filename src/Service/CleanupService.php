@@ -211,7 +211,7 @@ class CleanupService
 	 * @return array
 	 * @throws \CoreException
 	 */
-	public function GetCleanupChangesRequests($aContext)
+	public function GetCleanupChangesRequests($aContext, $bFirstUser)
 	{
 		$sChangeTable = MetaModel::DBGetTable('CMDBChange');
 		$sKey = MetaModel::DBGetKey('CMDBChange');
@@ -226,25 +226,27 @@ class CleanupService
 		$aRequests = [];
 
 		if (MetaModel::IsValidAttCode('CMDBChange', 'user_id')) {
-			$aRequests['req1'] = [
-				'search_key' => $sKey,
-				'key'        => $sKey,
-				'select'     => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).' AND user_id IS NULL'.$sDateCreateCondition,
-				'updates'    => [$sChangeTable => "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
-			];
-			$aRequests['req2'] = [
-				'search_key' => $sKey,
-				'key'        => $sKey,
-				'select'     => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').' AND user_id IS NULL'.$sDateCreateCondition,
-				'updates'    => [$sChangeTable => "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname.' (CSV)')],
-			];
+			if ($bFirstUser) {
+				$aRequests['req1'] = [
+					'search_key' => $sKey,
+					'key'        => $sKey,
+					'select'     => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).' AND user_id IS NULL'.$sDateCreateCondition,
+					'updates'    => [$sChangeTable => "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
+				];
+				$aRequests['req2'] = [
+					'search_key' => $sKey,
+					'key'        => $sKey,
+					'select'     => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').' AND user_id IS NULL'.$sDateCreateCondition,
+					'updates'    => [$sChangeTable => "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname.' (CSV)')],
+				];
+			}
 			$aRequests['req3'] = [
 				'search_key' => $sKey,
 				'key'        => $sKey,
 				'select'     => "SELECT `$sKey` from `$sChangeTable` WHERE user_id in (".$this->sId.')',
 				'updates'    => [$sChangeTable => "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
 			];
-		} else {
+		} elseif ($bFirstUser) {
 			$aRequests['req1'] = [
 				'search_key' => $sKey,
 				'key'        => $sKey,

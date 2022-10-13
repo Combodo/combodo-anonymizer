@@ -65,6 +65,7 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 		$oService = new AnonymizerService();
 		$aParams['aUserIds'] = $oService->GetUserIdListFromContact($sId);
 		$aParams['sCurrentUserId'] = reset($aParams['aUserIds']);
+		$aParams['first_user'] = true;
 
 		$this->Set('action_params', json_encode($aParams));
 		$this->DBWrite();
@@ -138,7 +139,7 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 			}
 
 			// Get all the request set to execute for every user
-			$aRequests = $oService->GetCleanupChangesRequests($aContext);
+			$aRequests = $oService->GetCleanupChangesRequests($aContext, $aParams['first_user']);
 
 			foreach ($aRequests as $sName => $aRequest) {
 				$iProgress = $aParams['aChangesProgress'][$sName] ?? 0;
@@ -153,7 +154,7 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 					}
 					catch (MySQLHasGoneAwayException $e) {
 						//in this case retry is possible
-						AnonymizerLog::Error('Error MySQLHasGoneAwayException during ActionCleanupUsers try again later');
+						AnonymizerLog::Error('Error MySQLHasGoneAwayException during ActionCleanupUsers with params '.$this->Get('action_params').' with message :'.$e->getMessage().' try again later');
 
 						return false;
 					}
@@ -171,6 +172,7 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 			}
 			$aParams['aChangesProgress'] = [];
 			$iUserId = next($aParams['aUserIds']);
+			$aParams['first_user'] = false;
 
 			// Save progression
 			$aParams['sCurrentUserId'] = $iUserId;
