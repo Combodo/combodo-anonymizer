@@ -57,7 +57,7 @@ class AnonymizerService
 
 		if ($bInteractive) {
 			// run one time background process.
-			$this->ProcessAnonymization();
+			$this->ProcessAnonymization($sMessage);
 		}
 	}
 
@@ -96,7 +96,7 @@ class AnonymizerService
 
 			if ($bInteractive) {
 				//run one time background process.
-				$this->ProcessAnonymization();
+				$this->ProcessAnonymization($sMessage);
 			}
 		}
 		catch (Exception $e) {
@@ -143,12 +143,12 @@ class AnonymizerService
 	 * @throws \OQLException
 	 * @throws \ArchivedObjectException
 	 */
-	public function ProcessAnonymization()
+	public function ProcessAnonymization(&$sMessage)
 	{
 		$oComplexService = new ComplexBackgroundTaskService();
 		$oComplexService->SetProcessEndTime($this->iProcessEndTime);
 
-		$oComplexService->ProcessTasks(self::ANONYMIZATION_TASK);
+		$oComplexService->ProcessTasks(self::ANONYMIZATION_TASK, $sMessage);
 	}
 
 	public function IsAllowedToAnonymize($sClass, $sId)
