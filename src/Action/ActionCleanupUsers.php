@@ -9,6 +9,7 @@ use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
+use Combodo\iTop\ComplexBackgroundTask\Service\DatabaseService;
 
 /**
  * remove login and deactivate user linked to anonymized person
@@ -107,6 +108,10 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 	 */
 	public function ExecuteAction($iEndExecutionTime): bool
 	{
+		if ($this->Get('action_params') == '') {
+			return true;
+		}
+
 		$oTask = $this->GetTask();
 
 		$aParams = json_decode($this->Get('action_params'), true);
@@ -124,6 +129,7 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 			/** @var \User $oUser */
 			$oUser = MetaModel::GetObject(self::USER_CLASS, $iUserId);
 			$oService = new CleanupService(get_class($oUser), $iUserId, $iEndExecutionTime);
+			$oDatabaseService = new DatabaseService();
 			// Disable User, reset login and password
 			$oService->CleanupUser($oUser);
 			if (!$oService->PurgeHistory($aParams['iChunkSize'])) {
@@ -139,7 +145,7 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 				$bCompleted = ($iProgress == -1);
 				while (!$bCompleted && time() < $iEndExecutionTime) {
 					try {
-						$bCompleted = $oService->ExecuteActionWithQueriesByChunk($aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
+						$bCompleted = $oDatabaseService->ExecuteSQLQueriesByChunk($aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
 						// Save progression
 						$aParams['aChangesProgress'][$sName] = $iProgress;
 						$this->Set('action_params', json_encode($aParams));

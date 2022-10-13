@@ -7,7 +7,7 @@
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
-use Combodo\iTop\Anonymizer\Service\CleanupService;
+use Combodo\iTop\ComplexBackgroundTask\Service\DatabaseService;
 
 
 /**
@@ -71,7 +71,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 
 			return;
 		}
-		$aMentionsAllowedClasses =  (array)MetaModel::GetConfig()->Get('mentions.allowed_classes');
+		$aMentionsAllowedClasses = (array)MetaModel::GetConfig()->Get('mentions.allowed_classes');
 		if (sizeof($aMentionsAllowedClasses) == 0) {
 			//nothing to do. We can skip the current action
 			$this->Set('action_params', '');
@@ -102,7 +102,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 				$sStartReplace = "REPLACE(";
 				$sEndReplaceInCaseLog = $sEndReplaceInCaseLog.", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sReplace).")";
 				$sEndReplaceInTxt = $sEndReplaceInTxt.", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sTargetFriendlyname).")";
-				if ($sOrigEmail!='' && in_array('email', $aCleanupCaseLog)) {
+				if ($sOrigEmail != '' && in_array('email', $aCleanupCaseLog)) {
 					$sReplace = str_repeat('*', strlen($sOrigEmail));
 
 					$sStartReplace = "REPLACE(".$sStartReplace;
@@ -188,12 +188,12 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 	{
 		$aParams = json_decode($this->Get('action_params'), true);
 		$iChunkSize = $aParams['iChunkSize'];
-		if($iChunkSize == 1){
+		if ($iChunkSize == 1) {
 			AnonymizerLog::Debug('Stop retry action ActionCleanupOnMention with params '.json_encode($aParams));
 			$this->Set('action_params', '');
 			$this->DBWrite();
 		}
-		$aParams['iChunkSize'] = (int) $iChunkSize/2 + 1;
+		$aParams['iChunkSize'] = (int)$iChunkSize / 2 + 1;
 
 		$this->Set('action_params', json_encode($aParams));
 		$this->DBWrite();
@@ -210,14 +210,11 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 	 */
 	public function ExecuteAction($iEndExecutionTime): bool
 	{
-		$oTask = $this->GetTask();
 		if ($this->Get('action_params') == '') {
 			return true;
 		}
-		$sClass = $oTask->Get('class_to_anonymize');
-		$sId = $oTask->Get('id_to_anonymize');
 
-		$oService = new CleanupService($sClass, $sId, $iEndExecutionTime);
+		$oDatabaseService = new DatabaseService();
 		$aParams = json_decode($this->Get('action_params'), true);
 		$aRequests = $aParams['aRequests'];
 
@@ -226,16 +223,19 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 			$bCompleted = ($iProgress == -1);
 			while (!$bCompleted && time() < $iEndExecutionTime) {
 				try {
-				$bCompleted = $oService->ExecuteActionWithQueriesByChunk($aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
+					$bCompleted = $oDatabaseService->ExecuteSQLQueriesByChunk($aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
 					$aParams['aChangesProgress'][$sName] = $iProgress;
-				} catch (MySQLHasGoneAwayException $e){
+				}
+				catch (MySQLHasGoneAwayException $e) {
 					//in this case retry is possible
 					AnonymizerLog::Error('Error MySQLHasGoneAwayException during ActionCleanupCaseLogs try again later');
+
 					return false;
-				} catch (\Exception $e){
+				}
+				catch (\Exception $e) {
 					AnonymizerLog::Error('Error during ActionCleanupCaseLogs with params '.$this->Get('action_params').' with message :'.$e->getMessage());
 					AnonymizerLog::Error('Go to next update');
-					$aParams['aChangesProgress'][$sName]= -1;
+					$aParams['aChangesProgress'][$sName] = -1;
 				}
 				// Save progression
 				$this->Set('action_params', json_encode($aParams));

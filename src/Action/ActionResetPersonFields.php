@@ -48,7 +48,7 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 
 		$oObject = MetaModel::GetObject($sClass, $sId);
 
-		AnonymizerLog::Debug('email'. $oObject->Get('email'));
+		AnonymizerLog::Debug('email'.$oObject->Get('email'));
 		$aContext = [
 			'origin' => [
 				'friendlyname' => $oObject->Get('friendlyname'),
@@ -70,6 +70,7 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 		$oTask->Set('anonymization_context', json_encode($aContext));
 		$oTask->DBWrite();
 	}
+
 	/**
 	 * @param $iEndExecutionTime
 	 *

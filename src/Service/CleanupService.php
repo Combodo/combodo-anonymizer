@@ -9,13 +9,10 @@ namespace Combodo\iTop\Anonymizer\Service;
 use AttributeLinkedSetIndirect;
 use CMDBObject;
 use CMDBSource;
-use Combodo\iTop\Anonymizer\Helper\AnonymizerException;
-use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use DBObjectSearch;
 use DBObjectSet;
 use Exception;
 use MetaModel;
-use MySQLHasGoneAwayException;
 use ormPassword;
 use Person;
 use User;
@@ -36,83 +33,6 @@ class CleanupService
 		$this->sClass = $sClass;
 		$this->sId = $sId;
 		$this->iProcessEndTime = $iProcessEndTime;
-	}
-
-	/**
-	 * @param string $sSqlSearch
-	 * @param array $aSqlUpdate array to update elements found by $sSqlSearch, don't specify the where close
-	 * @param string $sKey primary key of updated table
-	 * @param string $sProgressId start the search at this value => updated with the last id computed
-	 * @param int $iMaxChunkSize limit size of processed data
-	 * Search objects to update and execute update by lot of  max_chunk_size elements
-	 * return true if all objects where updated, false if the function don't have the time to finish
-	 *
-	 * @return bool  true if completed
-	 * @throws \CoreException
-	 * @throws \MySQLException
-	 * @throws \MySQLHasGoneAwayException
-	 * @throws \Combodo\iTop\Anonymizer\Helper\AnonymizerException
-	 */
-	public function ExecuteActionWithQueriesByChunk($sSqlSearch, $aSqlUpdate, $sKey, &$sProgressId, $iMaxChunkSize): bool
-	{
-		$sId = $sProgressId;
-		$sSQL = $sSqlSearch." AND $sKey > $sProgressId ORDER BY $sKey LIMIT ".$iMaxChunkSize;
-		AnonymizerLog::Debug($sSQL);
-		$oResult = CMDBSource::Query($sSQL);
-
-		$aObjects = [];
-		if ($oResult->num_rows > 0) {
-			while ($oRaw = $oResult->fetch_assoc()) {
-				$sId = $oRaw[$sKey];
-				$aObjects[] = $sId;
-			}
-			CMDBSource::Query('START TRANSACTION');
-			try {
-				foreach ($aSqlUpdate as $sSqlUpdate) {
-					$sSQL = $sSqlUpdate." WHERE `$sKey` IN (".implode(', ', $aObjects).");";
-					AnonymizerLog::Debug($sSQL);
-					CMDBSource::Query($sSQL);
-				}
-				CMDBSource::Query('COMMIT');
-				// Save progression
-				$sProgressId = $sId + 1;
-			}
-			catch (MySQLHasGoneAwayException $e) {
-				// Allow to retry the same set
-				CMDBSource::Query('ROLLBACK');
-				if ($iMaxChunkSize == 1) {
-					// This is hopeless for this entry
-					throw new AnonymizerException($e->getMessage());
-				}
-				throw $e;
-			}
-			catch (Exception $e) {
-				CMDBSource::Query('ROLLBACK');
-				if ($iMaxChunkSize == 1) {
-					// Ignore current entries and skip to the next ones
-					$sProgressId = $sId + 1;
-					AnonymizerLog::Error($e->getMessage());
-
-					return false;
-				}
-
-				// Try with a reduced set in order to find the entries in error
-				throw $e;
-			}
-			if (count($aObjects) < $iMaxChunkSize) {
-				// completed
-				$sProgressId = -1;
-
-				return true;
-			}
-		} else {
-			$sProgressId = -1;
-
-			return true;
-		}
-
-		// not completed yet
-		return false;
 	}
 
 	/**

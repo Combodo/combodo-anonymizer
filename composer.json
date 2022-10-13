@@ -1,19 +1,19 @@
 {
-  "config": {
-    "platform": {
-      "php": ">=7.0.8"
+  "config" : {
+    "platform" : {
+      "php" : ">=7.0.8"
     },
-    "classmap-authoritative": true
+    "classmap-authoritative" : true
   },
-  "autoload": {
-      "psr-4": {
-      "Combodo\\iTop\\Anonymizer\\": "src"
+  "autoload" : {
+    "psr-4" : {
+      "Combodo\\iTop\\Anonymizer\\" : "src"
     }
   },
-  "name": "combodo/combodo-anonymizer",
-  "type": "itop-extension",
-  "description": "Personal data anonymizer",
-  "require": {
-    "composer-runtime-api": "^2.0"
+  "name" : "combodo/combodo-anonymizer",
+  "type" : "itop-extension",
+  "description" : "Personal data anonymizer",
+  "require" : {
+    "composer-runtime-api" : "^2.0"
   }
 }

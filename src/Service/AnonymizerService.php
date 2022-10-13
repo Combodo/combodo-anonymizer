@@ -193,7 +193,7 @@ class AnonymizerService
 		$aFields['first_name'] = vsprintf($sTemplate, $sId);
 
 		$sTemplate = $this->aAnonymizedFields['email'] ?? 'xxxx@xxxx.xxx';
-		$aFields['email'] = str_replace(' ', '', vsprintf($sTemplate,$sId));
+		$aFields['email'] = str_replace(' ', '', vsprintf($sTemplate, $sId));
 
 		return $aFields;
 	}

@@ -7,7 +7,7 @@
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
-use Combodo\iTop\Anonymizer\Service\CleanupService;
+use Combodo\iTop\ComplexBackgroundTask\Service\DatabaseService;
 
 /**
  * search for objects with caselogs created by a user of the anonymized person.
@@ -110,7 +110,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		}
 		//}
 
-		if ($sOrigEmail!='' && in_array('email', $aCleanupCaseLog)) {
+		if ($sOrigEmail != '' && in_array('email', $aCleanupCaseLog)) {
 			$sReplace = str_repeat('*', strlen($sOrigEmail));
 
 			$sStartReplace = "REPLACE(".$sStartReplace;
@@ -205,12 +205,11 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 	 */
 	public function ExecuteAction($iEndExecutionTime): bool
 	{
-		$oTask = $this->GetTask();
+		if ($this->Get('action_params') == '') {
+			return true;
+		}
 
-		$sClass = $oTask->Get('class_to_anonymize');
-		$sId = $oTask->Get('id_to_anonymize');
-
-		$oService = new CleanupService($sClass, $sId, $iEndExecutionTime);
+		$oDatabaseService = new DatabaseService();
 		$aParams = json_decode($this->Get('action_params'), true);
 		$aRequests = $aParams['aRequests'];
 
@@ -219,7 +218,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 			$bCompleted = ($iProgress == -1);
 			while (!$bCompleted && time() < $iEndExecutionTime) {
 				try {
-					$bCompleted = $oService->ExecuteActionWithQueriesByChunk($aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
+					$bCompleted = $oDatabaseService->ExecuteSQLQueriesByChunk($aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
 					$aParams['aChangesProgress'][$sName] = $iProgress;
 				}
 				catch (MySQLHasGoneAwayException $e) {

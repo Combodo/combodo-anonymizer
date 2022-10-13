@@ -10,12 +10,10 @@ use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 use Combodo\iTop\Test\UnitTest\ItopDataTestCase;
 use DBObjectSet;
-use HTMLSanitizer;
 use MetaModel;
 use ormCaseLog;
 use ormLinkSet;
 use UserRights;
-use utils;
 
 
 /**
@@ -52,12 +50,12 @@ class AnonymizationTest extends ItopDataTestCase
 	 * @dataProvider AnonymizationProvider
 	 *
 	 * @param $aPerson
-	 *  @param $aPersonExpected
+	 * @param $aPersonExpected
 	 *
 	 * @return void
 	 * @throws \ReflectionException
 	 */
-	public function testAnonymization($aPerson,$aPersonExpected)
+	public function testAnonymization($aPerson, $aPersonExpected)
 	{
 		UserRights::Login('admin'); // Login as admin
 		$aParamsPerson = [
@@ -105,26 +103,28 @@ class AnonymizationTest extends ItopDataTestCase
 		$sStarFriendlyName = $aPersonExpected['friendlyname'];
 		$sStarEmail = $aPersonExpected['email'];
 		$sExpectedFriendlyName = "Anonymous Contact $iPersonId";
-		$sExpectedEmail ="Anonymous.Contact$iPersonId@anony.mized";
+		$sExpectedEmail = "Anonymous.Contact$iPersonId@anony.mized";
 
 		$aUserRequestForTest = [
 			[
 				'initial'  => [
 					'title'       => "title of user request $sEmail",
 					'description' => "description $sFriendlyName and name : $sName and firstname:$sFirstName <\br> email : $sEmail<b>bbbb</b>",
-					'private_log' => [[
-						'message' => "test  $sEmail not replace false friendlyname : $sName $sFirstName and not other things",
-						'user_id' => $iUserKey,
+					'private_log' => [
+						[
+							'message' => "test  $sEmail not replace false friendlyname : $sName $sFirstName and not other things",
+							'user_id' => $iUserKey,
+						],
+						[
+							'message' => "test  $sEmail replace friendlyname $sFriendlyName",
+							'user_id' => $iUserKey,
+						],
+						[
+							'message'    => "test  replace friendlyname $sFriendlyName",
+							'user_id'    => 1,
+							'user_login' => 'admin',
+						],
 					],
-					[
-						'message' => "test  $sEmail replace friendlyname $sFriendlyName",
-						'user_id' => $iUserKey,
-					],
-					[
-						'message' => "test  replace friendlyname $sFriendlyName",
-						'user_id' => 1,
-						'user_login' => 'admin',
-					],]
 				],
 				'expected' => [
 					'title'       => "title of user request $sExpectedEmail",
@@ -150,34 +150,36 @@ class AnonymizationTest extends ItopDataTestCase
 				'initial'  => [
 					'title'       => "title of user request $sEmail",
 					'description' => "description $sFriendlyName and name : $sName and firstname:$sFirstName <\br> email : $sEmail<b>bbbb</b>",
-					'private_log' => [[
-						                  'message' => "test  $sEmail not replace false friendlyname : $sName $sFirstName and not other things ",
-						                  'user_id' => 1,
-					                  ],
-					                  [
-						                  'message' => "test  $sEmail replace friendlyname $sFriendlyName",
-						                  'user_id' => 1,
-					                  ],
-					                  [
-						                  'message' => "test replace friendlyname $sFriendlyName",
-						                  'user_id' => 1,
-					                  ],]
+					'private_log' => [
+						[
+							'message' => "test  $sEmail not replace false friendlyname : $sName $sFirstName and not other things ",
+							'user_id' => 1,
+						],
+						[
+							'message' => "test  $sEmail replace friendlyname $sFriendlyName",
+							'user_id' => 1,
+						],
+						[
+							'message' => "test replace friendlyname $sFriendlyName",
+							'user_id' => 1,
+						],
+					],
 				],
 				'expected' => [
 					'title'       => "title of user request $sEmail",
-					'description' =>"<p>description $sFriendlyName and name : $sName and firstname:$sFirstName  email : $sEmail<b>bbbb</b></p>",
+					'description' => "<p>description $sFriendlyName and name : $sName and firstname:$sFirstName  email : $sEmail<b>bbbb</b></p>",
 					'private_log' =>
 						[
 							[
-								'message' => "test replace friendlyname $sFriendlyName",
+								'message'    => "test replace friendlyname $sFriendlyName",
 								'user_login' => 'My first name My last name',
 							],
 							[
-								'message' => "test $sEmail replace friendlyname $sFriendlyName",
+								'message'    => "test $sEmail replace friendlyname $sFriendlyName",
 								'user_login' => 'My first name My last name',
 							],
 							[
-								'message' => "test $sEmail not replace false friendlyname : $sName $sFirstName and not other things",
+								'message'    => "test $sEmail not replace false friendlyname : $sName $sFirstName and not other things",
 								'user_login' => 'My first name My last name',
 							],
 						],
@@ -214,18 +216,18 @@ class AnonymizationTest extends ItopDataTestCase
 		$oService->AnonymizeOneObject('Person', $iPersonId, true);
 
 
-		foreach ($aUserRequestForTest as $iCurrentUR=>$aUserRequest) {
+		foreach ($aUserRequestForTest as $iCurrentUR => $aUserRequest) {
 			$oNewUserRequest = MetaModel::GetObject('UserRequest', $aUserRequest['id']);
 			$oCaseLogFinal = $oNewUserRequest->Get('private_log');
 			$aCaseLogs = $oCaseLogFinal->GetAsArray();
 
-			$this->assertEquals($aUserRequest['expected']['title'], $oNewUserRequest->Get('title'),"Test UR n°$iCurrentUR title");
-			$this->assertEquals($aUserRequest['expected']['description'], $oNewUserRequest->Get('description'),"Test UR n°$iCurrentUR  description");
+			$this->assertEquals($aUserRequest['expected']['title'], $oNewUserRequest->Get('title'), "Test UR n°$iCurrentUR title");
+			$this->assertEquals($aUserRequest['expected']['description'], $oNewUserRequest->Get('description'), "Test UR n°$iCurrentUR  description");
 
 			AnonymizerLog::Debug(json_encode($aCaseLogs));
 			foreach ($aUserRequest['expected']['private_log'] as $index => $aLog) {
-				$this->assertEquals($aLog['message'], $aCaseLogs[$index]['message'],"Test UR n°$iCurrentUR  message private_log index $index");
-				$this->assertEquals($aLog['user_login'], $aCaseLogs[$index]['user_login'],"Test UR n°$iCurrentUR login private_log index $index");
+				$this->assertEquals($aLog['message'], $aCaseLogs[$index]['message'], "Test UR n°$iCurrentUR  message private_log index $index");
+				$this->assertEquals($aLog['user_login'], $aCaseLogs[$index]['user_login'], "Test UR n°$iCurrentUR login private_log index $index");
 			}
 		}
 	}
@@ -233,28 +235,34 @@ class AnonymizationTest extends ItopDataTestCase
 	public function AnonymizationProvider()
 	{
 		return [
-			'classic'  => [[
-				'name'       => 'MyName',
-				'first_name' => 'MyFirstname',
-				'email'      => 'aa@bb.cc',
-				'user'       => [
-					'login' => 'loginTest',
+			'classic'  => [
+				[
+					'name'       => 'MyName',
+					'first_name' => 'MyFirstname',
+					'email'      => 'aa@bb.cc',
+					'user'       => [
+						'login' => 'loginTest',
+					],
 				],
-			],[
-				'friendlyname' => '******************',
-				'email'      => '********',
-			]],
-			'with éàù' => [[
+				[
+					'friendlyname' => '******************',
+					'email'        => '********',
+				],
+			],
+			'with éàù' => [
+				[
 					'name'       => 'AnéàùName',
 					'first_name' => 'AnéàùFirstname',
 					'email'      => 'aa@bb.cc',
 					'user'       => [
 						'login' => 'loginTest',
 					],
-				],[
+				],
+				[
 					'friendlyname' => '******************************',
-					'email'      => '********',
-				]],
+					'email'        => '********',
+				],
+			],
 
 		];
 	}
