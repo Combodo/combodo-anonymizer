@@ -148,13 +148,14 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 											foreach ($aColumnsToUpdate as $sTable => $aRequestReplace) {
 												$sSqlUpdate = "UPDATE `$sTable` ".
 													"SET ".implode(' , ', $aRequestReplace);
-												$aSqlUpdate[] = $sSqlUpdate;
+												$aSqlUpdate[$sTable] = $sSqlUpdate;
 											}
 
 											$aAction = [];
 											$aAction['select'] = $sSqlSearch;
 											$aAction['updates'] = $aSqlUpdate;
 											$aAction['key'] = $sKey;
+											$aAction['search_key'] = $sKey;
 											$aRequests[] = $aAction;
 										}
 									}
@@ -223,7 +224,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 			$bCompleted = ($iProgress == -1);
 			while (!$bCompleted && time() < $iEndExecutionTime) {
 				try {
-					$bCompleted = $oDatabaseService->ExecuteSQLQueriesByChunk($aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
+					$bCompleted = $oDatabaseService->ExecuteSQLQueriesByChunk($aRequest['search_key'], $aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
 					$aParams['aChangesProgress'][$sName] = $iProgress;
 				}
 				catch (MySQLHasGoneAwayException $e) {

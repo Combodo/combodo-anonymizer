@@ -227,30 +227,35 @@ class CleanupService
 
 		if (MetaModel::IsValidAttCode('CMDBChange', 'user_id')) {
 			$aRequests['req1'] = [
-				'key'     => $sKey,
-				'select'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).' AND user_id IS NULL'.$sDateCreateCondition,
-				'updates' => ["UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
+				'search_key' => $sKey,
+				'key'        => $sKey,
+				'select'     => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).' AND user_id IS NULL'.$sDateCreateCondition,
+				'updates'    => [$sChangeTable => "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
 			];
 			$aRequests['req2'] = [
-				'key'     => $sKey,
-				'select'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').' AND user_id IS NULL'.$sDateCreateCondition,
-				'updates' => ["UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname.' (CSV)')],
+				'search_key' => $sKey,
+				'key'        => $sKey,
+				'select'     => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').' AND user_id IS NULL'.$sDateCreateCondition,
+				'updates'    => [$sChangeTable => "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname.' (CSV)')],
 			];
 			$aRequests['req3'] = [
-				'key'     => $sKey,
-				'select'  => "SELECT `$sKey` from `$sChangeTable` WHERE user_id in (".$this->sId.')',
-				'updates' => ["UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
+				'search_key' => $sKey,
+				'key'        => $sKey,
+				'select'     => "SELECT `$sKey` from `$sChangeTable` WHERE user_id in (".$this->sId.')',
+				'updates'    => [$sChangeTable => "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
 			];
 		} else {
 			$aRequests['req1'] = [
-				'key'     => $sKey,
-				'select'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).$sDateCreateCondition,
-				'updates' => ["UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
+				'search_key' => $sKey,
+				'key'        => $sKey,
+				'select'     => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).$sDateCreateCondition,
+				'updates'    => [$sChangeTable => "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
 			];
 			$aRequests['req2'] = [
-				'key'     => $sKey,
-				'select'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').$sDateCreateCondition,
-				'updates' => ["UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname.' (CSV)')],
+				'search_key' => $sKey,
+				'key'        => $sKey,
+				'select'     => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').$sDateCreateCondition,
+				'updates'    => [$sChangeTable => "UPDATE `$sChangeTable` SET userinfo=".CMDBSource::Quote($sTargetFriendlyname.' (CSV)')],
 			];
 		}
 
