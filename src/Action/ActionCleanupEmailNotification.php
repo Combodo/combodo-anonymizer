@@ -8,6 +8,10 @@ use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
 
+/**
+ * search for email send to anonymized person
+ * anonymize friendly name and email in all fields (subject and body) of these objects
+ */
 class ActionCleanupEmailNotification extends AnonymizationTaskAction
 {
 	/**
@@ -38,6 +42,11 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 	}
 
 	/**
+	 * build queries search and update to run later in Execute function
+	 * search all email notifications with anonymized person as excipient
+	 * replace data of anonymized person in subject and body of found objects
+	 *
+	 *
 	 * @return void
 	 * @throws \ArchivedObjectException
 	 * @throws \CoreCannotSaveObjectException
@@ -113,6 +122,15 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 	}
 
 
+	/**
+	 * modify iChunkSize (divide by 2) before continuing to clean the data of the anonymized person
+	 *
+	 * @return void
+	 * @throws \ArchivedObjectException
+	 * @throws \CoreCannotSaveObjectException
+	 * @throws \CoreException
+	 * @throws \CoreUnexpectedValue
+	 */
 	public function ChangeActionParamsOnError()
 	{
 		$aParams = json_decode($this->Get('action_params'), true);

@@ -9,6 +9,10 @@ use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
 
+/**
+ * search for objects with caselogs created by a user of the anonymized person.
+ * anonymize friendly name and email in all text fields of these objects
+ */
 class ActionCleanupCaseLogs extends AnonymizationTaskAction
 {
 	const USER_CLASS = 'User';
@@ -41,6 +45,11 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 	}
 
 	/**
+	 * build queries search and update to run later in Execute function
+	 * search all objects with caselogs with anonymized user as writer
+	 * replace data of anonymized user with  *** in caselogs in order to maintain index of caselog
+	 * replace data of anonymized person in all text and string attributes of found objects
+	 *
 	 * @return void
 	 * @throws \ArchivedObjectException
 	 * @throws \CoreCannotSaveObjectException

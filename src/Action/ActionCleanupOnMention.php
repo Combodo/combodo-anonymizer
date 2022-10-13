@@ -9,6 +9,11 @@ use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
 
+
+/**
+ * search anonymized person in objects with trigger on "onMention" .
+ * anonymize friendly name and email in all text fields of these objects
+ */
 class ActionCleanupOnMention extends AnonymizationTaskAction
 {
 	/**
@@ -39,6 +44,10 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 	}
 
 	/**
+	 * build queries search and update to run later in Execute function
+	 * search all objects with anonymized person notification. The search is executed on classes with a trigger on "onMention"
+	 * replace data of anonymized person in all text and string attributes of found objects
+	 *
 	 * @return void
 	 * @throws \ArchivedObjectException
 	 * @throws \CoreCannotSaveObjectException
@@ -54,6 +63,14 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 		$sCleanupOnMention = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'on_mention');
 		$aCleanupCaseLog = (array)MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'caselog_content');
 
+		//mention exists only since iTop 3.0
+		if (!MetaModel::GetConfig()->IsProperty('mentions.allowed_classes')) {
+			//nothing to do. We can skip the current action
+			$this->Set('action_params', '');
+			$this->DBWrite();
+
+			return;
+		}
 		$aMentionsAllowedClasses =  (array)MetaModel::GetConfig()->Get('mentions.allowed_classes');
 		if (sizeof($aMentionsAllowedClasses) == 0) {
 			//nothing to do. We can skip the current action
@@ -159,6 +176,8 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 
 
 	/**
+	 * modify iChunkSize (divide by 2) before continuing to clean the data of the anonymized person
+	 *
 	 * @return void
 	 * @throws \ArchivedObjectException
 	 * @throws \CoreCannotSaveObjectException

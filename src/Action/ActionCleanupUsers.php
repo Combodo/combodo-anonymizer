@@ -10,6 +10,10 @@ use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
 
+/**
+ * remove login and deactivate user linked to anonymized person
+ *
+ */
 class ActionCleanupUsers extends AnonymizationTaskAction
 {
 	const USER_CLASS = 'User';
@@ -42,6 +46,8 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 	}
 
 	/**
+	 * modify iChunkSize (divide by 2) before continuing to clean the data of the anonymized person
+	 *
 	 * @return void
 	 * @throws \ArchivedObjectException
 	 * @throws \CoreCannotSaveObjectException

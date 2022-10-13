@@ -55,7 +55,9 @@ class ActionPurgePersonHistory extends AnonymizationTaskAction
 		$this->DBWrite();
 	}
 
-	/**
+	/**	 *
+	 * modify iChunkSize (divide by 2) before continuing to clean the data of the anonymized person
+	 *
 	 * @return void
 	 * @throws \ArchivedObjectException
 	 * @throws \CoreCannotSaveObjectException

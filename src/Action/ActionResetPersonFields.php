@@ -8,6 +8,9 @@
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
 
+/**
+ * reset all non-mandatory fields of the anonymized person
+ */
 class ActionResetPersonFields extends AnonymizationTaskAction
 {
 	/**

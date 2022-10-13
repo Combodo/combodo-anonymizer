@@ -6,7 +6,13 @@
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
+/*
+ *
+ */
 
+/**
+ * Set new values in Person to anonymize its data
+ */
 class ActionAnonymizePerson extends AnonymizationTaskAction
 {
 	/**
