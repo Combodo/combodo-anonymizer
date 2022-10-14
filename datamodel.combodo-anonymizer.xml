@@ -178,25 +178,6 @@
         }
           ]]></code>
         </method>
-        <method id="SetAnonymousValues" _delta="define">
-          <static>false</static>
-          <access>protected</access>
-          <type>Overload-DBObject</type>
-          <code><![CDATA[
-        public function SetAnonymousValues()
-       {
-           // Put some more fancy values
-           $this->Set('name', Dict::S('Anonymization:Person:name').' '.$this->GetKey());
-           $this->Set('first_name', Dict::S('Anonymization:Person:first_name'));
-           $this->Set('email', Dict::Format('Anonymization:Person:email', Dict::S('Anonymization:Person:first_name'), Dict::S('Anonymization:Person:name'), $this->GetKey()) );
-           // Mark the contact as obsolete
-           $this->Set('status', 'inactive');
-           // Remove picture
-           $this->Set('picture', null);
-       }
-
-]]></code>
-        </method>
       </methods>
     </class>
   </classes>
