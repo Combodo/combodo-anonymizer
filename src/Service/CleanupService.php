@@ -51,6 +51,7 @@ class CleanupService
 	 */
 	public function PurgeHistory($iChunkSize): bool
 	{
+		// TODO Replace with a call to DatabaseService::ExecuteSQLQueriesByChunk()
 		// Delete any existing change tracking about the current object
 		$oFilter = new DBObjectSearch('CMDBChangeOp');
 		$oFilter->AddCondition('objclass', $this->sClass, '=');

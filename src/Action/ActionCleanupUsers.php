@@ -160,7 +160,6 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 					}
 					catch (Exception $e) {
 						AnonymizerLog::Error('Error during ActionCleanupUsers with params '.$this->Get('action_params').' with message :'.$e->getMessage());
-						AnonymizerLog::Error('Go to next update');
 						$aParams['aChangesProgress'][$sName] = -1;
 					}
 					AnonymizerLog::Debug("ExecuteActionWithQueriesByChunk: name: $sName progress: $iProgress completed: $bCompleted");

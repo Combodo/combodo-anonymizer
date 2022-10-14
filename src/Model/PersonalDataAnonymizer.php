@@ -1,25 +1,14 @@
 <?php
-
-use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
-use Combodo\iTop\ComplexBackgroundTask\Service\ComplexBackgroundTaskService;
-
-
 /**
  * @copyright   Copyright (C) 2010-2022 Combodo SARL
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
-class PersonalDataAnonymizer extends AbstractWeeklyScheduledProcess
+
+use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
+use Combodo\iTop\ComplexBackgroundTask\Service\ComplexBackgroundTaskService;
+
+class PersonalDataAnonymizer extends AbstractTimeRangeWeeklyScheduledProcess
 {
-
-	protected function GetDefaultModuleSettingTime()
-	{
-		return '01:00';
-	}
-
-	protected function GetDefaultModuleSettingEndTime()
-	{
-		return '05:00';
-	}
 
 	/**
 	 * @inheritDoc
@@ -45,9 +34,9 @@ class PersonalDataAnonymizer extends AbstractWeeklyScheduledProcess
 		$oSet = new CMDBObjectSet($DBSearch);
 		$iCount = $oSet->Count();
 		if ($iCount == 0) {
-			$sMessage .= sprintf(" and finished.");
+			$sMessage .= sprintf("\nAnonymization finished.");
 		} else {
-			$sMessage .= sprintf(" and not finished. %d person(s) left to anonymize.", $iCount);
+			$sMessage .= sprintf("\nAnonymization not finished. %d person(s) left to anonymize.", $iCount);
 		}
 
 		return $sMessage;

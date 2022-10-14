@@ -235,7 +235,6 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 				}
 				catch (\Exception $e) {
 					AnonymizerLog::Error('Error during ActionCleanupCaseLogs with params '.$this->Get('action_params').' with message :'.$e->getMessage());
-					AnonymizerLog::Error('Go to next update');
 					$aParams['aChangesProgress'][$sName] = -1;
 				}
 				// Save progression
