@@ -10,6 +10,7 @@ use cmdbAbstractObject;
 use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 use Combodo\iTop\Application\TwigBase\Controller\Controller;
 use CoreUnexpectedValue;
+use DBSearch;
 use Dict;
 use utils;
 
@@ -39,7 +40,7 @@ class AjaxAnonymizerController extends Controller
 		}
 
 		$oService = new AnonymizerService();
-		$oService->AnonymizeObjectList($sFilter, true);
+		$oService->AnonymizeObjectList(DBSearch::unserialize($sFilter), true);
 
 		$this->DisplayAjaxPage($aParams);
 	}

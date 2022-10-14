@@ -6,9 +6,11 @@
       <enabled>true</enabled>
       <debug>true</debug>
       <max_chunk_size>10</max_chunk_size>
-      <week_days>monday, tuesday, wednesday, thursday, friday, saturday, sunday</week_days>
       <time>00:30</time>
       <end_time>23:30</end_time>
+      <week_days>monday, tuesday, wednesday, thursday, friday, saturday, sunday</week_days>
+      <anonymize_obsolete_persons>true</anonymize_obsolete_persons>
+      <obsolete_persons_retention>1</obsolete_persons_retention>
       <caselog_content type="array">
         <field id="0">friendlyname</field>
         <field id="1">email</field>

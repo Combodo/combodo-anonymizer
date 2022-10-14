@@ -83,6 +83,7 @@ class CleanupService
 	 * @throws \CoreCannotSaveObjectException
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
+	 * @throws \Exception
 	 */
 	public function ResetObjectFields(): bool
 	{
@@ -104,7 +105,7 @@ class CleanupService
 					$oObject->Set($sAttCode, null);
 				}
 			} elseif ($oAttDef instanceof AttributeLinkedSetIndirect) {
-				$oValue = DBObjectSet::FromScratch($oAttDef->GetLinkedClass());
+				$oValue = new DBObjectSet(new DBObjectSearch($oAttDef->GetLinkedClass()));
 				$oObject->Set($sAttCode, $oValue);
 			}
 		}

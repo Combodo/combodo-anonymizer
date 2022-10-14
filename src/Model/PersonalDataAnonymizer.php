@@ -5,39 +5,59 @@
  */
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
-use Combodo\iTop\ComplexBackgroundTask\Service\ComplexBackgroundTaskService;
+use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 
 class PersonalDataAnonymizer extends AbstractTimeRangeWeeklyScheduledProcess
 {
+	const NEXT_OCCURRENCE = 'AnonymizationNextOccurrence';
+	const NEXT_OCCURRENCE_DESCRIPTION = 'Next occurrence date for the anonymization background task';
+	const NEXT_OCCURRENCE_COMMENT = 'In UNIX time stamp format';
+	const MODULE_SETTING_EXEC_INTERVAL = 'execution_interval_in_s';
+	const MODULE_SETTING_MAX_EXECUTION_TIME = 'max_execution_time';
+
+	public function GetNextOccurrence($sCurrentTime = 'now')
+	{
+		// remember the starting point from the last execution
+		$sCurrentTime = DBProperty::GetProperty(self::NEXT_OCCURRENCE, $sCurrentTime);
+		return parent::GetNextOccurrence($sCurrentTime);
+	}
 
 	/**
 	 * @inheritDoc
+	 *
+	 * @param $iUnixTimeLimit
+	 *
+	 * @return string
+	 * @throws \ArchivedObjectException
+	 * @throws \CoreCannotSaveObjectException
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
+	 * @throws \DeleteException
 	 * @throws \MySQLException
+	 * @throws \MySQLHasGoneAwayException
 	 * @throws \OQLException
+	 * @throws \ProcessInvalidConfigException
 	 */
 	public function Process($iUnixTimeLimit)
 	{
-		$DBSearch = new DBObjectSearch('AnonymizationTask');
-		$oSet = new CMDBObjectSet($DBSearch);
-		$iCount = $oSet->Count();
-		if ($iCount == 0) {
-			return 'Nothing to do';
+		$iSelfLimit = time() + MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, static::MODULE_SETTING_MAX_EXECUTION_TIME, 30);
+		if ($iSelfLimit < $iUnixTimeLimit) {
+			$iUnixTimeLimit = $iSelfLimit;
 		}
-		$sMessage = sprintf("Anonymization started for %d person(s)", $iCount);
-
-		$aBackGroundTaskService = new ComplexBackgroundTaskService();
-		$aBackGroundTaskService->SetProcessEndTime($iUnixTimeLimit);
-		$aBackGroundTaskService->ProcessTasks('AnonymizationTask', $sMessage);
-
-		$oSet = new CMDBObjectSet($DBSearch);
-		$iCount = $oSet->Count();
-		if ($iCount == 0) {
-			$sMessage .= sprintf("\nAnonymization finished.");
+		$oService = new AnonymizerService();
+		$oService->SetProcessEndTime($iUnixTimeLimit);
+		$sMessage = '';
+		if ($oService->ProcessBackgroundAnonymization($sMessage)) {
+			// Anonymization finished for today, schedule next period
+			$oNextOccurrence = $this->GetWeeklyScheduledService()->GetNextOccurrenceNextDay(time());
+			$sNextOccurrence = $oNextOccurrence->format(AttributeDateTime::GetSQLFormat());
 		} else {
-			$sMessage .= sprintf("\nAnonymization not finished. %d person(s) left to anonymize.", $iCount);
+			$oNext = new DateTime();
+			$sCoolDown = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, static::MODULE_SETTING_EXEC_INTERVAL, 10);
+			$oNext->modify("+ $sCoolDown second");
+			$sNextOccurrence = $oNext->format(AttributeDateTime::GetSQLFormat());
 		}
+		DBProperty::SetProperty(static::NEXT_OCCURRENCE, $sNextOccurrence, static::NEXT_OCCURRENCE_COMMENT,static::NEXT_OCCURRENCE_DESCRIPTION);
 
 		return $sMessage;
 	}

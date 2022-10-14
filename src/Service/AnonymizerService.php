@@ -26,12 +26,18 @@ class AnonymizerService
 	private $iMaxChunkSize;
 	/** @var array */
 	private $aAnonymizedFields;
+	/** @var bool */
+	private $bBackgroundAnonymizationEnabled;
+	/** @var int */
+	private $iRetentionDays;
 
 	public function __construct()
 	{
 		$this->iProcessEndTime = time() + MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_interactive_anonymization_time_in_s', 30);
 		$this->iMaxChunkSize = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
 		$this->aAnonymizedFields = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'anonymized_fields', []);
+		$this->bBackgroundAnonymizationEnabled = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'anonymize_obsolete_persons', false);
+		$this->iRetentionDays = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'obsolete_persons_retention', 365);
 	}
 
 
@@ -62,7 +68,7 @@ class AnonymizerService
 	}
 
 	/**
-	 * @param $sFilter
+	 * @param \DBSearch $oSearch
 	 * @param bool $bInteractive
 	 *
 	 * @throws \ArchivedObjectException
@@ -75,9 +81,8 @@ class AnonymizerService
 	 * @throws \MySQLHasGoneAwayException
 	 * @throws \OQLException
 	 */
-	public function AnonymizeObjectList($sFilter, $bInteractive = false)
+	public function AnonymizeObjectList(DBSearch $oSearch, bool $bInteractive = false)
 	{
-		$oSearch = DBSearch::unserialize($sFilter);
 		$oSet = new DBObjectSet($oSearch);
 
 		$iCount = 1;
@@ -149,6 +154,38 @@ class AnonymizerService
 		$oComplexService->SetProcessEndTime($this->iProcessEndTime);
 
 		$oComplexService->ProcessTasks(self::ANONYMIZATION_TASK, $sMessage);
+	}
+
+	/**
+	 * @throws \CoreException
+	 * @throws \DeleteException
+	 * @throws \CoreCannotSaveObjectException
+	 * @throws \MySQLException
+	 * @throws \MySQLHasGoneAwayException
+	 * @throws \CoreUnexpectedValue
+	 * @throws \OQLException
+	 * @throws \ArchivedObjectException
+	 */
+	public function ProcessBackgroundAnonymization(&$sMessage): bool
+	{
+		$oSet = new DBObjectSet(new DBObjectSearch(self::ANONYMIZATION_TASK));
+		if ($oSet->Count() == 0) {
+			// Gather cleanup rules
+			$this->GatherAnonymizationTasks();
+		}
+		$oComplexService = new ComplexBackgroundTaskService();
+		$oComplexService->SetProcessEndTime($this->iProcessEndTime);
+
+		return $oComplexService->ProcessTasks(self::ANONYMIZATION_TASK, $sMessage);
+	}
+
+	private function GatherAnonymizationTasks()
+	{
+		if (!$this->bBackgroundAnonymizationEnabled) {
+			return;
+		}
+
+		$this->AnonymizeObjectList(DBObjectSearch::FromOQL("SELECT Person WHERE anonymized = 0 AND obsolescence_flag = 1 AND obsolescence_date < DATE_SUB(NOW(), INTERVAL $this->iRetentionDays DAY)"));
 	}
 
 	public function IsAllowedToAnonymize($sClass, $sId)
@@ -227,4 +264,19 @@ class AnonymizerService
 		$this->aAnonymizedFields = $aAnonymizedFields;
 	}
 
+	/**
+	 * @param bool $bBackgroundAnonymizationEnabled
+	 */
+	public function SetBackgroundAnonymizationEnabled(bool $bBackgroundAnonymizationEnabled)
+	{
+		$this->bBackgroundAnonymizationEnabled = $bBackgroundAnonymizationEnabled;
+	}
+
+	/**
+	 * @param int $iRetentionDays
+	 */
+	public function SetRetentionDays(int $iRetentionDays)
+	{
+		$this->iRetentionDays = $iRetentionDays;
+	}
 }
