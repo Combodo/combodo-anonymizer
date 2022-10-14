@@ -29,21 +29,7 @@
             </p>
         </fieldset>
 
-        <fieldset>
-            <legend>{{ 'Anonymization:NotificationsPurgeParameters'|dict_s }}</legend>
-            <p>
-                <input type="checkbox"{% if bCleanupNotifications and  iNotificationsPurgeDelay >= 0 %} checked {% endif %}id="checkbox_purge" name=""/>
-                {% if bCleanupNotifications and iNotificationsPurgeDelay >= 0 %}
-                    {% set sDelay = iNotificationsPurgeDelay %}
-                {% else %}
-                    {% set sDelay = '' %}
-                {% endif %}
-                {% set sDelayInput = 'Anonymization:PurgeDelay_Input'|dict_format('<input id="notifications_purge_delay" type="text" size="4" name="notifications_purge_delay" value="' ~ sDelay ~ '"/>') %}
-                <label for="checkbox_purge">{{ sDelayInput|raw }}</label>
-            </p>
-        </fieldset>
         <p>
-            <button id="btn_cancel">{{ 'UI:Button:Cancel'|dict_s }}</button>
             <button id="btn_apply" type="submit">{{ 'UI:Button:Apply'|dict_s }}</button>
         </p>
     </form>

@@ -43,16 +43,6 @@ class ConfigAnonymizerController extends Controller
 			$oConfig = MetaModel::GetConfig();
 			$sModuleName = AnonymizerHelper::MODULE_NAME;
 
-			$iNotificationsPurgeDelay = (int)utils::ReadPostedParam('notifications_purge_delay', -1, 'integer');
-			if ($iNotificationsPurgeDelay >= 0) {
-				$oConfig->SetModuleSetting($sModuleName, 'cleanup_notifications', true);
-				$oConfig->SetModuleSetting($sModuleName, 'notifications_retention', $iNotificationsPurgeDelay);
-			} else {
-				// No automatic purge of notifications
-				$oConfig->SetModuleSetting($sModuleName, 'cleanup_notifications', false);
-				$oConfig->SetModuleSetting($sModuleName, 'notifications_retention', -1);
-			}
-
 			$iAnonymizationDelay = (int)utils::ReadPostedParam('anonymization_delay', -1, 'integer');
 			if ($iAnonymizationDelay >= 0) {
 				$oConfig->SetModuleSetting($sModuleName, 'anonymize_obsolete_persons', true);
@@ -92,8 +82,6 @@ class ConfigAnonymizerController extends Controller
 		$sModuleName = AnonymizerHelper::MODULE_NAME;
 		$oConfig = MetaModel::GetConfig();
 		$aParams = [];
-		$aParams['bCleanupNotifications'] = (bool)$oConfig->GetModuleSetting($sModuleName, 'cleanup_notifications', false);
-		$aParams['iNotificationsPurgeDelay'] = $oConfig->GetModuleSetting($sModuleName, 'notifications_retention', -1);
 		$aParams['bAnonymizeObsoletePersons'] = $oConfig->GetModuleSetting($sModuleName, 'anonymize_obsolete_persons', false);
 		$aParams['iAnonymizationDelay'] = $oConfig->GetModuleSetting($sModuleName, 'obsolete_persons_retention', -1);
 		$aParams['sTransactionId'] = utils::GetNewTransactionId();

@@ -43,28 +43,7 @@
 			</div>
 		{% EndUIFieldSet %}
 
-		{% UIFieldSet Standard {sLegend:'Anonymization:NotificationsPurgeParameters'|dict_s} %}
-			{% if bCleanupNotifications and iNotificationsPurgeDelay >= 0 %}
-				{% set sDelay = iNotificationsPurgeDelay %}
-			{% else %}
-				{% set sDelay = '' %}
-			{% endif %}
-			{% set sDelayInput = 'Anonymization:PurgeDelay_Input'|dict_format('<input id="notifications_purge_delay" type="text" size="4" name="notifications_purge_delay" value="' ~ sDelay ~ '"/>') %}
-			{% if bCleanupNotifications and  iNotificationsPurgeDelay >= 0 %}
-				{% set bChecked = '1' %}
-			{% else %}
-				{% set bChecked = '0' %}
-			{% endif %}
-			<div class="ibo-field">
-				<span>
-					<input type="checkbox"{% if bCleanupNotifications and  iNotificationsPurgeDelay >= 0 %} checked {% endif %}id="checkbox_purge" name=""/>
-					<label for="checkbox_purge">{{ sDelayInput|raw }}</label>
-				</span>
-			</div>
-		{% EndUIFieldSet %}
-
 		{% UIToolbar ForButton {} %}
-			{% UIButton ForSecondaryAction {sLabel:'UI:Button:Cancel'|dict_s, sName:'btn_cancel', sId:'btn_cancel', bIsSubmit:true} %}
 			{% UIButton ForSecondaryAction {sLabel:'UI:Button:Apply'|dict_s, sName:'btn_apply', sId:'btn_apply', bIsSubmit:true} %}
 		{% EndUIToolbar %}
 	{% EndUIForm %}
