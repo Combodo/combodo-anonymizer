@@ -98,10 +98,9 @@ if (!class_exists('AnonymizerInstaller'))
 		 * @throws \MySQLException
 		 * @throws \MySQLHasGoneAwayException
 		 */
-		public static function BeforeDatabaseCreation(Config $oConfiguration, $sPreviousVersion, $sCurrentVersion)
+		public static function AfterDatabaseCreation(Config $oConfiguration, $sPreviousVersion, $sCurrentVersion)
 		{
-			if (strlen($sPreviousVersion) > 0)
-			{
+			if (strlen($sPreviousVersion) > 0) {
 				$sBackgroundTask = MetaModel::DBGetTable('BackgroundTask');
 				// If you want to migrate data from one format to another, do it here
 				$sQueryUpdate = "UPDATE `$sBackgroundTask` SET `class_name` = 'PersonalDataAnonymizer' WHERE `class_name` = 'AnonymisationBackgroundProcess'";

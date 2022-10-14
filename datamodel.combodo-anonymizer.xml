@@ -169,12 +169,12 @@
           <code><![CDATA[
         public function DisplayBareHeader(WebPage $oPage, $bEditMode = false)
         {
-          $oSet = new DBObjectSet(DBSearch::FromOQL("SELECT AnonymizationTask WHERE class_to_anonymize='Person' AND id_to_anonymize=:id"), [], ["id" => $this->GetKey()]);
+         $oSet = new DBObjectSet(DBSearch::FromOQL("SELECT AnonymizationTask WHERE class_to_anonymize='Person' AND id_to_anonymize=:id"), [], ["id" => $this->GetKey()]);
           if ($oSet->Count() > 0) {
             $sMessage = Dict::S('Anonymization:InProgress');
             $this::SetSessionMessage(get_class($this), $this->GetKey(), 1, $sMessage, 'info', 1);
           }
-          parent::DisplayBareHeader($oPage, $bEditMode);
+          return parent::DisplayBareHeader($oPage, $bEditMode);
         }
           ]]></code>
         </method>
