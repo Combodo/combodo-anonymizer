@@ -20,7 +20,7 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 	'Anonymization:Error' => 'Anonymization FAILED~~',
 	'Anonymization:Close' => 'Close~~',
 	'Anonymization:Configuration' => 'Configuration~~',
-	'Menu:ConfigAnonymizer' => 'Anonymization and purge~~',
+	'Menu:ConfigAnonymizer' => 'Anonymization~~',
 	'Anonymization:AutomationParameters' => 'Automatic anonymization~~',
 	'Anonymization:NotificationsPurgeParameters' => 'Automatic purge of notifications~~',
 	'Anonymization:AnonymizationDelay_Input' => 'Automatically anonymize Persons which are obsolete since more than %1$s days.~~',

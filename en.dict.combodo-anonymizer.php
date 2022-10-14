@@ -22,11 +22,9 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Anonymization:Error' => 'Anonymization FAILED',
 	'Anonymization:Close' => 'Close',
 	'Anonymization:Configuration' => 'Configuration',
-	'Menu:ConfigAnonymizer' => 'Anonymization and purge',
+	'Menu:ConfigAnonymizer' => 'Anonymization',
 	'Anonymization:AutomationParameters' => 'Automatic anonymization',
-	'Anonymization:NotificationsPurgeParameters' => 'Automatic purge of notifications',
 	'Anonymization:AnonymizationDelay_Input' => 'Automatically anonymize Persons which are obsolete since more than %1$s days.',
-	'Anonymization:PurgeDelay_Input' => 'Automatically delete all notifications emitted since more than %1$s days.',
 	
 	// Default values used during anonymization
 	'Anonymization:Person:name' => 'Contact',

@@ -20,7 +20,7 @@ Dict::Add('HU HU', 'Hungarian', 'Magyar', array(
 	'Anonymization:Error' => 'Anonymization FAILED~~',
 	'Anonymization:Close' => 'Close~~',
 	'Anonymization:Configuration' => 'Configuration~~',
-	'Menu:ConfigAnonymizer' => 'Anonymization and purge~~',
+	'Menu:ConfigAnonymizer' => 'Anonymization~~',
 	'Anonymization:AutomationParameters' => 'Automatic anonymization~~',
 	'Anonymization:NotificationsPurgeParameters' => 'Automatic purge of notifications~~',
 	'Anonymization:AnonymizationDelay_Input' => 'Automatically anonymize Persons which are obsolete since more than %1$s days.~~',
@@ -29,7 +29,6 @@ Dict::Add('HU HU', 'Hungarian', 'Magyar', array(
 	// Default values used during anonymization
 	'Anonymization:Person:name' => 'Contact~~',
 	'Anonymization:Person:first_name' => 'Anonymous~~',
-	'Anonymization:Person:email' => '%1$s.%2$s%3$s@anony.mized',
 	'Anonymization:Person:email' => '%1$s.%2$s%3$s@anony.mized',
 ));
 

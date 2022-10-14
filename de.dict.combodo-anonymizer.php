@@ -22,7 +22,7 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'Anonymization:Error' => 'Anonymisierung FEHLGESCHLAGEN',
 	'Anonymization:Close' => 'Schließen',
 	'Anonymization:Configuration' => 'Konfiguration',
-	'Menu:ConfigAnonymizer' => 'Anonymisierung und löschen',
+	'Menu:ConfigAnonymizer' => 'Anonymisierung',
 	'Anonymization:AutomationParameters' => 'Automatische Anonymisierung',
 	'Anonymization:NotificationsPurgeParameters' => 'Automatische Löschen von Benachrichtigungen',
 	'Anonymization:AnonymizationDelay_Input' => 'Automatisch Personen anonymisieren, die obsolet sind seit %1$s Tagen.',
