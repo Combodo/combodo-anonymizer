@@ -102,7 +102,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 			$sKey = MetaModel::DBGetKey('EventNotificationEmail');
 
 			$sSqlSearch = "SELECT `$sKey` from `$sNotificationTable` WHERE ".implode(' OR ', $aConditions);
-			$sSqlUpdate = "UPDATE `$sNotificationTable` SET".
+			$sSqlUpdate = "UPDATE `$sNotificationTable` /*JOIN*/ SET".
 				"  `from` =  ".$sStartReplaceEmail."`from`".$sEndReplaceEmail.",".
 				"  `to` = ".$sStartReplaceEmail."`to`".$sEndReplaceEmail.",".
 				"  `cc` = ".$sStartReplaceEmail."`cc`".$sEndReplaceEmail.",".
@@ -111,8 +111,8 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 				"  `body` = ".$sStartReplace."`body`".$sEndReplace." ";
 
 			$aRequest = [];
-			$aRequest['select'] = $sSqlSearch;
-			$aRequest['updates'] = [$sNotificationTable => $sSqlUpdate];
+			$aRequest['search_query'] = $sSqlSearch;
+			$aRequest['apply_queries'] = [$sNotificationTable => $sSqlUpdate];
 			$aRequest['key'] = $sKey;
 			$aRequest['search_key'] = $sKey;
 
@@ -197,7 +197,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 		$iProgress = $aParams['aChangesProgress'] ?? 0;
 		$bCompleted = ($iProgress == -1);
 		while (!$bCompleted && time() < $iEndExecutionTime) {
-			$bCompleted = $oDatabaseService->ExecuteSQLQueriesByChunk($aRequest['search_key'], $aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
+			$bCompleted = $oDatabaseService->ExecuteQueriesByChunk($aRequest, $iProgress, $aParams['iChunkSize']);
 			// Save progression
 			$aParams['aChangesProgress'] = $iProgress;
 			$this->Set('action_params', json_encode($aParams));

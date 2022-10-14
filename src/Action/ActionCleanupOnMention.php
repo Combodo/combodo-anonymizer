@@ -146,14 +146,14 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 											}
 											$aSqlUpdate = [];
 											foreach ($aColumnsToUpdate as $sTable => $aRequestReplace) {
-												$sSqlUpdate = "UPDATE `$sTable` ".
+												$sSqlUpdate = "UPDATE `$sTable` /*JOIN*/ ".
 													"SET ".implode(' , ', $aRequestReplace);
 												$aSqlUpdate[$sTable] = $sSqlUpdate;
 											}
 
 											$aAction = [];
-											$aAction['select'] = $sSqlSearch;
-											$aAction['updates'] = $aSqlUpdate;
+											$aAction['search_query'] = $sSqlSearch;
+											$aAction['apply_queries'] = $aSqlUpdate;
 											$aAction['key'] = $sKey;
 											$aAction['search_key'] = $sKey;
 											$aRequests[] = $aAction;
@@ -224,7 +224,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 			$bCompleted = ($iProgress == -1);
 			while (!$bCompleted && time() < $iEndExecutionTime) {
 				try {
-					$bCompleted = $oDatabaseService->ExecuteSQLQueriesByChunk($aRequest['search_key'], $aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
+					$bCompleted = $oDatabaseService->ExecuteQueriesByChunk($aRequest, $iProgress, $aParams['iChunkSize']);
 					$aParams['aChangesProgress'][$sName] = $iProgress;
 				}
 				catch (MySQLHasGoneAwayException $e) {
@@ -233,9 +233,10 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 
 					return false;
 				}
-				catch (\Exception $e) {
-					AnonymizerLog::Error('Error during ActionCleanupCaseLogs with params '.$this->Get('action_params').' with message :'.$e->getMessage());
+				catch (Exception $e) {
+					AnonymizerLog::Error('Error during ActionCleanupCaseLogs with message :'.$e->getMessage());
 					$aParams['aChangesProgress'][$sName] = -1;
+					$bCompleted = true;
 				}
 				// Save progression
 				$this->Set('action_params', json_encode($aParams));

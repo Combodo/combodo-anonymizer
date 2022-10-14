@@ -98,6 +98,8 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 	/**
 	 * Delete history entries, no need to keep track of the progress.
 	 *
+	 * @param $iEndExecutionTime
+	 *
 	 * @return bool
 	 * @throws \ArchivedObjectException
 	 * @throws \CoreCannotSaveObjectException
@@ -112,6 +114,8 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 		if ($this->Get('action_params') == '') {
 			return true;
 		}
+
+		AnonymizerLog::Enable(APPROOT.'log/error.log');
 
 		$oTask = $this->GetTask();
 
@@ -129,10 +133,12 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 		while ($iUserId !== false) {
 			/** @var \User $oUser */
 			$oUser = MetaModel::GetObject(self::USER_CLASS, $iUserId);
+			AnonymizerLog::Debug("Anonymize User ".$oUser->Get('login'));
 			$oService = new CleanupService(get_class($oUser), $iUserId, $iEndExecutionTime);
 			$oDatabaseService = new DatabaseService();
 			// Disable User, reset login and password
 			$oService->CleanupUser($oUser);
+			AnonymizerLog::Debug('Purge History for User '.$oUser->Get('login'));
 			if (!$oService->PurgeHistory($aParams['iChunkSize'])) {
 				// Timeout stop here
 				return false;
@@ -146,7 +152,8 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 				$bCompleted = ($iProgress == -1);
 				while (!$bCompleted && time() < $iEndExecutionTime) {
 					try {
-						$bCompleted = $oDatabaseService->ExecuteSQLQueriesByChunk($aRequest['search_key'], $aRequest['select'], $aRequest['updates'], $aRequest['key'], $iProgress, $aParams['iChunkSize']);
+						AnonymizerLog::Debug('ExecuteQueries $sName');
+						$bCompleted = $oDatabaseService->ExecuteQueriesByChunk($aRequest, $iProgress, $aParams['iChunkSize']);
 						// Save progression
 						$aParams['aChangesProgress'][$sName] = $iProgress;
 						$this->Set('action_params', json_encode($aParams));
@@ -161,11 +168,13 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 					catch (Exception $e) {
 						AnonymizerLog::Error('Error during ActionCleanupUsers with params '.$this->Get('action_params').' with message :'.$e->getMessage());
 						$aParams['aChangesProgress'][$sName] = -1;
+						$bCompleted = true;
 					}
 					AnonymizerLog::Debug("ExecuteActionWithQueriesByChunk: name: $sName progress: $iProgress completed: $bCompleted");
 				}
 				if (!$bCompleted) {
 					// Timeout
+					AnonymizerLog::Debug('Timeout');
 					return false;
 				}
 			}
