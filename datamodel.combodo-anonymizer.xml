@@ -27,7 +27,8 @@
         <action id="30">ActionCleanupCaseLogs</action>
         <action id="40">ActionCleanupOnMention</action>
         <action id="50">ActionCleanupEmailNotification</action>
-        <action id="1000">ActionPurgePersonHistory</action>
+        <action id="60">ActionPurgePersonHistory</action>
+        <action id="1000">ActionEndOfAnonymization</action>
       </actions>
       <anonymized_fields type="hash">
         <name>Contact %1$s</name>

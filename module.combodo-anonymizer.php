@@ -55,6 +55,7 @@ SetupWebPage::AddModule(
 			'src/Action/ActionCleanupUsers.php',
 			'src/Action/ActionPurgePersonHistory.php',
 			'src/Action/ActionResetPersonFields.php',
+			'src/Action/ActionEndOfAnonymization.php',
 		],
 		'webservice' => [
 
