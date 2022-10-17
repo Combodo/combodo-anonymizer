@@ -7,7 +7,6 @@
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
-use Combodo\iTop\ComplexBackgroundTask\Service\DatabaseService;
 
 
 /**

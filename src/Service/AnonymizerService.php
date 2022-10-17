@@ -9,7 +9,7 @@ namespace Combodo\iTop\Anonymizer\Service;
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
-use Combodo\iTop\BackgroundTaskEx\Service\ComplexBackgroundTaskService;
+use Combodo\iTop\BackgroundTaskEx\Service\BackgroundTaskExService;
 use DBObjectSearch;
 use DBObjectSet;
 use DBSearch;
@@ -151,7 +151,7 @@ class AnonymizerService
 	 */
 	public function ProcessAnonymization(&$sMessage)
 	{
-		$oComplexService = new ComplexBackgroundTaskService();
+		$oComplexService = new BackgroundTaskExService();
 		$oComplexService->SetProcessEndTime($this->iProcessEndTime);
 
 		$oComplexService->ProcessTasks(self::ANONYMIZATION_TASK, $sMessage);
@@ -174,7 +174,7 @@ class AnonymizerService
 			// Gather cleanup rules
 			$this->GatherAnonymizationTasks();
 		}
-		$oComplexService = new ComplexBackgroundTaskService();
+		$oComplexService = new BackgroundTaskExService();
 		$oComplexService->SetProcessEndTime($this->iProcessEndTime);
 
 		return $oComplexService->ProcessTasks(self::ANONYMIZATION_TASK, $sMessage);

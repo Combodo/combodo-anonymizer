@@ -9,7 +9,6 @@ use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
-use Combodo\iTop\ComplexBackgroundTask\Service\DatabaseService;
 
 /**
  * remove login and deactivate user linked to anonymized person
