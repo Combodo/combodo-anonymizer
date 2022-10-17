@@ -127,22 +127,8 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 											$sSearch = "class=".$sMentionClass." & amp;id = ".$this->Get('id_to_anonymize')."\">@";
 											$sSqlSearch = "SELECT `$sKey` from `$sTable` WHERE `$sColumn` LIKE ".CMDBSource::Quote('%'.$sSearch.'%');
 
-											$aColumnsToUpdate = [];
-											$aClasses = array_merge([$sClass], MetaModel::GetSubclasses($sClass));
-											foreach ($aClasses as $sClass) {
-												foreach (MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef) {
-													$sTable = MetaModel::DBGetTable($sClass, $sAttCode);
-													if ($oAttDef instanceof AttributeCaseLog) {
-														$aSQLColumns = $oAttDef->GetSQLColumns();
-														$sColumn = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
-														$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInCaseLog;
-													} elseif ($oAttDef instanceof AttributeText || ($oAttDef instanceof AttributeString && !($oAttDef instanceof AttributeFinalClass))) {
-														$aSQLColumns = $oAttDef->GetSQLColumns();
-														$sColumn = array_keys($aSQLColumns)[0]; //
-														$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInTxt;
-													}
-												}
-											}
+											$aColumnsToUpdate = $this->GetColumnsToUpdate($sClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt);
+
 											$aSqlUpdate = [];
 											foreach ($aColumnsToUpdate as $sTable => $aRequestReplace) {
 												$sSqlUpdate = "UPDATE `$sTable` /*JOIN*/ ".
@@ -155,7 +141,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 											$aAction['apply_queries'] = $aSqlUpdate;
 											$aAction['key'] = $sKey;
 											$aAction['search_key'] = $sKey;
-											$aRequests[] = $aAction;
+											$aRequests[$sClass.'-'.$sAttCode] = $aAction;
 										}
 									}
 								}
@@ -174,6 +160,26 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 		$this->DBWrite();
 	}
 
+	private function GetColumnsToUpdate($sClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt)
+	{
+		$aColumnsToUpdate = [];
+		$aClasses = array_merge([$sClass], MetaModel::GetSubclasses($sClass));
+		foreach ($aClasses as $sClass) {
+			foreach (MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef) {
+				$sTable = MetaModel::DBGetTable($sClass, $sAttCode);
+				if ($oAttDef instanceof AttributeCaseLog) {
+					$aSQLColumns = $oAttDef->GetSQLColumns();
+					$sColumn = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
+					$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInCaseLog;
+				} elseif ($oAttDef instanceof AttributeText || ($oAttDef instanceof AttributeString && !($oAttDef instanceof AttributeFinalClass))) {
+					$aSQLColumns = $oAttDef->GetSQLColumns();
+					$sColumn = array_keys($aSQLColumns)[0]; //
+					$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInTxt;
+				}
+			}
+		}
+		return $aColumnsToUpdate;
+	}
 
 	/**
 	 * modify iChunkSize (divide by 2) before continuing to clean the data of the anonymized person
@@ -223,6 +229,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 		foreach ($aRequests as $sName => $aRequest) {
 			$iProgress = $aParams['aChangesProgress'][$sName] ?? 0;
 			$bCompleted = ($iProgress == -1);
+			AnonymizerLog::Debug("=> Request: $sName Progress: $iProgress");
 			while (!$bCompleted && time() < $iEndExecutionTime) {
 				try {
 					$bCompleted = $oDatabaseService->ExecuteQueriesByChunk($aRequest, $iProgress, $aParams['iChunkSize']);
@@ -240,11 +247,14 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 					$bCompleted = true;
 				}
 				// Save progression
+				AnonymizerLog::Debug('Save progression: '.json_encode($aParams));
 				$this->Set('action_params', json_encode($aParams));
 				$this->DBWrite();
 			}
 			if (!$bCompleted) {
 				// Timeout
+				AnonymizerLog::Debug("Timeout Request: $sName with progression: $iProgress");
+
 				return false;
 			}
 		}

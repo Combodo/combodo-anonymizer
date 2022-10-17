@@ -249,7 +249,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 			}
 			if (!$bCompleted) {
 				// Timeout
-				AnonymizerLog::Debug("Timeout with progression: $iProgress");
+				AnonymizerLog::Debug("Timeout Request: $sName with progression: $iProgress");
 
 				return false;
 			}
