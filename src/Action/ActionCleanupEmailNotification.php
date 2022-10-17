@@ -132,7 +132,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
 	 */
-	public function ChangeActionParamsOnError()
+	public function ChangeActionParamsOnError(): bool
 	{
 		$aParams = json_decode($this->Get('action_params'), true);
 		$iChunkSize = $aParams['iChunkSize'];
@@ -140,11 +140,13 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 			AnonymizerLog::Debug('Stop retry action ActionCleanupEmailNotification with params '.json_encode($aParams));
 			$this->Set('action_params', '');
 			$this->DBWrite();
+			return false;
 		}
 		$aParams['iChunkSize'] = (int)$iChunkSize / 2 + 1;
 
 		$this->Set('action_params', json_encode($aParams));
 		$this->DBWrite();
+		return true;
 	}
 
 	/**
