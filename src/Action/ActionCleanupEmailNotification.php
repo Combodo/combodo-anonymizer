@@ -6,6 +6,7 @@
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
+use Combodo\iTop\BackgroundTaskEx\Service\DatabaseService;
 
 /**
  * search for email send to anonymized person

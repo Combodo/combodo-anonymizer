@@ -107,6 +107,7 @@ class AnonymizerService
 		}
 		catch (Exception $e) {
 			CMDBSource::Query('ROLLBACK');
+			$sFilter = $oSearch->ToOQL(true);
 			AnonymizerLog::Error("Anonymization using $sFilter failed: ".$e->getMessage());
 			throw $e;
 		}
