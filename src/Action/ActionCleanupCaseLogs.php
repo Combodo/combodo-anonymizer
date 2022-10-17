@@ -135,24 +135,8 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 					$sCondition = implode(' OR ', $aConditions);
 					$sSqlSearch = "SELECT  `$sKey` FROM `$sTable` WHERE $sCondition";
 
-					$aColumnsToUpdate = [];
-					$aClasses = array_merge([$sClass], MetaModel::GetSubclasses($sClass));
-					foreach ($aClasses as $sClass) {
-						foreach (MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef) {
-							$sTable = MetaModel::DBGetTable($sClass, $sAttCode);
-							if ($oAttDef instanceof AttributeCaseLog) {
-								$aSQLColumns = $oAttDef->GetSQLColumns();
-								$sColumn = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
-								$sColumnIdx = array_keys($aSQLColumns)[1]; // We assume that the second column is the index
-								$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInCaseLog;
-								$aColumnsToUpdate[$sTable][$sColumnIdx] = " `$sColumnIdx` = ".$sStartReplaceInIdx."`$sColumnIdx`".$sEndReplaceInIdx." ";
-							} elseif ($oAttDef instanceof AttributeText || ($oAttDef instanceof AttributeString && !($oAttDef instanceof AttributeFinalClass))) {
-								$aSQLColumns = $oAttDef->GetSQLColumns();
-								$sColumn = array_keys($aSQLColumns)[0]; //
-								$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInTxt;
-							}
-						}
-					}
+					$aColumnsToUpdate = $this->GetColumnsToUpdate($sClass,  $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt, $sStartReplaceInIdx, $sEndReplaceInIdx);
+
 					$aSqlUpdate = [];
 					foreach ($aColumnsToUpdate as $sTable => $aRequestReplace) {
 						$sSqlUpdate = "UPDATE `$sTable` /*JOIN*/ ".
@@ -173,6 +157,28 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		$this->DBWrite();
 	}
 
+	private function GetColumnsToUpdate($sClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt, $sStartReplaceInIdx, $sEndReplaceInIdx)
+	{
+		$aColumnsToUpdate = [];
+		$aClasses = array_merge([$sClass], MetaModel::GetSubclasses($sClass));
+		foreach ($aClasses as $sClass) {
+			foreach (MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef) {
+				$sTable = MetaModel::DBGetTable($sClass, $sAttCode);
+				if ($oAttDef instanceof AttributeCaseLog) {
+					$aSQLColumns = $oAttDef->GetSQLColumns();
+					$sColumn = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
+					$sColumnIdx = array_keys($aSQLColumns)[1]; // We assume that the second column is the index
+					$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInCaseLog;
+					$aColumnsToUpdate[$sTable][$sColumnIdx] = " `$sColumnIdx` = ".$sStartReplaceInIdx."`$sColumnIdx`".$sEndReplaceInIdx.' ';
+				} elseif ($oAttDef instanceof AttributeText || ($oAttDef instanceof AttributeString && !($oAttDef instanceof AttributeFinalClass))) {
+					$aSQLColumns = $oAttDef->GetSQLColumns();
+					$sColumn = array_keys($aSQLColumns)[0]; //
+					$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInTxt;
+				}
+			}
+		}
+		return $aColumnsToUpdate;
+	}
 
 	/**
 	 * @return void
