@@ -5,7 +5,7 @@
     <parameters  id="combodo-anonymizer" _delta="define">
       <enabled>true</enabled>
       <debug>true</debug>
-      <max_chunk_size>10</max_chunk_size>
+      <max_chunk_size>10000</max_chunk_size>
       <time>00:30</time>
       <end_time>23:30</end_time>
       <week_days>monday, tuesday, wednesday, thursday, friday, saturday, sunday</week_days>
@@ -143,7 +143,18 @@
           <tracking_level>none</tracking_level>
         </field>
       </fields>
-      <presentation/>
+      <presentation>
+        <list>
+          <items>
+            <item id="name">
+              <rank>10</rank>
+            </item>
+            <item id="rank">
+              <rank>60</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
       <methods/>
     </class>
     <class id="Person" _delta="must_exist">

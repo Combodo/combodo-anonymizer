@@ -38,7 +38,6 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		MetaModel::Init_InheritAttributes();
 
 		// Display lists
-		MetaModel::Init_SetZListItems('details', array('name', 'rank')); // Attributes to be displayed for the complete details
 		MetaModel::Init_SetZListItems('list', array('name', 'rank')); // Attributes to be displayed for a list
 		// Search criteria
 		MetaModel::Init_SetZListItems('standard_search', array('name')); // Criteria of the std search form
@@ -165,7 +164,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 					$aAction['apply_queries'] = $aSqlUpdate;
 					$aAction['search_key'] = $sKey;
 					$aAction['key'] = $sKey;
-					$aRequests[] = $aAction;
+					$aRequests[$sClass.'-'.$sAttCode] = $aAction;
 				}
 			}
 		}
@@ -221,6 +220,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		foreach ($aRequests as $sName => $aRequest) {
 			$iProgress = $aParams['aChangesProgress'][$sName] ?? 0;
 			$bCompleted = ($iProgress == -1);
+			AnonymizerLog::Debug("=> Request: $sName Progress: $iProgress");
 			while (!$bCompleted && time() < $iEndExecutionTime) {
 				try {
 					$bCompleted = $oDatabaseService->ExecuteQueriesByChunk($aRequest, $iProgress, $aParams['iChunkSize']);
@@ -237,17 +237,17 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 					$aParams['aChangesProgress'][$sName] = -1;
 				}
 				// Save progression
+				AnonymizerLog::Debug("Save progression: ".json_encode($aParams));
 				$this->Set('action_params', json_encode($aParams));
 				$this->DBWrite();
 			}
 			if (!$bCompleted) {
 				// Timeout
-				AnonymizerLog::Debug('timeout');
+				AnonymizerLog::Debug("Timeout with progression: $iProgress");
 
 				return false;
 			}
 		}
-		AnonymizerLog::Debug('return true');
 
 		return true;
 	}
