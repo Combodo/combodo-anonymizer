@@ -53,7 +53,7 @@
       <methods/>
     </class>
     <class id="AnonymizationTask" _delta="define">
-      <parent>ComplexBackgroundTask</parent>
+      <parent>BackgroundTaskEx</parent>
       <properties>
         <category/>
         <abstract>false</abstract>
@@ -129,7 +129,7 @@
       </presentation>
     </class>
     <class id="AnonymizationTaskAction" _delta="define">
-      <parent>ComplexBackgroundTaskAction</parent>
+      <parent>BackgroundTaskExAction</parent>
       <properties>
         <abstract>false</abstract>
         <db_table>priv_anonymization_task_action</db_table>
@@ -195,7 +195,7 @@
       <group id="RessourceAnonymizationGroup">
         <classes>
           <class id="RessourceAnonymization"/>
-          <class id="ComplexBackgroundTask"/>
+          <class id="BackgroundTaskEx"/>
           <class id="ComplexBackgroundTaskAction"/>
         </classes>
       </group>

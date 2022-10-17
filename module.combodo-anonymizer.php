@@ -34,7 +34,7 @@ SetupWebPage::AddModule(
 		// Setup
 		//
 		'dependencies' => [
-			'combodo-complex-background-task/1.0.0',
+			'combodo-background-task-extended/1.0.0',
 		],
 		'mandatory' => false,
 		'visible' => true,

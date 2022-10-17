@@ -9,7 +9,7 @@ namespace Combodo\iTop\Anonymizer\Service;
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
-use Combodo\iTop\ComplexBackgroundTask\Service\ComplexBackgroundTaskService;
+use Combodo\iTop\BackgroundTaskEx\Service\ComplexBackgroundTaskService;
 use DBObjectSearch;
 use DBObjectSet;
 use DBSearch;

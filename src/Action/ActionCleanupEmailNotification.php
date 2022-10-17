@@ -179,7 +179,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 	 *
 	 * @return bool
 	 * @throws \ArchivedObjectException
-	 * @throws \Combodo\iTop\ComplexBackgroundTask\Helper\ComplexBackgroundTaskException
+	 * @throws \Combodo\iTop\BackgroundTaskEx\Helper\ComplexBackgroundTaskException
 	 * @throws \CoreCannotSaveObjectException
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
