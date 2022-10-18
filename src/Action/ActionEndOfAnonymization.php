@@ -22,7 +22,7 @@ class ActionEndOfAnonymization extends AnonymizationTaskAction
 			'name_attcode'        => 'name',
 			'state_attcode'       => '',
 			'reconc_keys'         => array('name'),
-			'db_table'            => 'priv_anonymization_task_action_end_anonymization',
+			'db_table'            => 'priv_anon_action_end_anonymization',
 			'db_key_field'        => 'id',
 			'db_finalclass_field' => '',
 			'display_template'    => '',

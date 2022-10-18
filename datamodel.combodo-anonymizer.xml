@@ -132,7 +132,7 @@
       <parent>BackgroundTaskExAction</parent>
       <properties>
         <abstract>false</abstract>
-        <db_table>priv_anonymization_task_action</db_table>
+        <db_table>priv_anon_action</db_table>
         <category/>
       </properties>
       <fields>

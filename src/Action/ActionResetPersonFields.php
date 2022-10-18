@@ -25,7 +25,7 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 			'name_attcode'        => 'name',
 			'state_attcode'       => '',
 			'reconc_keys'         => array('name'),
-			'db_table'            => 'priv_anonymization_task_action_reset_person_fields',
+			'db_table'            => 'priv_anon_action_reset_person_fields',
 			'db_key_field'        => 'id',
 			'db_finalclass_field' => '',
 			'display_template'    => '',
