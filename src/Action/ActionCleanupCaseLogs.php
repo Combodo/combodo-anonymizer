@@ -10,7 +10,7 @@ use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
 use Combodo\iTop\BackgroundTaskEx\Service\DatabaseService;
 
 /**
- * search for objects with caselogs created by a user of the anonymized person.
+ * search for objects with case logs created by a user of the anonymized person.
  * anonymize friendly name and email in all text fields of these objects
  */
 class ActionCleanupCaseLogs extends AnonymizationTaskAction
@@ -119,6 +119,8 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 			$sEndReplaceInTxt = $sEndReplaceInTxt.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
 		}
 
+		$oDatabaseService = new DatabaseService();
+
 		// 2) Find all classes containing case logs
 		foreach (MetaModel::GetClasses() as $sClass) {
 			foreach (MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef) {
@@ -145,6 +147,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 					}
 					$aAction = [];
 					$aAction['search_query'] = $sSqlSearch;
+					$aAction['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sTable);
 					$aAction['apply_queries'] = $aSqlUpdate;
 					$aAction['search_key'] = $sKey;
 					$aAction['key'] = $sKey;

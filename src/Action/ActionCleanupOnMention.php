@@ -57,6 +57,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 	public function InitActionParams()
 	{
 		$oTask = $this->GetTask();
+		$oDatabaseService = new DatabaseService();
 
 		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
 		$sCleanupOnMention = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'on_mention');
@@ -138,6 +139,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 
 											$aAction = [];
 											$aAction['search_query'] = $sSqlSearch;
+											$aAction['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sTable);
 											$aAction['apply_queries'] = $aSqlUpdate;
 											$aAction['key'] = $sKey;
 											$aAction['search_key'] = $sKey;

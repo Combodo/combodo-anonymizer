@@ -55,6 +55,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 	public function InitActionParams()
 	{
 		$oTask = $this->GetTask();
+		$oDatabaseService = new DatabaseService();
 
 		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
 		$aCleanupEmail = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'notification_content');
@@ -111,6 +112,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 
 			$aRequest = [];
 			$aRequest['search_query'] = $sSqlSearch;
+			$aAction['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sNotificationTable);
 			$aRequest['apply_queries'] = [$sNotificationTable => $sSqlUpdate];
 			$aRequest['key'] = $sKey;
 			$aRequest['search_key'] = $sKey;

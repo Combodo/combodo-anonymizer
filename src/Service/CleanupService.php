@@ -10,6 +10,7 @@ use AttributeLinkedSetIndirect;
 use CMDBObject;
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
+use Combodo\iTop\BackgroundTaskEx\Service\DatabaseService;
 use DBObjectSearch;
 use DBObjectSet;
 use Exception;
@@ -228,39 +229,47 @@ class CleanupService
 		$sTargetFriendlyname = $aContext['anonymized']['friendlyname'];
 
 		$aRequests = [];
+		$oDatabaseService = new DatabaseService();
 
 		if (MetaModel::IsValidAttCode('CMDBChange', 'user_id')) {
+			$iMaxId = $oDatabaseService->QueryMaxKey($sKey, $sChangeTable);
 			if ($bFirstUser) {
 				$aRequests['req1'] = [
-					'search_key'     => $sKey,
-					'key'            => $sKey,
-					'search_query'   => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).' AND user_id IS NULL'.$sDateCreateCondition,
+					'search_key'    => $sKey,
+					'key'           => $sKey,
+					'search_max_id' => $iMaxId,
+					'search_query'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).' AND user_id IS NULL'.$sDateCreateCondition,
 					'apply_queries' => [$sChangeTable => "UPDATE `$sChangeTable` /*JOIN*/ SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
 				];
 				$aRequests['req2'] = [
-					'search_key'     => $sKey,
-					'key'            => $sKey,
-					'search_query'   => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').' AND user_id IS NULL'.$sDateCreateCondition,
+					'search_key'    => $sKey,
+					'key'           => $sKey,
+					'search_max_id' => $iMaxId,
+					'search_query'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').' AND user_id IS NULL'.$sDateCreateCondition,
 					'apply_queries' => [$sChangeTable => "UPDATE `$sChangeTable` /*JOIN*/ SET userinfo=".CMDBSource::Quote($sTargetFriendlyname.' (CSV)')],
 				];
 			}
 			$aRequests['req3'] = [
-				'search_key'     => $sKey,
-				'key'            => $sKey,
-				'search_query'   => "SELECT `$sKey` from `$sChangeTable` WHERE user_id in (".$this->sId.')',
+				'search_key'    => $sKey,
+				'key'           => $sKey,
+				'search_max_id' => $iMaxId,
+				'search_query'  => "SELECT `$sKey` from `$sChangeTable` WHERE user_id in (".$this->sId.')',
 				'apply_queries' => [$sChangeTable => "UPDATE `$sChangeTable` /*JOIN*/ SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
 			];
 		} elseif ($bFirstUser) {
+			$iMaxId = $oDatabaseService->QueryMaxKey($sKey, $sChangeTable);
 			$aRequests['req1'] = [
-				'search_key'     => $sKey,
-				'key'            => $sKey,
-				'search_query'   => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).$sDateCreateCondition,
+				'search_key'    => $sKey,
+				'key'           => $sKey,
+				'search_max_id' => $iMaxId,
+				'search_query'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).$sDateCreateCondition,
 				'apply_queries' => [$sChangeTable => "UPDATE `$sChangeTable` /*JOIN*/ SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
 			];
 			$aRequests['req2'] = [
-				'search_key'     => $sKey,
-				'key'            => $sKey,
-				'search_query'   => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').$sDateCreateCondition,
+				'search_key'    => $sKey,
+				'key'           => $sKey,
+				'search_max_id' => $iMaxId,
+				'search_query'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').$sDateCreateCondition,
 				'apply_queries' => [$sChangeTable => "UPDATE `$sChangeTable` /*JOIN*/ SET userinfo=".CMDBSource::Quote($sTargetFriendlyname.' (CSV)')],
 			];
 		}
