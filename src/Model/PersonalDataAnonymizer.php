@@ -18,7 +18,7 @@ class PersonalDataAnonymizer extends AbstractTimeRangeWeeklyScheduledProcess
 	public function GetNextOccurrence($sCurrentTime = 'now')
 	{
 		// remember the starting point from the last execution
-		$sCurrentTime = DBProperty::GetProperty(self::NEXT_OCCURRENCE, $sCurrentTime);
+		// $sCurrentTime = DBProperty::GetProperty(self::NEXT_OCCURRENCE, $sCurrentTime);
 		return parent::GetNextOccurrence($sCurrentTime);
 	}
 
@@ -47,17 +47,19 @@ class PersonalDataAnonymizer extends AbstractTimeRangeWeeklyScheduledProcess
 		$oService = new AnonymizerService();
 		$oService->SetProcessEndTime($iUnixTimeLimit);
 		$sMessage = '';
-		if ($oService->ProcessBackgroundAnonymization($sMessage)) {
-			// Anonymization finished for today, schedule next period
-			$oNextOccurrence = $this->GetWeeklyScheduledService()->GetNextOccurrenceNextDay(time());
-			$sNextOccurrence = $oNextOccurrence->format(AttributeDateTime::GetSQLFormat());
-		} else {
-			$oNext = new DateTime();
-			$sCoolDown = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, static::MODULE_SETTING_EXEC_INTERVAL, 10);
-			$oNext->modify("+ $sCoolDown second");
-			$sNextOccurrence = $oNext->format(AttributeDateTime::GetSQLFormat());
-		}
-		DBProperty::SetProperty(static::NEXT_OCCURRENCE, $sNextOccurrence, static::NEXT_OCCURRENCE_COMMENT,static::NEXT_OCCURRENCE_DESCRIPTION);
+		$oService->ProcessBackgroundAnonymization($sMessage);
+
+//		if ($oService->ProcessBackgroundAnonymization($sMessage)) {
+//			// Anonymization finished for today, schedule next period
+//			$oNextOccurrence = $this->GetWeeklyScheduledService()->GetNextOccurrenceNextDay(time());
+//			$sNextOccurrence = $oNextOccurrence->format(AttributeDateTime::GetSQLFormat());
+//		} else {
+//			$oNext = new DateTime();
+//			$sCoolDown = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, static::MODULE_SETTING_EXEC_INTERVAL, 10);
+//			$oNext->modify("+ $sCoolDown second");
+//			$sNextOccurrence = $oNext->format(AttributeDateTime::GetSQLFormat());
+//		}
+//		DBProperty::SetProperty(static::NEXT_OCCURRENCE, $sNextOccurrence, static::NEXT_OCCURRENCE_COMMENT,static::NEXT_OCCURRENCE_DESCRIPTION);
 
 		return $sMessage;
 	}
