@@ -5,7 +5,7 @@
     <parameters  id="combodo-anonymizer" _delta="define">
       <enabled>true</enabled>
       <debug>true</debug>
-      <max_chunk_size>10000</max_chunk_size>
+      <max_chunk_size>1000</max_chunk_size>
       <time>00:30</time>
       <end_time>23:30</end_time>
       <week_days>monday, tuesday, wednesday, thursday, friday, saturday, sunday</week_days>
@@ -25,10 +25,10 @@
       <actions type="array">
         <action id="0">ActionResetPersonFields</action>
         <action id="10">ActionAnonymizePerson</action>
-        <action id="20">ActionCleanupUsers</action>
-        <action id="30">ActionCleanupCaseLogs</action>
-        <action id="40">ActionCleanupOnMention</action>
-        <action id="50">ActionCleanupEmailNotification</action>
+        <action id="20">ActionCleanupCaseLogs</action>
+        <action id="30">ActionCleanupOnMention</action>
+        <action id="40">ActionCleanupEmailNotification</action>
+        <action id="50">ActionCleanupUsers</action>
         <action id="60">ActionPurgePersonHistory</action>
         <action id="1000">ActionEndOfAnonymization</action>
       </actions>

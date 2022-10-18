@@ -125,7 +125,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 									//don't change number of characters
 									foreach ($aMentionsAllowedClasses as $sMentionChar => $sMentionClass) {
 										if (MetaModel::IsParentClass('Contact', $sMentionClass)) {
-											$sSearch = "class=".$sMentionClass." & amp;id = ".$this->Get('id_to_anonymize')."\">@";
+											$sSearch = "class=".$sMentionClass."&amp;id=".$this->Get('id_to_anonymize')."\">@";
 											$sSqlSearch = "SELECT `$sKey` from `$sTable` WHERE `$sColumn` LIKE ".CMDBSource::Quote('%'.$sSearch.'%');
 
 											$aColumnsToUpdate = $this->GetColumnsToUpdate($sClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt);

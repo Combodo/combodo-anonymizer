@@ -127,15 +127,8 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 				$sTable = MetaModel::DBGetTable($sClass);
 				$sKey = MetaModel::DBGetKey($sClass);
 				if ((MetaModel::GetAttributeOrigin($sClass, $sAttCode) == $sClass) && $oAttDef instanceof AttributeCaseLog) {
-					$aSQLColumns = $oAttDef->GetSQLColumns();
-					$sColumn = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
-
-					$aConditions = [];
-					foreach ($aIdUser as $sIdUser) {
-						$aConditions[] = " `$sColumn` LIKE ".CMDBSource::Quote('%'.sprintf($sPattern, $sOrigFriendlyname, $sIdUser).'%');
-					}
-					$sCondition = implode(' OR ', $aConditions);
-					$sSqlSearch = "SELECT  `$sKey` FROM `$sTable` WHERE $sCondition";
+					// Search case logs by the changes
+					$sSqlSearch = $this->GetCaseLogChangeQuery($sClass, $sSearchKey, $sOrigFriendlyname);
 
 					$aColumnsToUpdate = $this->GetColumnsToUpdate($sClass,  $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt, $sStartReplaceInIdx, $sEndReplaceInIdx);
 
@@ -149,7 +142,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 					$aAction['search_query'] = $sSqlSearch;
 					$aAction['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sTable);
 					$aAction['apply_queries'] = $aSqlUpdate;
-					$aAction['search_key'] = $sKey;
+					$aAction['search_key'] = $sSearchKey;
 					$aAction['key'] = $sKey;
 					$aRequests[$sClass.'-'.$sAttCode] = $aAction;
 				}
@@ -158,6 +151,41 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		$aParams['aRequests'] = $aRequests;
 		$this->Set('action_params', json_encode($aParams));
 		$this->DBWrite();
+	}
+
+	private function GetCaseLogChangeQuery($sClass, &$sKey, $sOrigFriendlyname)
+	{
+		$sChangeTable = MetaModel::DBGetTable('CMDBChange');
+		$sChangeKey = MetaModel::DBGetKey('CMDBChange');
+		$sChangeOpTable = MetaModel::DBGetTable('CMDBChangeOp');
+		$oAttDef = MetaModel::GetAttributeDef('CMDBChangeOp', 'change');
+		$aColumns = array_keys($oAttDef->GetSQLColumns());
+		$sChangeOpChangeId = reset($aColumns);
+		$oAttDef = MetaModel::GetAttributeDef('CMDBChangeOp', 'finalclass');
+		$aColumns = array_keys($oAttDef->GetSQLColumns());
+		$sChangeOpFinalClass = reset($aColumns);
+		$oAttDef = MetaModel::GetAttributeDef('CMDBChangeOp', 'objkey');
+		$aColumns = array_keys($oAttDef->GetSQLColumns());
+		$sObjKey = reset($aColumns);
+		$oAttDef = MetaModel::GetAttributeDef('CMDBChangeOp', 'objclass');
+		$aColumns = array_keys($oAttDef->GetSQLColumns());
+		$sObjClass = reset($aColumns);
+		$oAttDef = MetaModel::GetAttributeDef('CMDBChange', 'userinfo');
+		$aColumns = array_keys($oAttDef->GetSQLColumns());
+		$sChangeUserInfo = reset($aColumns);
+		$sKey = "$sObjKey";
+
+		$sSQL = <<<SQL
+SELECT DISTINCT `CMDBChangeOp`.`$sObjKey`
+    FROM `$sChangeOpTable` AS `CMDBChangeOp`
+    INNER JOIN `$sChangeTable` AS `CMDBChange` ON `CMDBChangeOp`.`$sChangeOpChangeId` = `CMDBChange`.`$sChangeKey`
+	WHERE `CMDBChangeOp`.`$sChangeOpFinalClass` = 'CMDBChangeOpSetAttributeCaseLog'
+	  AND `CMDBChangeOp`.`$sObjClass` = '$sClass'
+	  AND `CMDBChange`.`$sChangeUserInfo` IN ('Job Cron', '$sOrigFriendlyname')
+	ORDER BY `CMDBChangeOp`.`$sObjKey`
+SQL;
+
+		return $sSQL;
 	}
 
 	private function GetColumnsToUpdate($sClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt, $sStartReplaceInIdx, $sEndReplaceInIdx)

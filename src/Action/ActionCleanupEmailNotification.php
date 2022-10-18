@@ -97,7 +97,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 			$sStartReplaceEmail = "REPLACE(".$sStartReplaceEmail;
 			$sEndReplaceEmail = $sEndReplaceEmail.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
 
-			// Now change email adress
+			// Now change email address
 			$sNotificationTable = MetaModel::DBGetTable('EventNotificationEmail');
 			$sKey = MetaModel::DBGetKey('EventNotificationEmail');
 
@@ -112,7 +112,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 
 			$aRequest = [];
 			$aRequest['search_query'] = $sSqlSearch;
-			$aAction['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sNotificationTable);
+			$aRequest['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sNotificationTable);
 			$aRequest['apply_queries'] = [$sNotificationTable => $sSqlUpdate];
 			$aRequest['key'] = $sKey;
 			$aRequest['search_key'] = $sKey;
