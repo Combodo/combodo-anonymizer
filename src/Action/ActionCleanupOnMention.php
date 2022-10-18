@@ -93,7 +93,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 			$oScopeQuery = "SELECT TriggerOnObjectMention";
 			$oSet = new DBObjectSet(DBSearch::FromOQL($oScopeQuery));
 			while ($oTrigger = $oSet->Fetch()) {
-				$sParentClass = $oTrigger->Get('target_class');
+				$sChangeOpId = $oTrigger->Get('target_class');
 
 				$sEndReplaceInCaseLog = "";
 				$sEndReplaceInTxt = "";
@@ -110,7 +110,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 					$sEndReplaceInTxt = $sEndReplaceInTxt.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
 				}
 
-				$aClasses = array_merge([$sParentClass], MetaModel::GetSubclasses($sParentClass));
+				$aClasses = MetaModel::EnumChildClasses($sChangeOpId, ENUM_CHILD_CLASSES_ALL);
 				$aAlreadyDone = [];
 				foreach ($aClasses as $sClass) {
 					foreach (MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef) {

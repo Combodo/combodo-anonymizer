@@ -64,6 +64,8 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 		$oChangeCreate = $oSet->Fetch();
 		if ($oChangeCreate) {
 			$aContext['origin']['date_create'] = $oChangeCreate->Get('date');
+			$aContext['origin']['changeop_id'] = $oChangeCreate->GetKey();
+			//$aContext['origin']['obsolescence_date'] = $oObject->Get('obsolescence_date') ?? new DateTime();
 		}
 
 		$oTask->Set('anonymization_context', json_encode($aContext));

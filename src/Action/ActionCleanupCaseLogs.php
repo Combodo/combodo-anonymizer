@@ -80,6 +80,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 			return;
 		}
 
+		$iChangeOpId = $aContext['origin']['changeop_id'];
 		$sOrigFriendlyname = $aContext['origin']['friendlyname'];
 		$sTargetFriendlyname = $aContext['anonymized']['friendlyname'];
 
@@ -128,7 +129,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 				$sKey = MetaModel::DBGetKey($sClass);
 				if ((MetaModel::GetAttributeOrigin($sClass, $sAttCode) == $sClass) && $oAttDef instanceof AttributeCaseLog) {
 					// Search case logs by the changes
-					$sSqlSearch = $this->GetCaseLogChangeQuery($sClass, $sSearchKey, $sOrigFriendlyname);
+					$sSqlSearch = $this->GetCaseLogChangeQuery($sClass, $sSearchKey, $sOrigFriendlyname, $iChangeOpId);
 
 					$aColumnsToUpdate = $this->GetColumnsToUpdate($sClass,  $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt, $sStartReplaceInIdx, $sEndReplaceInIdx);
 
@@ -153,11 +154,12 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		$this->DBWrite();
 	}
 
-	private function GetCaseLogChangeQuery($sClass, &$sKey, $sOrigFriendlyname)
+	private function GetCaseLogChangeQuery($sClass, &$sKey, $sOrigFriendlyname, $iChangeOpId)
 	{
 		$sChangeTable = MetaModel::DBGetTable('CMDBChange');
 		$sChangeKey = MetaModel::DBGetKey('CMDBChange');
 		$sChangeOpTable = MetaModel::DBGetTable('CMDBChangeOp');
+		$sChangeOpId = MetaModel::DBGetKey('CMDBChangeOp');
 		$oAttDef = MetaModel::GetAttributeDef('CMDBChangeOp', 'change');
 		$aColumns = array_keys($oAttDef->GetSQLColumns());
 		$sChangeOpChangeId = reset($aColumns);
@@ -182,6 +184,7 @@ SELECT DISTINCT `CMDBChangeOp`.`$sObjKey`
 	WHERE `CMDBChangeOp`.`$sChangeOpFinalClass` = 'CMDBChangeOpSetAttributeCaseLog'
 	  AND `CMDBChangeOp`.`$sObjClass` = '$sClass'
 	  AND `CMDBChange`.`$sChangeUserInfo` IN ('Job Cron', '$sOrigFriendlyname')
+	  AND `CMDBChangeOp`.`$sChangeOpId` >= '$iChangeOpId'
 	ORDER BY `CMDBChangeOp`.`$sObjKey`
 SQL;
 
