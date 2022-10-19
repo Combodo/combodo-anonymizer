@@ -133,18 +133,24 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 
 		while ($iUserId !== false) {
 			/** @var \User $oUser */
-			$oUser = MetaModel::GetObject(self::USER_CLASS, $iUserId);
+			$sUserClass = self::USER_CLASS;
+			$oUser = MetaModel::GetObject($sUserClass, $iUserId);
 			AnonymizerLog::Debug("Anonymize User ".$oUser->Get('login'));
 			$oService = new CleanupService(get_class($oUser), $iUserId, $iEndExecutionTime);
 			$oDatabaseService = new DatabaseService();
 			// Disable User, reset login and password
-			$oService->CleanupUser($oUser);
-			AnonymizerLog::Debug('Purge History for User '.$oUser->Get('login'));
-			if (!$oService->PurgeHistory($aParams['iChunkSize'])) {
-				// Timeout stop here
-				return false;
+			try {
+				$oService->CleanupUser($oUser);
+				AnonymizerLog::Debug('Purge History for User '.$oUser->Get('login'));
+				if (!$oService->PurgeHistory($aParams['iChunkSize'])) {
+					// Timeout stop here
+					return false;
+				}
+			} catch (Exception $e) {
+				// Error stop here
+				AnonymizerLog::Error("Error during anonymization of $sUserClass::$iUserId - ".$e->getMessage());
+				return true;
 			}
-
 			// Get all the request set to execute for every user
 			$aRequests = $oService->GetCleanupChangesRequests($aContext, $aParams['first_user']);
 
