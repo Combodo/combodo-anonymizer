@@ -199,7 +199,15 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 		$iProgress = $aParams['aChangesProgress'] ?? 0;
 		$bCompleted = ($iProgress == -1);
 		while (!$bCompleted && time() < $iEndExecutionTime) {
+			$fStart = microtime(true);
 			$bCompleted = $oDatabaseService->ExecuteQueriesByChunk($aRequest, $iProgress, $aParams['iChunkSize']);
+			$fDuration = microtime(true) - $fStart;
+			if ($fDuration < 20.0) {
+				$aParams['iChunkSize'] *= 2;
+			} elseif ($fDuration > 60.0 && $aParams['iChunkSize'] > 1) {
+				$aParams['iChunkSize'] /= 2;
+			}
+
 			// Save progression
 			$aParams['aChangesProgress'] = $iProgress;
 			$this->Set('action_params', json_encode($aParams));

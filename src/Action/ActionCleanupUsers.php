@@ -154,7 +154,14 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 				while (!$bCompleted && time() < $iEndExecutionTime) {
 					try {
 						AnonymizerLog::Debug("ExecuteQueries $sName");
+						$fStart = microtime(true);
 						$bCompleted = $oDatabaseService->ExecuteQueriesByChunk($aRequest, $iProgress, $aParams['iChunkSize']);
+						$fDuration = microtime(true) - $fStart;
+						if ($fDuration < 20.0) {
+							$aParams['iChunkSize'] *= 2;
+						} elseif ($fDuration > 60.0 && $aParams['iChunkSize'] > 1) {
+							$aParams['iChunkSize'] /= 2;
+						}
 						// Save progression
 						$aParams['aChangesProgress'][$sName] = $iProgress;
 						$this->Set('action_params', json_encode($aParams));

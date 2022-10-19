@@ -234,7 +234,15 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 			AnonymizerLog::Debug("=> Request: $sName Progress: $iProgress");
 			while (!$bCompleted && time() < $iEndExecutionTime) {
 				try {
+					$fStart = microtime(true);
 					$bCompleted = $oDatabaseService->ExecuteQueriesByChunk($aRequest, $iProgress, $aParams['iChunkSize']);
+					$fDuration = microtime(true) - $fStart;
+					if ($fDuration < 20.0) {
+						$aParams['iChunkSize'] *= 2;
+					} elseif ($fDuration > 60.0 && $aParams['iChunkSize'] > 1) {
+						$aParams['iChunkSize'] /= 2;
+					}
+
 					$aParams['aChangesProgress'][$sName] = $iProgress;
 				}
 				catch (MySQLHasGoneAwayException $e) {
