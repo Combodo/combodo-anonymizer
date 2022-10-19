@@ -67,14 +67,14 @@ class ActionPurgePersonHistory extends AnonymizationTaskAction
 	{
 		$aParams = json_decode($this->Get('action_params'), true);
 		$iChunkSize = $aParams['iChunkSize'];
-		if ($iChunkSize == 1) {
+		if ($iChunkSize <= 1) {
 			AnonymizerLog::Debug('Stop retry action ActionPurgePersonHistory with params '.json_encode($aParams));
 			$this->Set('action_params', '');
 			$this->DBWrite();
 
 			return false;
 		}
-		$aParams['iChunkSize'] = (int)$iChunkSize / 2 + 1;
+		$aParams['iChunkSize'] = (int)$iChunkSize / 2;
 		$this->Set('action_params', json_encode($aParams));
 		$this->DBWrite();
 

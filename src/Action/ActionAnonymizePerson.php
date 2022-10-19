@@ -38,6 +38,12 @@ class ActionAnonymizePerson extends AnonymizationTaskAction
 		MetaModel::Init_SetZListItems('standard_search', array('name')); // Criteria of the std search form
 	}
 
+	public function ChangeActionParamsOnError(): bool
+	{
+		// Cannot continue with the action
+		return false;
+	}
+
 	/**
 	 * @inheritDoc
 	 */

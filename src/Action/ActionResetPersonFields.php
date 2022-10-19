@@ -72,6 +72,12 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 		$oTask->DBWrite();
 	}
 
+	public function ChangeActionParamsOnError(): bool
+	{
+		// Cannot continue with the action
+		return false;
+	}
+
 	/**
 	 * @param $iEndExecutionTime
 	 *
