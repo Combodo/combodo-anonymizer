@@ -108,8 +108,8 @@ class CleanupService
 					$oObject->Set($sAttCode, null);
 				}
 			} elseif ($oAttDef instanceof AttributeLinkedSetIndirect) {
-				$oValue = new DBObjectSet(new DBObjectSearch($oAttDef->GetLinkedClass()));
-				$oObject->Set($sAttCode, $oValue);
+//				$oValue = new DBObjectSet(new DBObjectSearch($oAttDef->GetLinkedClass()));
+//				$oObject->Set($sAttCode, $oValue);
 			}
 		}
 		$oObject->AllowWrite();
