@@ -82,7 +82,8 @@ class ConfigAnonymizerController extends Controller
 		$sModuleName = AnonymizerHelper::MODULE_NAME;
 		$oConfig = MetaModel::GetConfig();
 		$aParams = [];
-		$aParams['bAnonymizeObsoletePersons'] = $oConfig->GetModuleSetting($sModuleName, 'anonymize_obsolete_persons', 'false') === 'true';
+		$bAnonymizeObsoletePersons = $oConfig->GetModuleSetting($sModuleName, 'anonymize_obsolete_persons', false);
+		$aParams['bAnonymizeObsoletePersons'] = ($bAnonymizeObsoletePersons === true || $bAnonymizeObsoletePersons === 'true');
 		$aParams['iAnonymizationDelay'] = $oConfig->GetModuleSetting($sModuleName, 'obsolete_persons_retention', -1);
 		$aParams['sTransactionId'] = utils::GetNewTransactionId();
 
