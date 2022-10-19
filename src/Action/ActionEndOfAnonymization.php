@@ -4,6 +4,8 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
+use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
+
 
 /**
  * reset all non-mandatory fields of the anonymized person
@@ -61,6 +63,7 @@ class ActionEndOfAnonymization extends AnonymizationTaskAction
 		$oObject->Set('anonymized', true);
 		$oObject->DBWrite();
 		$oObject->Reload();
+		AnonymizerLog::Info("<<< Anonymization of $sClass::$sId ended");
 
 		return true;
 	}

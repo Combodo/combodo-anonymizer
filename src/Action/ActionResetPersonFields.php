@@ -93,6 +93,7 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 
 		$sClass = $oTask->Get('class_to_anonymize');
 		$sId = $oTask->Get('id_to_anonymize');
+		AnonymizerLog::Info(">>> Anonymization of $sClass::$sId started");
 
 		$oService = new CleanupService($sClass, $sId, $iEndExecutionTime);
 
