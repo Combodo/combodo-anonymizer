@@ -66,6 +66,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 		//mention exists only since iTop 3.0
 		if (!MetaModel::GetConfig()->IsProperty('mentions.allowed_classes')) {
 			//nothing to do. We can skip the current action
+			AnonymizerLog::Debug("Config mentions.allowed_classes is empty");
 			$this->Set('action_params', '');
 			$this->DBWrite();
 
@@ -73,12 +74,13 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 		}
 		$aMentionsAllowedClasses = (array)MetaModel::GetConfig()->Get('mentions.allowed_classes') ?? [];
 		foreach ($aMentionsAllowedClasses as $sChar => $sClass) {
-			if (!($sClass instanceof Person)) {
+			if ($sClass != 'Person') {
 				unset($aMentionsAllowedClasses[$sChar]);
 			}
 		}
 		if (count($aMentionsAllowedClasses) == 0) {
 			//nothing to do. We can skip the current action
+			AnonymizerLog::Debug('Config mentions.allowed_classes does not contains Person');
 			$this->Set('action_params', '');
 			$this->DBWrite();
 
