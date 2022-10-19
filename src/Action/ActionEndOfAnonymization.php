@@ -63,7 +63,7 @@ class ActionEndOfAnonymization extends AnonymizationTaskAction
 		$oObject->Set('anonymized', true);
 		$oObject->DBWrite();
 		$oObject->Reload();
-		AnonymizerLog::Info("<<< Anonymization of $sClass::$sId ended");
+		AnonymizerLog::Info("<<< Anonymization of $sClass::$sId ended  ");
 
 		return true;
 	}
