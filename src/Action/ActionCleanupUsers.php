@@ -159,6 +159,9 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 						$fDuration = microtime(true) - $fStart;
 						if ($fDuration < AnonymizerHelper::ADAPTATIVE_MIN_TIME) {
 							$aParams['iChunkSize'] *= 2;
+							if ($aParams['iChunkSize'] > AnonymizerHelper::ADAPTATIVE_MAX_CHUNK_SIZE) {
+								$aParams['iChunkSize'] = AnonymizerHelper::ADAPTATIVE_MAX_CHUNK_SIZE;
+							}
 						} elseif ($fDuration > AnonymizerHelper::ADAPTATIVE_MAX_TIME && $aParams['iChunkSize'] > 1) {
 							$aParams['iChunkSize'] /= 2;
 						}
