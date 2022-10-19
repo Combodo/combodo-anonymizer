@@ -6,7 +6,6 @@
 
 namespace Combodo\iTop\Anonymizer\Service;
 
-use AttributeLinkedSetIndirect;
 use CMDBObject;
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
@@ -107,9 +106,6 @@ class CleanupService
 				} else {
 					$oObject->Set($sAttCode, null);
 				}
-			} elseif ($oAttDef instanceof AttributeLinkedSetIndirect) {
-//				$oValue = new DBObjectSet(new DBObjectSearch($oAttDef->GetLinkedClass()));
-//				$oObject->Set($sAttCode, $oValue);
 			}
 		}
 		$oObject->AllowWrite();

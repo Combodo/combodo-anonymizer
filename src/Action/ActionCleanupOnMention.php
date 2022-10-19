@@ -71,8 +71,13 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 
 			return;
 		}
-		$aMentionsAllowedClasses = (array)MetaModel::GetConfig()->Get('mentions.allowed_classes');
-		if (sizeof($aMentionsAllowedClasses) == 0) {
+		$aMentionsAllowedClasses = (array)MetaModel::GetConfig()->Get('mentions.allowed_classes') ?? [];
+		foreach ($aMentionsAllowedClasses as $sChar => $sClass) {
+			if (!($sClass instanceof Person)) {
+				unset($aMentionsAllowedClasses[$sChar]);
+			}
+		}
+		if (count($aMentionsAllowedClasses) == 0) {
 			//nothing to do. We can skip the current action
 			$this->Set('action_params', '');
 			$this->DBWrite();
@@ -87,13 +92,18 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 		$sOrigEmail = $aContext['origin']['email'];
 		$sTargetEmail = $aContext['anonymized']['email'];
 
+		$aMentionSearches = [];
+		foreach ($aMentionsAllowedClasses as $sMentionClass) {
+			$aMentionSearches[] = 'class='.$sMentionClass.'&amp;id='.$oTask->Get('id_to_anonymize')."\">@";
+		}
+
 		$aRequests = [];
 
 		if ($sCleanupOnMention == 'trigger-only') {
 			$oScopeQuery = "SELECT TriggerOnObjectMention";
 			$oSet = new DBObjectSet(DBSearch::FromOQL($oScopeQuery));
 			while ($oTrigger = $oSet->Fetch()) {
-				$sChangeOpId = $oTrigger->Get('target_class');
+				$sTargetClass = $oTrigger->Get('target_class');
 
 				$sEndReplaceInCaseLog = "";
 				$sEndReplaceInTxt = "";
@@ -110,47 +120,44 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 					$sEndReplaceInTxt = $sEndReplaceInTxt.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
 				}
 
-				$aClasses = MetaModel::EnumChildClasses($sChangeOpId, ENUM_CHILD_CLASSES_ALL);
-				$aAlreadyDone = [];
+				$aClasses = MetaModel::EnumChildClasses($sTargetClass, ENUM_CHILD_CLASSES_ALL);
 				foreach ($aClasses as $sClass) {
+					$sTable = MetaModel::DBGetTable($sClass);
+					$sKey = MetaModel::DBGetKey($sClass);
+					$aConditions = [];
+
 					foreach (MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef) {
-						$sTable = MetaModel::DBGetTable($sClass, $sAttCode);
-						$sKey = MetaModel::DBGetKey($sClass);
-						if (!in_array($sTable.'->'.$sAttCode, $aAlreadyDone)) {
-							$aAlreadyDone[] = $sTable.'->'.$sAttCode;
-							if ((MetaModel::GetAttributeOrigin($sClass, $sAttCode) == $sClass)) {
-								if ($oAttDef instanceof AttributeCaseLog) {
-									$aSQLColumns = $oAttDef->GetSQLColumns();
-									$sColumn = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
-									//don't change number of characters
-									foreach ($aMentionsAllowedClasses as $sMentionChar => $sMentionClass) {
-										if (MetaModel::IsParentClass('Contact', $sMentionClass)) {
-											$sSearch = "class=".$sMentionClass."&amp;id=".$oTask->Get('id_to_anonymize')."\">@";
-											$sSqlSearch = "SELECT `$sKey` from `$sTable` WHERE `$sColumn` LIKE ".CMDBSource::Quote('%'.$sSearch.'%');
-
-											$aColumnsToUpdate = $this->GetColumnsToUpdate($sClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt);
-
-											$aSqlUpdate = [];
-											foreach ($aColumnsToUpdate as $sTable => $aRequestReplace) {
-												$sSqlUpdate = "UPDATE `$sTable` /*JOIN*/ ".
-													"SET ".implode(' , ', $aRequestReplace);
-												$aSqlUpdate[$sTable] = $sSqlUpdate;
-											}
-
-											$aAction = [];
-											$aAction['search_query'] = $sSqlSearch;
-											$aAction['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sTable);
-											$aAction['apply_queries'] = $aSqlUpdate;
-											$aAction['key'] = $sKey;
-											$aAction['search_key'] = $sKey;
-											$aRequests[$sClass.'-'.$sAttCode] = $aAction;
-										}
-									}
+						if (MetaModel::IsAttributeOrigin($sClass, $sAttCode)) {
+							if ($oAttDef instanceof AttributeCaseLog) {
+								$aSQLColumns = $oAttDef->GetSQLColumns();
+								$sColumn = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
+								foreach ($aMentionSearches as $sMentionSearch) {
+									$aConditions[] = "`$sColumn` LIKE ".CMDBSource::Quote('%'.$sMentionSearch.'%');
 								}
 							}
 						}
 					}
 
+					if (count($aConditions) > 0) {
+						$sSqlSearch = "SELECT `$sKey` from `$sTable` WHERE ".implode(' OR ', $aConditions);
+
+						$aColumnsToUpdate = $this->GetColumnsToUpdate($sClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt);
+
+						$aSqlUpdate = [];
+						foreach ($aColumnsToUpdate as $sTable => $aRequestReplace) {
+							$sSqlUpdate = "UPDATE `$sTable` /*JOIN*/ ".
+								'SET '.implode(' , ', $aRequestReplace);
+							$aSqlUpdate[$sTable] = $sSqlUpdate;
+						}
+
+						$aAction = [];
+						$aAction['search_query'] = $sSqlSearch;
+						$aAction['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sTable);
+						$aAction['apply_queries'] = $aSqlUpdate;
+						$aAction['key'] = $sKey;
+						$aAction['search_key'] = $sKey;
+						$aRequests[$sClass] = $aAction;
+					}
 				}
 			}
 			//} elseif ($sCleanupOnMention == 'all') {
@@ -162,10 +169,10 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 		$this->DBWrite();
 	}
 
-	private function GetColumnsToUpdate($sClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt)
+	private function GetColumnsToUpdate($sTargetClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt)
 	{
 		$aColumnsToUpdate = [];
-		$aClasses = array_merge([$sClass], MetaModel::GetSubclasses($sClass));
+		$aClasses = MetaModel::EnumChildClasses($sTargetClass, ENUM_CHILD_CLASSES_ALL);
 		foreach ($aClasses as $sClass) {
 			foreach (MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef) {
 				$sTable = MetaModel::DBGetTable($sClass, $sAttCode);
@@ -173,13 +180,14 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 					$aSQLColumns = $oAttDef->GetSQLColumns();
 					$sColumn = array_keys($aSQLColumns)[0]; // We assume that the first column is the text
 					$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInCaseLog;
-				} elseif ($oAttDef instanceof AttributeText || ($oAttDef instanceof AttributeString && !($oAttDef instanceof AttributeFinalClass))) {
+				} elseif ($oAttDef instanceof AttributeString && !($oAttDef instanceof AttributeFinalClass)) {
 					$aSQLColumns = $oAttDef->GetSQLColumns();
 					$sColumn = array_keys($aSQLColumns)[0]; //
 					$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInTxt;
 				}
 			}
 		}
+
 		return $aColumnsToUpdate;
 	}
 
@@ -200,12 +208,14 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 			AnonymizerLog::Debug('Stop retry action ActionCleanupOnMention with params '.json_encode($aParams));
 			$this->Set('action_params', '');
 			$this->DBWrite();
+
 			return false;
 		}
 		$aParams['iChunkSize'] = (int)$iChunkSize / 2 + 1;
 
 		$this->Set('action_params', json_encode($aParams));
 		$this->DBWrite();
+
 		return true;
 	}
 

@@ -124,15 +124,21 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 
 		// 2) Find all classes containing case logs
 		foreach (MetaModel::GetClasses() as $sClass) {
-			foreach (MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef) {
-				$sTable = MetaModel::DBGetTable($sClass);
+			if (MetaModel::IsLeafClass($sClass)) {
+				$sLeafTable = MetaModel::DBGetTable($sClass);
 				$sKey = MetaModel::DBGetKey($sClass);
-				if ((MetaModel::GetAttributeOrigin($sClass, $sAttCode) == $sClass) && $oAttDef instanceof AttributeCaseLog) {
+				$bHasCaseLog = false;
+				foreach (MetaModel::ListAttributeDefs($sClass) as $oAttDef) {
+					if ($oAttDef instanceof AttributeCaseLog) {
+						$bHasCaseLog = true;
+						break;
+					}
+				}
+
+				if ($bHasCaseLog) {
 					// Search case logs by the changes
 					$sSqlSearch = $this->GetCaseLogChangeQuery($sClass, $sSearchKey, $sOrigFriendlyname, $iChangeOpId);
-
-					$aColumnsToUpdate = $this->GetColumnsToUpdate($sClass,  $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt, $sStartReplaceInIdx, $sEndReplaceInIdx);
-
+					$aColumnsToUpdate = $this->GetColumnsToUpdate($sClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt, $sStartReplaceInIdx, $sEndReplaceInIdx);
 					$aSqlUpdate = [];
 					foreach ($aColumnsToUpdate as $sTable => $aRequestReplace) {
 						$sSqlUpdate = "UPDATE `$sTable` /*JOIN*/ ".
@@ -141,11 +147,11 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 					}
 					$aAction = [];
 					$aAction['search_query'] = $sSqlSearch;
-					$aAction['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sTable);
+					$aAction['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sLeafTable);
 					$aAction['apply_queries'] = $aSqlUpdate;
 					$aAction['search_key'] = $sSearchKey;
 					$aAction['key'] = $sKey;
-					$aRequests[$sClass.'-'.$sAttCode] = $aAction;
+					$aRequests[$sClass] = $aAction;
 				}
 			}
 		}
