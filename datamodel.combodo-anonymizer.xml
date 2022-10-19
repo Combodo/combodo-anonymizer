@@ -7,7 +7,7 @@
       <debug>true</debug>
       <max_chunk_size>1000</max_chunk_size>
       <time>00:30</time>
-      <end_time>23:30</end_time>
+      <end_time>05:30</end_time>
       <week_days>monday, tuesday, wednesday, thursday, friday, saturday, sunday</week_days>
       <anonymize_obsolete_persons>false</anonymize_obsolete_persons>
       <obsolete_persons_retention>-1</obsolete_persons_retention>
