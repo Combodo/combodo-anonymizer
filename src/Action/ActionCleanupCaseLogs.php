@@ -182,6 +182,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		$aColumns = array_keys($oAttDef->GetSQLColumns());
 		$sChangeUserInfo = reset($aColumns);
 		$sKey = "$sObjKey";
+		$sOrigFriendlyname = CMDBSource::Quote($sOrigFriendlyname);
 
 		$sSQL = <<<SQL
 SELECT DISTINCT `CMDBChangeOp`.`$sObjKey`
@@ -189,7 +190,7 @@ SELECT DISTINCT `CMDBChangeOp`.`$sObjKey`
     INNER JOIN `$sChangeTable` AS `CMDBChange` ON `CMDBChangeOp`.`$sChangeOpChangeId` = `CMDBChange`.`$sChangeKey`
 	WHERE `CMDBChangeOp`.`$sChangeOpFinalClass` = 'CMDBChangeOpSetAttributeCaseLog'
 	  AND `CMDBChangeOp`.`$sObjClass` = '$sClass'
-	  AND `CMDBChange`.`$sChangeUserInfo` IN ('Job Cron', '$sOrigFriendlyname')
+	  AND `CMDBChange`.`$sChangeUserInfo` IN ('Job Cron', $sOrigFriendlyname)
 	  AND `CMDBChangeOp`.`$sChangeOpId` >= '$iChangeOpId'
 	ORDER BY `CMDBChangeOp`.`$sObjKey`
 SQL;
