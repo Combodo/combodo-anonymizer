@@ -113,7 +113,10 @@ class CleanupService
 			}
 		}
 		$oObject->AllowWrite();
+		$fStart = microtime(true);
 		$oObject->DBWrite();
+		$fDuration = microtime(true) - $fStart;
+		AnonymizerLog::Debug(sprintf("ResetObjectFields duration %.2f", $fDuration));
 		CMDBObject::SetCurrentChangeFromParams(null);
 		CMDBObject::SetCurrentChange(null);
 

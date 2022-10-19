@@ -284,7 +284,6 @@ SQL;
 					$aParams['aChangesProgress'][$sName] = -1;
 				}
 				// Save progression
-				AnonymizerLog::Debug("Save progression: ".json_encode($aParams));
 				$this->Set('action_params', json_encode($aParams));
 				$this->DBWrite();
 			}

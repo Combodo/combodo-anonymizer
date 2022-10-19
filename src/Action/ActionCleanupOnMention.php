@@ -257,7 +257,6 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 					$bCompleted = true;
 				}
 				// Save progression
-				AnonymizerLog::Debug('Save progression: '.json_encode($aParams));
 				$this->Set('action_params', json_encode($aParams));
 				$this->DBWrite();
 			}
