@@ -136,7 +136,7 @@
         <category/>
       </properties>
       <fields>
-        <field id="action_params" xsi:type="AttributeText">
+        <field id="action_params" xsi:type="AttributeLongText">
           <sql>action_params</sql>
           <default_value/>
           <is_null_allowed>true</is_null_allowed>
