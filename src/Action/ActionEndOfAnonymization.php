@@ -41,6 +41,12 @@ class ActionEndOfAnonymization extends AnonymizationTaskAction
 	public function ChangeActionParamsOnError(): bool
 	{
 		// Cannot continue with the action
+		$oTask = $this->GetTask();
+
+		$sClass = $oTask->Get('class_to_anonymize');
+		$sId = $oTask->Get('id_to_anonymize');
+
+		AnonymizerLog::Error("Anonymization ActionEndOfAnonymization of $sClass::$sId Failed");
 		return false;
 	}
 

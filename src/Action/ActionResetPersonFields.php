@@ -46,8 +46,6 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 		$sId = $oTask->Get('id_to_anonymize');
 
 		$oObject = MetaModel::GetObject($sClass, $sId);
-
-		AnonymizerLog::Debug('email'.$oObject->Get('email'));
 		$aContext = [
 			'origin' => [
 				'friendlyname' => $oObject->Get('friendlyname'),
@@ -75,6 +73,12 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 	public function ChangeActionParamsOnError(): bool
 	{
 		// Cannot continue with the action
+		$oTask = $this->GetTask();
+
+		$sClass = $oTask->Get('class_to_anonymize');
+		$sId = $oTask->Get('id_to_anonymize');
+
+		AnonymizerLog::Error("Anonymization ActionResetPersonFields of $sClass::$sId Failed");
 		return false;
 	}
 

@@ -41,6 +41,12 @@ class ActionAnonymizePerson extends AnonymizationTaskAction
 	public function ChangeActionParamsOnError(): bool
 	{
 		// Cannot continue with the action
+		$oTask = $this->GetTask();
+
+		$sClass = $oTask->Get('class_to_anonymize');
+		$sId = $oTask->Get('id_to_anonymize');
+
+		AnonymizerLog::Error("Anonymization ActionAnonymizePerson of $sClass::$sId Failed");
 		return false;
 	}
 
