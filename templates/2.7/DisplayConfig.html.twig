@@ -1,7 +1,7 @@
 {# @copyright   Copyright (C) 2010-2022 Combodo SARL #}
 {# @license     http://opensource.org/licenses/AGPL-3.0 #}
 
-<h1>{{ 'Anonymization:Configuration'|dict_s }}</h1>
+<h1>{{ 'combodo-anonymizer/Operation:DisplayConfig/Title'|dict_s }}</h1>
 
 {% if sMessage is not empty %}
     {% if sMessageType is empty %}
@@ -11,27 +11,71 @@
     <div id="save_result" class="header_message message_{{ sMessageType }}">{{ sMessage }}</div>
 
 {% else %}
-
-    <form method="post">
-        <input type="hidden" name="operation" value="ApplyConfig"/>
-        <input type="hidden" name="transaction_id" value="{{ sTransactionId }}"/>
-        <fieldset>
-            <legend>{{ 'Anonymization:AutomationParameters'|dict_s }}</legend>
-            <p>
-                <input type="checkbox"{% if bAnonymizeObsoletePersons and  iAnonymizationDelay >= 0 %} checked {% endif %}id="checkbox_anonymize" name=""/>
-                {% if bAnonymizeObsoletePersons and iAnonymizationDelay >= 0 %}
-                    {% set sDelay = iAnonymizationDelay %}
-                {% else %}
-                    {% set sDelay = '' %}
-                {% endif %}
-                {% set sDelayInput = 'Anonymization:AnonymizationDelay_Input'|dict_format('<input id="anonymization_delay" type="text" size="4" name="anonymization_delay" value="' ~ sDelay ~ '"/>') %}
-                <label for="checkbox_anonymize">{{ sDelayInput|raw }}</label>
-            </p>
-        </fieldset>
-
-        <p>
-            <button id="btn_apply" type="submit">{{ 'UI:Button:Apply'|dict_s }}</button>
-        </p>
-    </form>
-
+    <div id="tabbedContent_0" class="light ui-tabs ui-widget ui-widget-content ui-corner-all">
+        <div class="display_block display-files">
+            <table style="vertical-align:top" class="n-cols-details 2-cols-details" data-mode="view">
+                <tbody>
+                <tr>
+                    <td style="vertical-align:top; font-size: 0.95em; color: rgb(51, 51, 51);">
+                        <form method="post">
+                            <input type="hidden" name="operation" value="ApplyConfig"/>
+                            <input type="hidden" name="transaction_id" value="{{ sTransactionId }}"/>
+                            <fieldset>
+                                <legend>{{ 'Anonymization:AutomationParameters'|dict_s }}</legend>
+                                <div class="details">
+                                    <div class="field_container field_small">
+                                        <div class="field_label label">
+                                            <input type="checkbox"{% if bAnonymizeObsoletePersons and  iAnonymizationDelay >= 0 %} checked {% endif %}id="checkbox_anonymize" name=""/>
+                                            {% if bAnonymizeObsoletePersons and iAnonymizationDelay >= 0 %}
+                                                {% set sDelay = iAnonymizationDelay %}
+                                            {% else %}
+                                                {% set sDelay = '' %}
+                                            {% endif %}
+                                            {% set sDelayInput = 'Anonymization:AnonymizationDelay_Input'|dict_format('<input id="anonymization_delay" type="text" size="4" name="anonymization_delay" value="' ~ sDelay ~ '"/>') %}
+                                            {{ sDelayInput|raw }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <fieldset>
+                                <legend>{{ 'Anonymization:Configuration:TimeRange'|dict_s }}</legend>
+                                {% for aData in aConfigBackground %}
+                                    <div class="details">
+                                        <div class="field_container field_small">
+                                            <div class="field_label label">{{ aData.name }}</div>
+                                            <div class="field_data">
+                                                <div id="{{ sTabName ~ '_' ~ aData.id }}" class="field_value">
+                                                    <input id="{{ aData.id }}" type="text" size="{{ aData.size }}" name="{{ aData.id }}" value="{{ aData.value }}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                <div class="details">
+                                    <div class="field_container field_small">
+                                        <div class="field_label label">
+                                            {{ 'Anonymization:Configuration:Weekdays'|dict_s }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="details">
+                                    <div class="field_container field_small">
+                                        <div class="field_label label">
+                                            {% for aWeekDay in aWeekDays %}
+                                                <input type="checkbox" {{ aWeekDay.checked }} id="{{ aWeekDay.id }}" name="{{ aWeekDay.id }}"/>{{ aWeekDay.label }}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <p>
+                                <input id="btn_apply" type="submit" value="{{ 'UI:Button:Apply'|dict_s }}"/>
+                            </p>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endif %}

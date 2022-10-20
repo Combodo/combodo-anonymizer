@@ -43,6 +43,23 @@
 			</div>
 		{% EndUIFieldSet %}
 
+        {% UIFieldSet Standard {sLegend:'Anonymization:Configuration:TimeRange'|dict_s} %}
+            {% for aData in aConfigBackground %}
+                {% UIField Small {sLabel:aData.name} %}
+                    <input id="{{ aData.id }}" type="text" size="{{ aData.size }}" name="{{ aData.id }}" value="{{ aData.value }}"/>
+                {% EndUIField %}
+            {% endfor %}
+            {% UIField Small {sLabel:'Anonymization:Configuration:Weekdays'|dict_s} %}
+            {% EndUIField %}
+            <div class="ibo-field">
+				<span>
+                {% for aWeekDay in aWeekDays %}
+                    <input type="checkbox" {{ aWeekDay.checked }} id="{{ aWeekDay.id }}" name="{{ aWeekDay.id }}"/> {{ aWeekDay.label }}&nbsp;
+                {% endfor %}
+				</span>
+            </div>
+        {% EndUIFieldSet %}
+
 		{% UIToolbar ForButton {} %}
 			{% UIButton ForSecondaryAction {sLabel:'UI:Button:Apply'|dict_s, sName:'btn_apply', sId:'btn_apply', bIsSubmit:true} %}
 		{% EndUIToolbar %}

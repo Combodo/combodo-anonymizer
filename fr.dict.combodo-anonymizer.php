@@ -8,6 +8,7 @@
 Dict::Add('FR FR', 'French', 'Français', array(
 	// Dictionary entries go here
 	'combodo-anonymizer/Operation:DisplayConfig/Title' => 'Anonymisation',
+	'combodo-anonymizer/Operation:ApplyConfig/Title' => 'Anonymisation',
 	'Anonymization:AnonymizeAll' => 'Tout anonymiser',
 	'Anonymization:AnonymizeOne' => 'Anonymiser',
 	'Anonymization:OnePersonWarning' => '̊̂Êtes vous sûr(e) de vouloir anonymiser cette Personne ? (ceci ne pourra pas être annulé)',
@@ -24,7 +25,19 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Menu:ConfigAnonymizer' => 'Anonymisation',
 	'Anonymization:AutomationParameters' => 'Anonymisation automatique',
 	'Anonymization:AnonymizationDelay_Input' => 'Anonymiser automatiquement les Personnes obsolètes depuis plus de %1$s jours.',
-	
+
+	'Anonymization:Configuration:TimeRange' => 'Plage d\'exécution autorisée',
+	'Anonymization:Configuration:time' => 'Heure de début (HH:MM)',
+	'Anonymization:Configuration:end_time' => 'Heure de fin (HH:MM)',
+	'Anonymization:Configuration:Weekdays' => 'Jours de la semaine',
+	'Anonymization:Configuration:Weekday:monday' => 'Lundi',
+	'Anonymization:Configuration:Weekday:tuesday' => 'Mardi',
+	'Anonymization:Configuration:Weekday:wednesday' => 'Mercredi',
+	'Anonymization:Configuration:Weekday:thursday' => 'Jeudi',
+	'Anonymization:Configuration:Weekday:friday' => 'Vendredi',
+	'Anonymization:Configuration:Weekday:saturday' => 'Samedi',
+	'Anonymization:Configuration:Weekday:sunday' => 'Dimanche',
+
 	// Default values used during anonymization
 	'Anonymization:Person:name' => 'Contact',
 	'Anonymization:Person:first_name' => 'Anonyme',

@@ -6,7 +6,7 @@
 
 namespace Combodo\iTop\Anonymizer\Helper;
 
-use MetaModel;
+use Config;
 use UserRights;
 use utils;
 
@@ -24,12 +24,13 @@ class AnonymizerHelper
 	}
 
 	/**
+	 * @param \Config $oConfig
+	 *
 	 * @return void
 	 * @throws \ConfigException
 	 */
-	public function SaveItopConfiguration()
+	public function SaveItopConfiguration(Config $oConfig)
 	{
-		$oConfig = MetaModel::GetConfig();
 		$sConfigFile = APPROOT.'conf/'.utils::GetCurrentEnvironment().'/config-itop.php';
 		@chmod($sConfigFile, 0770); // Allow overwriting the file
 		$oConfig->WriteToFile($sConfigFile);
