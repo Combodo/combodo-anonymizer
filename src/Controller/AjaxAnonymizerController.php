@@ -12,6 +12,7 @@ use Combodo\iTop\Application\TwigBase\Controller\Controller;
 use CoreUnexpectedValue;
 use DBSearch;
 use Dict;
+use Exception;
 use utils;
 
 class AjaxAnonymizerController extends Controller
@@ -22,12 +23,17 @@ class AjaxAnonymizerController extends Controller
 		$sId = utils::ReadParam('id');
 		$sClass = utils::ReadParam('class', 'Person');
 
-		$oService = new AnonymizerService();
-		$oService->AnonymizeOneObject($sClass, $sId, true);
+		try {
+			$oService = new AnonymizerService();
+			$oService->AnonymizeOneObject($sClass, $sId, true);
 
-		cmdbAbstractObject::SetSessionMessage($sClass, $sId, 'anonymization', Dict::S('Anonymization:DoneOnePerson'), 'ok', 1);
-		$aParams['sUrl'] = utils::GetAbsoluteUrlAppRoot()."pages/UI.php?operation=details&class=$sClass&id=$sId";
-
+			cmdbAbstractObject::SetSessionMessage($sClass, $sId, 'anonymization', Dict::S('Anonymization:DoneOnePerson'), 'ok', 1);
+			$aParams['sUrl'] = utils::GetAbsoluteUrlAppRoot()."pages/UI.php?operation=details&class=$sClass&id=$sId";
+		}
+		catch (Exception $e) {
+			$aParams['bError'] = true;
+			$aParams['sErrorMessage'] = Dict::S('Anonymization:Error')." - ".$e->getMessage();
+		}
 		$this->DisplayAjaxPage($aParams);
 	}
 
@@ -39,8 +45,14 @@ class AjaxAnonymizerController extends Controller
 			throw new CoreUnexpectedValue('mandatory filter parameter is empty !');
 		}
 
-		$oService = new AnonymizerService();
-		$oService->AnonymizeObjectList(DBSearch::unserialize($sFilter), true);
+		try {
+			$oService = new AnonymizerService();
+			$oService->AnonymizeObjectList(DBSearch::unserialize($sFilter), true);
+		}
+		catch (Exception $e) {
+			$aParams['bError'] = true;
+			$aParams['sErrorMessage'] = Dict::S('Anonymization:Error').' - '.$e->getMessage();
+		}
 
 		$this->DisplayAjaxPage($aParams);
 	}

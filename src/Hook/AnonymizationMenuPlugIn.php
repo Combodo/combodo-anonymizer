@@ -34,9 +34,13 @@ class AnonymizationMenuPlugIn implements iPopupMenuExtension
 				case iPopupMenuExtension::MENU_OBJDETAILS_ACTIONS:
 					/** @var DBObject $param */
 					if ($param instanceof Person) {
-						$oService = new AnonymizerService();
-						if ($oService->IsAllowedToAnonymize(get_class($param), $param->GetKey())) {
-							$aExtraMenus[] = new JSPopupMenuItem('Anonymize', Dict::S('Anonymization:AnonymizeOne'), 'AnonymizeOnePerson('.$param->GetKey().');', [$sJSUrl]);
+						// avoid anonymize myself
+						$oCurrentUser = \UserRights::GetUserObject();
+						if ($oCurrentUser->Get('contactid') != $param->GetKey()) {
+							$oService = new AnonymizerService();
+							if ($oService->IsAllowedToAnonymize(get_class($param), $param->GetKey())) {
+								$aExtraMenus[] = new JSPopupMenuItem('Anonymize', Dict::S('Anonymization:AnonymizeOne'), 'AnonymizeOnePerson('.$param->GetKey().');', [$sJSUrl]);
+							}
 						}
 					}
 					break;

@@ -86,11 +86,17 @@ class AnonymizerService
 	public function AnonymizeObjectList(DBSearch $oSearch, bool $bInteractive = false)
 	{
 		$oSet = new DBObjectSet($oSearch);
+		$oCurrentUser = \UserRights::GetUserObject();
+		$iCurrentContactId = $oCurrentUser->Get('contactid');
 
 		$iCount = 1;
 		CMDBSource::Query('START TRANSACTION');
 		try {
 			while ($oObject = $oSet->Fetch()) {
+				if (get_class($oObject) == 'Person' && $iCurrentContactId == $oObject->GetKey()) {
+					// Skip myself
+					continue;
+				}
 				$this->AddAnonymizationToProcessList(get_class($oObject), $oObject->GetKey());
 				$iCount++;
 				if ($iCount > $this->iMaxChunkSize) {

@@ -146,6 +146,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 						$aSqlUpdate[$sTable] = $sSqlUpdate;
 					}
 					$aAction = [];
+					$aAction['class'] = $sClass;
 					$aAction['search_query'] = $sSqlSearch;
 					$aAction['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sLeafTable);
 					$aAction['apply_queries'] = $aSqlUpdate;
@@ -211,7 +212,7 @@ SQL;
 					$sColumnIdx = array_keys($aSQLColumns)[1]; // We assume that the second column is the index
 					$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInCaseLog;
 					$aColumnsToUpdate[$sTable][$sColumnIdx] = " `$sColumnIdx` = ".$sStartReplaceInIdx."`$sColumnIdx`".$sEndReplaceInIdx.' ';
-				} elseif ($oAttDef instanceof AttributeText || ($oAttDef instanceof AttributeString && !($oAttDef instanceof AttributeFinalClass))) {
+				} elseif ($oAttDef instanceof AttributeString && !($oAttDef instanceof AttributeFinalClass)) {
 					$aSQLColumns = $oAttDef->GetSQLColumns();
 					$sColumn = array_keys($aSQLColumns)[0]; //
 					$aColumnsToUpdate[$sTable][$sColumn] = " `$sColumn` = ".$sStartReplace."`$sColumn`".$sEndReplaceInTxt;

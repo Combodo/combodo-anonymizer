@@ -111,6 +111,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 				"  `body` = ".$sStartReplace."`body`".$sEndReplace." ";
 
 			$aRequest = [];
+			$aRequest['class'] = 'EventNotificationEmail';
 			$aRequest['search_query'] = $sSqlSearch;
 			$aRequest['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sNotificationTable);
 			$aRequest['apply_queries'] = [$sNotificationTable => $sSqlUpdate];

@@ -153,6 +153,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 						}
 
 						$aAction = [];
+						$aAction['class'] = $sClass;
 						$aAction['search_query'] = $sSqlSearch;
 						$aAction['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sTable);
 						$aAction['apply_queries'] = $aSqlUpdate;

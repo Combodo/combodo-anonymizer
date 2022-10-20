@@ -234,6 +234,7 @@ class CleanupService
 			$iMaxId = $oDatabaseService->QueryMaxKey($sKey, $sChangeTable);
 			if ($bFirstUser) {
 				$aRequests['req1'] = [
+					'class'         => 'CMDBChange',
 					'search_key'    => $sKey,
 					'key'           => $sKey,
 					'search_max_id' => $iMaxId,
@@ -241,6 +242,7 @@ class CleanupService
 					'apply_queries' => [$sChangeTable => "UPDATE `$sChangeTable` /*JOIN*/ SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
 				];
 				$aRequests['req2'] = [
+					'class'         => 'CMDBChange',
 					'search_key'    => $sKey,
 					'key'           => $sKey,
 					'search_max_id' => $iMaxId,
@@ -249,6 +251,7 @@ class CleanupService
 				];
 			}
 			$aRequests['req3'] = [
+				'class'         => 'CMDBChange',
 				'search_key'    => $sKey,
 				'key'           => $sKey,
 				'search_max_id' => $iMaxId,
@@ -258,6 +261,7 @@ class CleanupService
 		} elseif ($bFirstUser) {
 			$iMaxId = $oDatabaseService->QueryMaxKey($sKey, $sChangeTable);
 			$aRequests['req1'] = [
+				'class'         => 'CMDBChange',
 				'search_key'    => $sKey,
 				'key'           => $sKey,
 				'search_max_id' => $iMaxId,
@@ -265,6 +269,7 @@ class CleanupService
 				'apply_queries' => [$sChangeTable => "UPDATE `$sChangeTable` /*JOIN*/ SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
 			];
 			$aRequests['req2'] = [
+				'class'         => 'CMDBChange',
 				'search_key'    => $sKey,
 				'key'           => $sKey,
 				'search_max_id' => $iMaxId,
