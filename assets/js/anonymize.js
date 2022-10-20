@@ -12,7 +12,7 @@ function AnonymizeAListOfPersons(sSerializedFilter, iCount)
 		sLabel = sTemplate.replace('%d', iCount);
 	}
 	AnonymizationConfirmDialog(sLabel, function () {
-		const oInProgressModal = $('<h1><img src="../images/indicator.gif" /> '+Dict.S('Anonymization:InProgress')+'</h1>');
+		const oInProgressModal = $('<h1 id="in-progress-modal-message"><img src="../images/indicator.gif" /> '+Dict.S('Anonymization:InProgress')+'</h1>');
 		$('body').append(oInProgressModal);
 		oInProgressModal.dialog({
 			modal: true,
@@ -20,17 +20,29 @@ function AnonymizeAListOfPersons(sSerializedFilter, iCount)
 				oInProgressModal.remove();
 			}
 		});
-		$.post(GetAbsoluteUrlAppRoot()+'/pages/exec.php?exec_module=combodo-anonymizer&exec_page=ajax.php', {operation: 'AnonymizeList', filter: sSerializedFilter}, function (data) {
-			$('body').append(data);
-			oInProgressModal.dialog('close');
+		$.ajax({
+			method: "POST",
+			url: GetAbsoluteUrlAppRoot()+'/pages/exec.php?exec_module=combodo-anonymizer&exec_page=ajax.php',
+			data: {
+				operation: 'AnonymizeList',
+				filter: sSerializedFilter
+			},
+			success: function(data) {
+				$('body').append(data);
+				oInProgressModal.dialog('close');
+			},
+			error: function(jqXHR) {
+				$('#in-progress-modal-message').html(jqXHR.responseText);
+			}
 		});
+
 	});
 }
 
 function AnonymizeOnePerson(iPersonId) {
 	var sLabel = Dict.S('Anonymization:OnePersonWarning');
 	AnonymizationConfirmDialog(sLabel, function () {
-		const oInProgressModal = $('<h1><img src="../images/indicator.gif" /> '+Dict.S('Anonymization:InProgress')+'</h1>');
+		const oInProgressModal = $('<h1 id="in-progress-modal-message"><img src="../images/indicator.gif" /> '+Dict.S('Anonymization:InProgress')+'</h1>');
 		$('body').append(oInProgressModal);
 		oInProgressModal.dialog({
 			modal: true,
@@ -38,9 +50,20 @@ function AnonymizeOnePerson(iPersonId) {
 				oInProgressModal.remove();
 			}
 		});
-		$.post(GetAbsoluteUrlAppRoot()+'/pages/exec.php?exec_module=combodo-anonymizer&exec_page=ajax.php', {operation: 'AnonymizeOne', id: iPersonId}, function (data) {
-			$('body').append(data);
-			oInProgressModal.dialog('close');
+		$.ajax({
+			method: "POST",
+			url: GetAbsoluteUrlAppRoot()+'/pages/exec.php?exec_module=combodo-anonymizer&exec_page=ajax.php',
+			data: {
+				operation: 'AnonymizeOne',
+				id: iPersonId
+			},
+			success: function(data) {
+				$('body').append(data);
+				oInProgressModal.dialog('close');
+			},
+			error: function(jqXHR) {
+				$('#in-progress-modal-message').html(jqXHR.responseText);
+			}
 		});
 	});
 }
