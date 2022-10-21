@@ -52,7 +52,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
 	 */
-	public function InitActionParams()
+	public function InitActionParams(): bool
 	{
 		$oTask = $this->GetTask();
 		$oDatabaseService = new DatabaseService();
@@ -62,10 +62,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 
 		if (sizeof($aCleanupEmail) == 0) {
 			//nothing to do. We can skip the current action
-			$this->Set('action_params', '');
-			$this->DBWrite();
-
-			return;
+			return false;
 		}
 
 		$aContext = json_decode($oTask->Get('anonymization_context'), true);
@@ -122,6 +119,8 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 			$this->Set('action_params', json_encode($aParams));
 			$this->DBWrite();
 		}
+
+		return true;
 	}
 
 

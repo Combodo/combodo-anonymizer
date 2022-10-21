@@ -55,7 +55,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
 	 */
-	public function InitActionParams()
+	public function InitActionParams(): bool
 	{
 		$oTask = $this->GetTask();
 
@@ -77,7 +77,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 
 		if (count($aIdUser) == 0) {
 			//nothing to do
-			return;
+			return false;
 		}
 
 		$iChangeOpId = $aContext['origin']['changeop_id'];
@@ -159,6 +159,8 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		$aParams['aRequests'] = $aRequests;
 		$this->Set('action_params', json_encode($aParams));
 		$this->DBWrite();
+
+		return true;
 	}
 
 	private function GetCaseLogChangeQuery($sClass, &$sKey, $sOrigFriendlyname, $iChangeOpId)

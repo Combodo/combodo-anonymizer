@@ -46,12 +46,14 @@ class ActionPurgePersonHistory extends AnonymizationTaskAction
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
 	 */
-	public function InitActionParams()
+	public function InitActionParams(): bool
 	{
 		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
 
 		$this->Set('action_params', json_encode($aParams));
 		$this->DBWrite();
+
+		return true;
 	}
 
 	/**	 *

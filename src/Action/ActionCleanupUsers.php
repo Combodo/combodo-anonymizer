@@ -54,7 +54,7 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
 	 */
-	public function InitActionParams()
+	public function InitActionParams(): bool
 	{
 		$oTask = $this->GetTask();
 
@@ -68,6 +68,8 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 
 		$this->Set('action_params', json_encode($aParams));
 		$this->DBWrite();
+
+		return true;
 	}
 
 	/**

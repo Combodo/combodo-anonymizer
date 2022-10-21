@@ -24,6 +24,7 @@ class ConfigAnonymizerController extends Controller
 	{
 		$aParams = $this->GetConfigParameters();
 		$aParams['sMessage'] = '';
+		$aParams['sUrl'] = utils::GetAbsoluteUrlExecPage().'?exec_module='.AnonymizerHelper::MODULE_NAME.'&exec_page=config.php';
 
 		$this->AddLinkedScript(utils::GetAbsoluteUrlModulesRoot().AnonymizerHelper::MODULE_NAME.'/assets/js/anonymize.js');
 		$this->DisplayPage($aParams);
@@ -72,15 +73,15 @@ class ConfigAnonymizerController extends Controller
 				$oHelper = new AnonymizerHelper();
 				$oHelper->SaveItopConfiguration($oConfig);
 
-				$aParams['$sMessageType'] = 'ok';
-				$aParams['$sMessage'] = Dict::S('config-saved');
+				$aParams['sMessageType'] = 'ok';
+				$aParams['sMessage'] = Dict::S('config-saved');
 			}
 			catch (Exception $e) {
-				$aParams['$sMessageType'] = 'error';
-				$aParams['$sMessage'] = $e->getMessage();
+				$aParams['sMessageType'] = 'error';
+				$aParams['sMessage'] = $e->getMessage();
 			}
-
 		}
+		$aParams['sUrl'] = utils::GetAbsoluteUrlExecPage().'?exec_module='.AnonymizerHelper::MODULE_NAME.'&exec_page=config.php';
 
 		$this->AddLinkedScript(utils::GetAbsoluteUrlModulesRoot().AnonymizerHelper::MODULE_NAME.'/assets/js/anonymize.js');
 		$this->DisplayPage($aParams, 'DisplayConfig');

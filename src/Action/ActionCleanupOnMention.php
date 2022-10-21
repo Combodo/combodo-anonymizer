@@ -54,7 +54,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 	 * @throws \CoreUnexpectedValue
 	 * @throws \MySQLException
 	 */
-	public function InitActionParams()
+	public function InitActionParams(): bool
 	{
 		$oTask = $this->GetTask();
 		$oDatabaseService = new DatabaseService();
@@ -67,10 +67,8 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 		if (!MetaModel::GetConfig()->IsProperty('mentions.allowed_classes')) {
 			//nothing to do. We can skip the current action
 			AnonymizerLog::Debug("Config mentions.allowed_classes is empty");
-			$this->Set('action_params', '');
-			$this->DBWrite();
 
-			return;
+			return false;
 		}
 		$aMentionsAllowedClasses = (array)MetaModel::GetConfig()->Get('mentions.allowed_classes') ?? [];
 		foreach ($aMentionsAllowedClasses as $sChar => $sClass) {
@@ -81,10 +79,8 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 		if (count($aMentionsAllowedClasses) == 0) {
 			//nothing to do. We can skip the current action
 			AnonymizerLog::Debug('Config mentions.allowed_classes does not contains Person');
-			$this->Set('action_params', '');
-			$this->DBWrite();
 
-			return;
+			return false;
 		}
 
 		$aContext = json_decode($oTask->Get('anonymization_context'), true);
@@ -170,6 +166,8 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 		$aParams['aRequests'] = $aRequests;
 		$this->Set('action_params', json_encode($aParams));
 		$this->DBWrite();
+
+		return true;
 	}
 
 	private function GetColumnsToUpdate($sTargetClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt)

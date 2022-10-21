@@ -9,60 +9,56 @@
 	{% endif %}
 
 	{% if sMessageType == 'error' %}
-		{% set sMessageType = 'ForDanger' %}
+        {% UIAlert ForDanger {sTitle:'', sContent:sMessage, sId:'save_result'} %}{% EndUIAlert %}
 	{% endif %}
 	{% if sMessageType == 'ok' %}
-		{% set sMessageType = 'ForSuccess' %}
+        {% UIAlert ForSuccess {sTitle:'', sContent:sMessage, sId:'save_result'} %}{% EndUIAlert %}
 	{% endif %}
-
-	{% UIAlert ForDanger {sTitle:'', sContent:sMessage, sId:'save_result'} %}{% EndUIAlert %}
-
-{% else %}
-
-	{% UIForm Standard {} %}
-		{% UIInput ForHidden {sName:'operation', sValue:'ApplyConfig'} %}
-		{% UIInput ForHidden {sName:'transaction_id', sValue:sTransactionId} %}
-
-		{% UIFieldSet Standard {sLegend:'Anonymization:AutomationParameters'|dict_s} %}
-			{% if bAnonymizeObsoletePersons and iAnonymizationDelay >= 0 %}
-				{% set sDelay = iAnonymizationDelay %}
-			{% else %}
-				{% set sDelay = '' %}
-			{% endif %}
-			{% set sDelayInput = 'Anonymization:AnonymizationDelay_Input'|dict_format('<input id="anonymization_delay" type="text" size="4" name="anonymization_delay" value="' ~ sDelay ~ '"/>') %}
-			{% if bAnonymizeObsoletePersons and  iAnonymizationDelay >= 0 %}
-				{% set bChecked = '1' %}
-			{% else %}
-				{% set bChecked = '0' %}
-			{% endif %}
-			<div class="ibo-field">
-				<span>
-					<input type="checkbox"{% if bAnonymizeObsoletePersons and  iAnonymizationDelay >= 0 %} checked {% endif %}id="checkbox_anonymize" name=""/>
-					<label for="checkbox_anonymize">{{ sDelayInput|raw }}</label>
-				</span>
-			</div>
-		{% EndUIFieldSet %}
-
-        {% UIFieldSet Standard {sLegend:'Anonymization:Configuration:TimeRange'|dict_s} %}
-            {% for aData in aConfigBackground %}
-                {% UIField Small {sLabel:aData.name} %}
-                    <input id="{{ aData.id }}" type="text" size="{{ aData.size }}" name="{{ aData.id }}" value="{{ aData.value }}"/>
-                {% EndUIField %}
-            {% endfor %}
-            {% UIField Small {sLabel:'Anonymization:Configuration:Weekdays'|dict_s} %}
-            {% EndUIField %}
-            <div class="ibo-field">
-				<span>
-                {% for aWeekDay in aWeekDays %}
-                    <input type="checkbox" {{ aWeekDay.checked }} id="{{ aWeekDay.id }}" name="{{ aWeekDay.id }}"/> {{ aWeekDay.label }}&nbsp;
-                {% endfor %}
-				</span>
-            </div>
-        {% EndUIFieldSet %}
-
-		{% UIToolbar ForButton {} %}
-			{% UIButton ForSecondaryAction {sLabel:'UI:Button:Apply'|dict_s, sName:'btn_apply', sId:'btn_apply', bIsSubmit:true} %}
-		{% EndUIToolbar %}
-	{% EndUIForm %}
-
 {% endif %}
+
+{% UIForm Standard {} %}
+    {% UIInput ForHidden {sName:'operation', sValue:'ApplyConfig'} %}
+    {% UIInput ForHidden {sName:'transaction_id', sValue:sTransactionId} %}
+
+    {% UIFieldSet Standard {sLegend:'Anonymization:AutomationParameters'|dict_s} %}
+        {% if bAnonymizeObsoletePersons and iAnonymizationDelay >= 0 %}
+            {% set sDelay = iAnonymizationDelay %}
+        {% else %}
+            {% set sDelay = '' %}
+        {% endif %}
+        {% set sDelayInput = 'Anonymization:AnonymizationDelay_Input'|dict_format('<input id="anonymization_delay" type="text" size="4" name="anonymization_delay" value="' ~ sDelay ~ '"/>') %}
+        {% if bAnonymizeObsoletePersons and  iAnonymizationDelay >= 0 %}
+            {% set bChecked = '1' %}
+        {% else %}
+            {% set bChecked = '0' %}
+        {% endif %}
+        <div class="ibo-field">
+            <span>
+                <input type="checkbox"{% if bAnonymizeObsoletePersons and  iAnonymizationDelay >= 0 %} checked {% endif %}id="checkbox_anonymize" name=""/>
+                <label for="checkbox_anonymize">{{ sDelayInput|raw }}</label>
+            </span>
+        </div>
+    {% EndUIFieldSet %}
+
+    {% UIFieldSet Standard {sLegend:'Anonymization:Configuration:TimeRange'|dict_s} %}
+        {% for aData in aConfigBackground %}
+            {% UIField Small {sLabel:aData.name} %}
+                <input id="{{ aData.id }}" type="text" size="{{ aData.size }}" name="{{ aData.id }}" value="{{ aData.value }}"/>
+            {% EndUIField %}
+        {% endfor %}
+        {% UIField Small {sLabel:'Anonymization:Configuration:Weekdays'|dict_s} %}
+        {% EndUIField %}
+        <div class="ibo-field">
+            <span>
+            {% for aWeekDay in aWeekDays %}
+                <input type="checkbox" {{ aWeekDay.checked }} id="{{ aWeekDay.id }}" name="{{ aWeekDay.id }}"/> {{ aWeekDay.label }}&nbsp;
+            {% endfor %}
+            </span>
+        </div>
+    {% EndUIFieldSet %}
+
+    {% UIToolbar ForButton {} %}
+        {% UIButton ForSecondaryAction {sLabel:'UI:Button:Cancel'|dict_s, sName:'btn_cancel', sId:'btn_cancel', bIsSubmit:false} %}
+        {% UIButton ForPrimaryAction {sLabel:'UI:Button:Apply'|dict_s, sName:'btn_apply', sId:'btn_apply', bIsSubmit:true} %}
+    {% EndUIToolbar %}
+{% EndUIForm %}

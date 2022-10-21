@@ -91,7 +91,6 @@ function AnonymizationConfirmDialog(sLabel, fnAction)
 
 function AnonymizationDialog(sTitle, sLabel)
 {
-	
 	var sCloseLabel = Dict.S('Anonymization:Close');
 
 	$.unblockUI();
@@ -110,7 +109,7 @@ function AnonymizationDialog(sTitle, sLabel)
 	});
 }
 
-function AnonymizationUpdateFormButtons()
+function AnonymizationUpdateFormInputs()
 {
 	var bAnonymizeChecked = $('#checkbox_anonymize').prop('checked');
 	var bPurgeChecked = $('#checkbox_purge').prop('checked');

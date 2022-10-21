@@ -39,7 +39,7 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 		MetaModel::Init_SetZListItems('standard_search', array('name')); // Criteria of the std search form
 	}
 
-	public function InitActionParams()
+	public function InitActionParams(): bool
 	{
 		$oTask = $this->GetTask();
 		$sClass = $oTask->Get('class_to_anonymize');
@@ -68,6 +68,8 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 
 		$oTask->Set('anonymization_context', json_encode($aContext));
 		$oTask->DBWrite();
+
+		return true;
 	}
 
 	public function ChangeActionParamsOnError(): bool
