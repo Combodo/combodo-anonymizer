@@ -9,6 +9,8 @@
       <time>00:30</time>
       <end_time>05:30</end_time>
       <week_days>monday, tuesday, wednesday, thursday, friday, saturday, sunday</week_days>
+      <max_execution_time>30</max_execution_time>
+      <max_interactive_anonymization_time_in_s>30</max_interactive_anonymization_time_in_s>
       <anonymize_obsolete_persons>false</anonymize_obsolete_persons>
       <obsolete_persons_retention>-1</obsolete_persons_retention>
       <caselog_content type="array">
