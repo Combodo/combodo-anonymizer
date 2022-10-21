@@ -107,8 +107,8 @@ class ActionPurgePersonHistory extends AnonymizationTaskAction
 		}
 		$aParams = json_decode($sParams, true);
 
-		$sClass = $oTask->Get('class_to_anonymize');
-		$sId = $oTask->Get('id_to_anonymize');
+		$sClass = Person::class;
+		$sId = $oTask->Get('person_id');
 
 		$oService = new CleanupService($sClass, $sId, $iEndExecutionTime);
 

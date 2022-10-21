@@ -43,8 +43,8 @@ class ActionEndOfAnonymization extends AnonymizationTaskAction
 		// Cannot continue with the action
 		$oTask = $this->GetTask();
 
-		$sClass = $oTask->Get('class_to_anonymize');
-		$sId = $oTask->Get('id_to_anonymize');
+		$sClass = Person::class;
+		$sId = $oTask->Get('person_id');
 
 		AnonymizerLog::Error("Anonymization ActionEndOfAnonymization of $sClass::$sId Failed");
 		return false;
@@ -62,8 +62,8 @@ class ActionEndOfAnonymization extends AnonymizationTaskAction
 	public function ExecuteAction($iEndExecutionTime): bool
 	{
 		$oTask = $this->GetTask();
-		$sClass = $oTask->Get('class_to_anonymize');
-		$sId = $oTask->Get('id_to_anonymize');
+		$sClass = Person::class;
+		$sId = $oTask->Get('person_id');
 
 		$oObject = MetaModel::GetObject($sClass, $sId);
 		$oObject->Set('anonymized', true);

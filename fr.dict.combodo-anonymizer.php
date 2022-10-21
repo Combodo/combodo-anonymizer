@@ -23,6 +23,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Anonymization:Close' => 'Fermer',
 	'Anonymization:Configuration' => 'Configuration',
 	'Menu:ConfigAnonymizer' => 'Anonymisation',
+	'Menu:AnonymizationTask' => 'Tâches d\'anonymisation',
+	'Menu:AnonymizationTask+' => 'Tâches d\'anonymisation',
 	'Anonymization:AutomationParameters' => 'Anonymisation automatique',
 	'Anonymization:AnonymizationDelay_Input' => 'Anonymiser automatiquement les Personnes obsolètes depuis plus de %1$s jours.',
 
@@ -67,7 +69,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 //
 
 Dict::Add('FR FR', 'French', 'Français', array(
-	'Class:AnonymizationTask' => 'AnonymizationTask~~',
+	'Class:AnonymizationTask' => 'Anonymization Task~~',
 	'Class:AnonymizationTask+' => '~~',
 	'Class:AnonymizationTask/Attribute:class_to_anonymize' => 'Class to anonymize~~',
 	'Class:AnonymizationTask/Attribute:class_to_anonymize+' => '~~',

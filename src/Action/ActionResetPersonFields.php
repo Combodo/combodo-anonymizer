@@ -42,8 +42,8 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 	public function InitActionParams(): bool
 	{
 		$oTask = $this->GetTask();
-		$sClass = $oTask->Get('class_to_anonymize');
-		$sId = $oTask->Get('id_to_anonymize');
+		$sClass = Person::class;
+		$sId = $oTask->Get('person_id');
 
 		$oObject = MetaModel::GetObject($sClass, $sId);
 		$aContext = [
@@ -77,8 +77,8 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 		// Cannot continue with the action
 		$oTask = $this->GetTask();
 
-		$sClass = $oTask->Get('class_to_anonymize');
-		$sId = $oTask->Get('id_to_anonymize');
+		$sClass = Person::class;
+		$sId = $oTask->Get('person_id');
 
 		AnonymizerLog::Error("Anonymization ActionResetPersonFields of $sClass::$sId Failed");
 		return false;
@@ -96,9 +96,8 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 	public function ExecuteAction($iEndExecutionTime): bool
 	{
 		$oTask = $this->GetTask();
-
-		$sClass = $oTask->Get('class_to_anonymize');
-		$sId = $oTask->Get('id_to_anonymize');
+		$sClass = Person::class;
+		$sId = $oTask->Get('person_id');
 		AnonymizerLog::Info(">>> Anonymization of $sClass::$sId started");
 
 		$oService = new CleanupService($sClass, $sId, $iEndExecutionTime);

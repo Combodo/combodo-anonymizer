@@ -6,6 +6,7 @@
 
 namespace Combodo\iTop\Anonymizer\Service;
 
+use AnonymizationTask;
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
@@ -19,7 +20,6 @@ use UserRights;
 
 class AnonymizerService
 {
-	const ANONYMIZATION_TASK = 'AnonymizationTask';
 	/** @var int */
 	private $iProcessEndTime;
 	/** @var int */
@@ -134,10 +134,9 @@ class AnonymizerService
 
 			return;
 		}
-		$oTask = MetaModel::NewObject(self::ANONYMIZATION_TASK);
+		$oTask = MetaModel::NewObject(AnonymizationTask::class);
 		$oTask->Set('name', 'Anonymizer');
-		$oTask->Set('class_to_anonymize', $sClass);
-		$oTask->Set('id_to_anonymize', $sId);
+		$oTask->Set('person_id', $sId);
 		$oTask->DBInsert();
 	}
 
@@ -156,7 +155,7 @@ class AnonymizerService
 		$oComplexService = new BackgroundTaskExService();
 		$oComplexService->SetProcessEndTime($this->iProcessEndTime);
 
-		$oComplexService->ProcessTasks(self::ANONYMIZATION_TASK, $sMessage);
+		$oComplexService->ProcessTasks(AnonymizationTask::class, $sMessage);
 	}
 
 	/**
@@ -171,7 +170,7 @@ class AnonymizerService
 	 */
 	public function ProcessBackgroundAnonymization(&$sMessage): bool
 	{
-		$oSet = new DBObjectSet(new DBObjectSearch(self::ANONYMIZATION_TASK));
+		$oSet = new DBObjectSet(new DBObjectSearch(AnonymizationTask::class));
 		if ($oSet->Count() == 0) {
 			// Gather cleanup rules
 			$this->GatherAnonymizationTasks();
@@ -179,7 +178,7 @@ class AnonymizerService
 		$oComplexService = new BackgroundTaskExService();
 		$oComplexService->SetProcessEndTime($this->iProcessEndTime);
 
-		return $oComplexService->ProcessTasks(self::ANONYMIZATION_TASK, $sMessage);
+		return $oComplexService->ProcessTasks(AnonymizationTask::class, $sMessage);
 	}
 
 	private function GatherAnonymizationTasks()

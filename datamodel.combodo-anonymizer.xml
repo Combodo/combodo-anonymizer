@@ -58,26 +58,13 @@
         <category/>
         <abstract>false</abstract>
         <db_table>priv_anonymization_task</db_table>
-        <naming>
-          <format>%1$s %2$s</format>
-          <attributes>
-            <attribute id="class_to_anonymize"/>
-            <attribute id="id_to_anonymize"/>
-          </attributes>
-        </naming>
       </properties>
       <fields>
-        <field id="class_to_anonymize" xsi:type="AttributeString">
-          <sql>class_to_anonymize</sql>
-          <default_value/>
+        <field id="person_id" xsi:type="AttributeExternalKey">
+          <sql>person_id</sql>
+          <target_class>Person</target_class>
           <is_null_allowed>false</is_null_allowed>
-          <tracking_level>none</tracking_level>
-        </field>
-        <field id="id_to_anonymize" xsi:type="AttributeInteger">
-          <sql>id_to_anonymize</sql>
-          <default_value/>
-          <is_null_allowed>false</is_null_allowed>
-          <tracking_level>none</tracking_level>
+          <on_target_delete>DEL_AUTO</on_target_delete>
         </field>
         <field id="anonymization_context" xsi:type="AttributeText">
           <sql>anonymization_context</sql>
@@ -115,11 +102,8 @@
       <presentation>
         <list>
           <items>
-            <item id="class_to_anonymize">
+            <item id="person_id">
               <rank>10</rank>
-            </item>
-            <item id="id_to_anonymize">
-              <rank>20</rank>
             </item>
             <item id="status">
               <rank>60</rank>
@@ -185,7 +169,7 @@
           <code><![CDATA[
         public function DisplayBareHeader(WebPage $oPage, $bEditMode = false)
         {
-         $oSet = new DBObjectSet(DBSearch::FromOQL("SELECT AnonymizationTask WHERE class_to_anonymize='Person' AND id_to_anonymize=:id"), [], ["id" => $this->GetKey()]);
+         $oSet = new DBObjectSet(DBSearch::FromOQL("SELECT AnonymizationTask WHERE person_id=:id"), [], ["id" => $this->GetKey()]);
           if ($oSet->Count() > 0) {
             $sMessage = Dict::S('Anonymization:InProgress');
             $this::SetSessionMessage(get_class($this), $this->GetKey(), 1, $sMessage, 'info', 1);

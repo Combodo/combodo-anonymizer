@@ -17,8 +17,6 @@ use Combodo\iTop\BackgroundTaskEx\Service\DatabaseService;
  */
 class ActionCleanupUsers extends AnonymizationTaskAction
 {
-	const USER_CLASS = 'User';
-
 	/**
 	 * @throws \CoreException
 	 */
@@ -60,7 +58,7 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 
 		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
 
-		$sId = $oTask->Get('id_to_anonymize');
+		$sId = $oTask->Get('person_id');
 		$oService = new AnonymizerService();
 		$aParams['aUserIds'] = $oService->GetUserIdListFromContact($sId);
 		$aParams['sCurrentUserId'] = reset($aParams['aUserIds']);
@@ -135,7 +133,7 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 
 		while ($iUserId !== false) {
 			/** @var \User $oUser */
-			$sUserClass = self::USER_CLASS;
+			$sUserClass = User::class;
 			$oUser = MetaModel::GetObject($sUserClass, $iUserId);
 			AnonymizerLog::Debug("Anonymize User ".$oUser->Get('login'));
 			$oService = new CleanupService(get_class($oUser), $iUserId, $iEndExecutionTime);

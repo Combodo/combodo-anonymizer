@@ -15,8 +15,6 @@ use Combodo\iTop\BackgroundTaskEx\Service\DatabaseService;
  */
 class ActionCleanupCaseLogs extends AnonymizationTaskAction
 {
-	const USER_CLASS = 'User';
-
 	/**
 	 * @throws \CoreException
 	 */
@@ -65,13 +63,13 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		$aRequests = [];
 
 		$aContext = json_decode($oTask->Get('anonymization_context'), true);
-		$sId = $oTask->Get('id_to_anonymize');
+		$sId = $oTask->Get('person_id');
 
-		$oSearch = new DBObjectSearch(self::USER_CLASS);
+		$oSearch = new DBObjectSearch(User::class);
 		$oSearch->AddCondition('contactid', $sId);
 		$oSearch->AllowAllData();
 		$oSet = new DBObjectSet($oSearch);
-		$oSet->OptimizeColumnLoad(array(self::USER_CLASS => array('finalclass')));
+		$oSet->OptimizeColumnLoad(array(User::class => array('finalclass')));
 		$aIdWithClass = $oSet->GetColumnAsArray('finalclass');
 		$aIdUser = array_keys($aIdWithClass);
 

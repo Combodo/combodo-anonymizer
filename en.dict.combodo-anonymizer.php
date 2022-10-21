@@ -24,6 +24,8 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Anonymization:Close' => 'Close',
 	'Anonymization:Configuration' => 'Configuration',
 	'Menu:ConfigAnonymizer' => 'Anonymization',
+	'Menu:AnonymizationTask' => 'Anonymization tasks',
+	'Menu:AnonymizationTask+' => 'Anonymization tasks',
 	'Anonymization:AutomationParameters' => 'Automatic anonymization',
 	'Anonymization:AnonymizationDelay_Input' => 'Automatically anonymize Persons which are obsolete since more than %1$s days.',
 

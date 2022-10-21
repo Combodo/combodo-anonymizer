@@ -43,8 +43,8 @@ class ActionAnonymizePerson extends AnonymizationTaskAction
 		// Cannot continue with the action
 		$oTask = $this->GetTask();
 
-		$sClass = $oTask->Get('class_to_anonymize');
-		$sId = $oTask->Get('id_to_anonymize');
+		$sClass = Person::class;
+		$sId = $oTask->Get('person_id');
 
 		AnonymizerLog::Error("Anonymization ActionAnonymizePerson of $sClass::$sId Failed");
 		return false;
@@ -56,8 +56,8 @@ class ActionAnonymizePerson extends AnonymizationTaskAction
 	public function ExecuteAction($iEndExecutionTime): bool
 	{
 		$oTask = $this->GetTask();
-		$sClass = $oTask->Get('class_to_anonymize');
-		$sId = $oTask->Get('id_to_anonymize');
+		$sClass = Person::class;
+		$sId = $oTask->Get('person_id');
 		$oCleanupService = new CleanupService($sClass, $sId, $iEndExecutionTime);
 		/** @var \Person $oPerson */
 		$oPerson = MetaModel::GetObject($sClass, $sId);

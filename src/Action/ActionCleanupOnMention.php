@@ -92,7 +92,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 
 		$aMentionSearches = [];
 		foreach ($aMentionsAllowedClasses as $sMentionClass) {
-			$aMentionSearches[] = 'class='.$sMentionClass.'&amp;id='.$oTask->Get('id_to_anonymize')."\">@";
+			$aMentionSearches[] = 'class='.$sMentionClass.'&amp;id='.$oTask->Get('person_id')."\">@";
 		}
 
 		$aRequests = [];
