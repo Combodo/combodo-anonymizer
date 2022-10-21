@@ -51,8 +51,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 //
 
 Dict::Add('FR FR', 'French', 'Français', array(
-	'Class:Person/Attribute:anonymized' => 'Anonymisé(e)~~',
-	'Class:Person/Attribute:anonymized+' => '~~',
+	'Class:Person/Attribute:anonymized' => 'Anonymisé(e)',
+	'Class:Person/Attribute:anonymized+' => '',
 ));
 
 //
@@ -65,27 +65,25 @@ Dict::Add('FR FR', 'French', 'Français', array(
 ));
 
 //
-// Class: AnonymizationTask
-//
-
-Dict::Add('FR FR', 'French', 'Français', array(
-	'Class:AnonymizationTask' => 'Anonymization Task~~',
-	'Class:AnonymizationTask+' => '~~',
-	'Class:AnonymizationTask/Attribute:class_to_anonymize' => 'Class to anonymize~~',
-	'Class:AnonymizationTask/Attribute:class_to_anonymize+' => '~~',
-	'Class:AnonymizationTask/Attribute:id_to_anonymize' => 'Id to anonymize~~',
-	'Class:AnonymizationTask/Attribute:id_to_anonymize+' => '~~',
-	'Class:AnonymizationTask/Attribute:anonymization_context' => 'Anonymization context~~',
-	'Class:AnonymizationTask/Attribute:anonymization_context+' => '~~',
-));
-
-//
 // Class: AnonymizationTaskAction
 //
 
 Dict::Add('FR FR', 'French', 'Français', array(
-	'Class:AnonymizationTaskAction' => 'AnonymizationTaskAction~~',
-	'Class:AnonymizationTaskAction+' => '~~',
-	'Class:AnonymizationTaskAction/Attribute:action_params' => 'Action params~~',
-	'Class:AnonymizationTaskAction/Attribute:action_params+' => '~~',
+	'Class:AnonymizationTaskAction' => 'Action d\'anonymisation',
+	'Class:AnonymizationTaskAction+' => '',
+	'Class:AnonymizationTaskAction/Attribute:action_params' => 'Paramètres',
+	'Class:AnonymizationTaskAction/Attribute:action_params+' => '',
+));
+
+//
+// Class: AnonymizationTask
+//
+
+Dict::Add('FR FR', 'French', 'Français', array(
+	'Class:AnonymizationTask' => 'Tâche d\'anonymisation',
+	'Class:AnonymizationTask+' => '',
+	'Class:AnonymizationTask/Attribute:person_id' => 'Personne',
+	'Class:AnonymizationTask/Attribute:person_id+' => 'Personne à anonymiser',
+	'Class:AnonymizationTask/Attribute:anonymization_context' => 'Contexte',
+	'Class:AnonymizationTask/Attribute:anonymization_context+' => '',
 ));

@@ -24,6 +24,8 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'Anonymization:Close' => 'Schließen',
 	'Anonymization:Configuration' => 'Konfiguration',
 	'Menu:ConfigAnonymizer' => 'Anonymisierung',
+	'Menu:AnonymizationTask' => 'Anonymization tasks~~',
+	'Menu:AnonymizationTask+' => 'Anonymization tasks~~',
 	'Anonymization:AutomationParameters' => 'Automatische Anonymisierung',
 	'Anonymization:AnonymizationDelay_Input' => 'Automatisch Personen anonymisieren, die obsolet sind seit %1$s Tagen.',
 
@@ -64,21 +66,6 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 ));
 
 //
-// Class: AnonymizationTask
-//
-
-Dict::Add('DE DE', 'German', 'Deutsch', array(
-	'Class:AnonymizationTask' => 'AnonymizationTask~~',
-	'Class:AnonymizationTask+' => '~~',
-	'Class:AnonymizationTask/Attribute:class_to_anonymize' => 'Class to anonymize~~',
-	'Class:AnonymizationTask/Attribute:class_to_anonymize+' => '~~',
-	'Class:AnonymizationTask/Attribute:id_to_anonymize' => 'Id to anonymize~~',
-	'Class:AnonymizationTask/Attribute:id_to_anonymize+' => '~~',
-	'Class:AnonymizationTask/Attribute:anonymization_context' => 'Anonymization context~~',
-	'Class:AnonymizationTask/Attribute:anonymization_context+' => '~~',
-));
-
-//
 // Class: AnonymizationTaskAction
 //
 
@@ -89,8 +76,25 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'Class:AnonymizationTaskAction/Attribute:action_params+' => '~~',
 ));
 
+//
+// Class: AnonymizationTask
+//
+
+Dict::Add('DE DE', 'German', 'Deutsch', array(
+	'Class:AnonymizationTask' => 'AnonymizationTask~~',
+	'Class:AnonymizationTask+' => '~~',
+	'Class:AnonymizationTask/Attribute:person_id' => 'Person id~~',
+	'Class:AnonymizationTask/Attribute:person_id+' => '~~',
+	'Class:AnonymizationTask/Attribute:anonymization_context' => 'Anonymization context~~',
+	'Class:AnonymizationTask/Attribute:anonymization_context+' => '~~',
+));
+
 // Additional language entries not present in English dict
 Dict::Add('DE DE', 'German', 'Deutsch', array(
+ 'Class:AnonymizationTask/Attribute:class_to_anonymize' => 'Class to anonymize~~',
+ 'Class:AnonymizationTask/Attribute:class_to_anonymize+' => '~~',
+ 'Class:AnonymizationTask/Attribute:id_to_anonymize' => 'Id to anonymize~~',
+ 'Class:AnonymizationTask/Attribute:id_to_anonymize+' => '~~',
  'Anonymization:NotificationsPurgeParameters' => 'Automatische Löschen von Benachrichtigungen',
  'Anonymization:PurgeDelay_Input' => 'Automatisch Benachrichtigungen entfernen, die vor mehr als %1$s Tagen gesendet wurden.',
 ));

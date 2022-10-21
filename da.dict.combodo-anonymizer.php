@@ -23,6 +23,8 @@ Dict::Add('DA DA', 'Danish', 'Dansk', array(
 	'Anonymization:Close' => 'Close~~',
 	'Anonymization:Configuration' => 'Configuration~~',
 	'Menu:ConfigAnonymizer' => 'Anonymization~~',
+	'Menu:AnonymizationTask' => 'Anonymization tasks~~',
+	'Menu:AnonymizationTask+' => 'Anonymization tasks~~',
 	'Anonymization:AutomationParameters' => 'Automatic anonymization~~',
 	'Anonymization:AnonymizationDelay_Input' => 'Automatically anonymize Persons which are obsolete since more than %1$s days.~~',
 
@@ -63,21 +65,6 @@ Dict::Add('DA DA', 'Danish', 'Dansk', array(
 ));
 
 //
-// Class: AnonymizationTask
-//
-
-Dict::Add('DA DA', 'Danish', 'Dansk', array(
-	'Class:AnonymizationTask' => 'AnonymizationTask~~',
-	'Class:AnonymizationTask+' => '~~',
-	'Class:AnonymizationTask/Attribute:class_to_anonymize' => 'Class to anonymize~~',
-	'Class:AnonymizationTask/Attribute:class_to_anonymize+' => '~~',
-	'Class:AnonymizationTask/Attribute:id_to_anonymize' => 'Id to anonymize~~',
-	'Class:AnonymizationTask/Attribute:id_to_anonymize+' => '~~',
-	'Class:AnonymizationTask/Attribute:anonymization_context' => 'Anonymization context~~',
-	'Class:AnonymizationTask/Attribute:anonymization_context+' => '~~',
-));
-
-//
 // Class: AnonymizationTaskAction
 //
 
@@ -88,8 +75,25 @@ Dict::Add('DA DA', 'Danish', 'Dansk', array(
 	'Class:AnonymizationTaskAction/Attribute:action_params+' => '~~',
 ));
 
+//
+// Class: AnonymizationTask
+//
+
+Dict::Add('DA DA', 'Danish', 'Dansk', array(
+	'Class:AnonymizationTask' => 'AnonymizationTask~~',
+	'Class:AnonymizationTask+' => '~~',
+	'Class:AnonymizationTask/Attribute:person_id' => 'Person id~~',
+	'Class:AnonymizationTask/Attribute:person_id+' => '~~',
+	'Class:AnonymizationTask/Attribute:anonymization_context' => 'Anonymization context~~',
+	'Class:AnonymizationTask/Attribute:anonymization_context+' => '~~',
+));
+
 // Additional language entries not present in English dict
 Dict::Add('DA DA', 'Danish', 'Dansk', array(
+ 'Class:AnonymizationTask/Attribute:class_to_anonymize' => 'Class to anonymize~~',
+ 'Class:AnonymizationTask/Attribute:class_to_anonymize+' => '~~',
+ 'Class:AnonymizationTask/Attribute:id_to_anonymize' => 'Id to anonymize~~',
+ 'Class:AnonymizationTask/Attribute:id_to_anonymize+' => '~~',
  'Anonymization:NotificationsPurgeParameters' => 'Automatic purge of notifications~~',
  'Anonymization:PurgeDelay_Input' => 'Automatically delete all notifications emitted since more than %1$s days.~~',
 ));
