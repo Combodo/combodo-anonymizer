@@ -67,6 +67,7 @@ class ActionEndOfAnonymization extends AnonymizationTaskAction
 
 		$oObject = MetaModel::GetObject($sClass, $sId);
 		$oObject->Set('anonymized', true);
+		$oObject->AllowWrite();
 		$oObject->DBWrite();
 		$oObject->Reload();
 		AnonymizerLog::Info("<<< Anonymization of $sClass::$sId ended  ");
