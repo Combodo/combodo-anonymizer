@@ -6,7 +6,6 @@
 
 namespace Combodo\iTop\Anonymizer\Service;
 
-use AnonymizationTask;
 use CMDBSource;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
@@ -243,11 +242,6 @@ class AnonymizerService
 		$aFields['email'] = str_replace(' ', '', vsprintf($sTemplate, [$sId]));
 
 		return $aFields;
-	}
-
-	public function GetTaskSet()
-	{
-		return new DBObjectSet(new DBObjectSearch(AnonymizationTask::class));
 	}
 
 	protected function IsTimeoutReached()

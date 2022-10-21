@@ -7,7 +7,6 @@
 namespace Combodo\iTop\Anonymizer\Controller;
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerHelper;
-use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 use Combodo\iTop\Application\TwigBase\Controller\Controller;
 use Combodo\iTop\BackgroundTaskEx\Service\TimeRangeWeeklyScheduledService;
 use Dict;
@@ -26,8 +25,6 @@ class ConfigAnonymizerController extends Controller
 		$aParams = $this->GetConfigParameters();
 		$aParams['sMessage'] = '';
 		$aParams['sUrl'] = utils::GetAbsoluteUrlExecPage().'?exec_module='.AnonymizerHelper::MODULE_NAME.'&exec_page=config.php';
-		$oAnonymizerService = new AnonymizerService();
-		$aParams['oAnonymizationTaskSet'] = $oAnonymizerService->GetTaskSet();
 
 		$this->AddLinkedScript(utils::GetAbsoluteUrlModulesRoot().AnonymizerHelper::MODULE_NAME.'/assets/js/anonymize.js');
 		$this->DisplayPage($aParams);
@@ -85,8 +82,6 @@ class ConfigAnonymizerController extends Controller
 			}
 		}
 		$aParams['sUrl'] = utils::GetAbsoluteUrlExecPage().'?exec_module='.AnonymizerHelper::MODULE_NAME.'&exec_page=config.php';
-		$oAnonymizerService = new AnonymizerService();
-		$aParams['oAnonymizationTaskSet'] = $oAnonymizerService->GetTaskSet();
 
 		$this->AddLinkedScript(utils::GetAbsoluteUrlModulesRoot().AnonymizerHelper::MODULE_NAME.'/assets/js/anonymize.js');
 		$this->DisplayPage($aParams, 'DisplayConfig');
