@@ -24,7 +24,7 @@ class ActionAnonymizePerson extends AnonymizationTaskAction
 			'name_attcode'        => 'name',
 			'state_attcode'       => '',
 			'reconc_keys'         => array('name'),
-			'db_table'            => 'priv_anon_action_anonymize_person',
+			'db_table'            => 'priv_anonym_action_anonymize_person',
 			'db_key_field'        => 'id',
 			'db_finalclass_field' => '',
 			'display_template'    => '',

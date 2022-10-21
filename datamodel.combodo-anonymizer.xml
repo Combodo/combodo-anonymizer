@@ -132,7 +132,7 @@
       <parent>BackgroundTaskExAction</parent>
       <properties>
         <abstract>false</abstract>
-        <db_table>priv_anon_action</db_table>
+        <db_table>priv_anonym_action</db_table>
         <category/>
       </properties>
       <fields>
@@ -208,6 +208,7 @@
           <class id="RessourceAnonymization"/>
           <class id="BackgroundTaskEx"/>
           <class id="BackgroundTaskExAction"/>
+          <class id="Person"/>
         </classes>
       </group>
       <group id="RessourcePersonGroup">
