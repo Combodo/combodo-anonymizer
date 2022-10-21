@@ -227,6 +227,10 @@ class CleanupService
 		$sOrigFriendlyname = $aContext['origin']['friendlyname'];
 		$sTargetFriendlyname = $aContext['anonymized']['friendlyname'];
 
+		if (trim($sOrigFriendlyname) === ''){
+			return [];
+		}
+
 		$aRequests = [];
 		$oDatabaseService = new DatabaseService();
 

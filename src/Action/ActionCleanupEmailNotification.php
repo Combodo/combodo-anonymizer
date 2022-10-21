@@ -72,13 +72,13 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 		$sOrigEmail = $aContext['origin']['email'];
 		$sTargetEmail = $aContext['anonymized']['email'];
 
-		if ($sOrigEmail != '') {
+		if ($sOrigEmail !== '') {
 			$sStartReplace = "";
 			$sEndReplace = "";
 			$sStartReplaceEmail = "";
 			$sEndReplaceEmail = "";
 
-			if (in_array('friendlyname', $aCleanupEmail)) {
+			if (in_array('friendlyname', $aCleanupEmail) && ($sOrigFriendlyname !== '')) {
 				$sStartReplace = "REPLACE(";
 				$sEndReplace = $sEndReplace.", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sTargetFriendlyname).")";
 			}
@@ -160,6 +160,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 	public function ExecuteAction($iEndExecutionTime): bool
 	{
 		try {
+
 			return $this->ExecuteQueries($iEndExecutionTime);
 		}
 		catch (MySQLHasGoneAwayException $e) {
@@ -191,7 +192,6 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 		if ($this->Get('action_params') == '') {
 			return true;
 		}
-
 		$oDatabaseService = new DatabaseService();
 		$aParams = json_decode($this->Get('action_params'), true);
 		$aRequest = $aParams['aRequest'];

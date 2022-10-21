@@ -154,6 +154,11 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 			// Get all the request set to execute for every user
 			$aRequests = $oService->GetCleanupChangesRequests($aContext, $aParams['first_user']);
 
+			if (count($aRequests) === 0) {
+				AnonymizerLog::Debug("Unable to clean change requests.");
+				return true;
+			}
+
 			foreach ($aRequests as $sName => $aRequest) {
 				$iProgress = $aParams['aChangesProgress'][$sName] ?? 0;
 				$bCompleted = ($iProgress == -1);

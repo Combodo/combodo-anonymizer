@@ -86,25 +86,27 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		$sStartReplaceInIdx = "REPLACE(";
 		$sEndReplaceInIdx = ", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sReplaceInIdx).")";
 
-		if (in_array('friendlyname', $aCleanupCaseLog)) {
-			$sReplace = str_repeat('*', strlen($sOrigFriendlyname));;
-			$sStartReplace = "REPLACE(";
-			$sEndReplaceInCaseLog = ", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sReplace).")";
-			$sEndReplaceInTxt = ", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sTargetFriendlyname).")";
-		} else {
-			$sStartReplace = '';
-			$sEndReplaceInCaseLog = '';
-			foreach ($aIdUser as $sIdUser) {
-				$sSearch = sprintf($sPattern, $sOrigFriendlyname, $sIdUser);
-				$sReplace = sprintf($sPattern, str_repeat('*', strlen($sOrigFriendlyname)), $sIdUser);
+		if ($sOrigFriendlyname !== '') {
+			if (in_array('friendlyname', $aCleanupCaseLog)) {
+				$sReplace = str_repeat('*', strlen($sOrigFriendlyname));;
+				$sStartReplace = "REPLACE(";
+				$sEndReplaceInCaseLog = ", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sReplace).")";
+				$sEndReplaceInTxt = ", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sTargetFriendlyname).")";
+			} else {
+				$sStartReplace = '';
+				$sEndReplaceInCaseLog = '';
+				foreach ($aIdUser as $sIdUser) {
+					$sSearch = sprintf($sPattern, $sOrigFriendlyname, $sIdUser);
+					$sReplace = sprintf($sPattern, str_repeat('*', strlen($sOrigFriendlyname)), $sIdUser);
 
-				$sStartReplace = "REPLACE(".$sStartReplace;
-				$sEndReplaceInCaseLog = $sEndReplaceInCaseLog.", ".CMDBSource::Quote($sSearch).", ".CMDBSource::Quote($sReplace).")";
+					$sStartReplace = "REPLACE(".$sStartReplace;
+					$sEndReplaceInCaseLog = $sEndReplaceInCaseLog.", ".CMDBSource::Quote($sSearch).", ".CMDBSource::Quote($sReplace).")";
+				}
+				$sEndReplaceInTxt = ', '.CMDBSource::Quote($sOrigFriendlyname).', '.CMDBSource::Quote($sTargetFriendlyname).')';
 			}
-			$sEndReplaceInTxt = ', '.CMDBSource::Quote($sOrigFriendlyname).', '.CMDBSource::Quote($sTargetFriendlyname).')';
 		}
 
-		if ($sOrigEmail != '' && in_array('email', $aCleanupCaseLog)) {
+		if ($sOrigEmail !== '' && in_array('email', $aCleanupCaseLog)) {
 			$sReplace = str_repeat('*', strlen($sOrigEmail));
 
 			$sStartReplace = "REPLACE(".$sStartReplace;

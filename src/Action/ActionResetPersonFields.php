@@ -48,8 +48,8 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 		$oObject = MetaModel::GetObject($sClass, $sId);
 		$aContext = [
 			'origin' => [
-				'friendlyname' => $oObject->Get('friendlyname'),
-				'email'        => $oObject->Get('email'),
+				'friendlyname' => trim($oObject->Get('friendlyname')),
+				'email'        => trim($oObject->Get('email')),
 			],
 		];
 

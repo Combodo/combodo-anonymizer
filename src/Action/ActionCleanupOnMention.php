@@ -87,6 +87,12 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 		$sOrigFriendlyname = $aContext['origin']['friendlyname'];
 		$sTargetFriendlyname = $aContext['anonymized']['friendlyname'];
 
+		if ($sOrigFriendlyname === '' ) {
+			//nothing to do. We can skip the current action
+			AnonymizerLog::Debug('Friendlyname is empty');
+			return false;
+		}
+
 		$sOrigEmail = $aContext['origin']['email'];
 		$sTargetEmail = $aContext['anonymized']['email'];
 
