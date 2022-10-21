@@ -62,3 +62,6 @@
         {% UIButton ForPrimaryAction {sLabel:'UI:Button:Apply'|dict_s, sName:'btn_apply', sId:'btn_apply', bIsSubmit:true} %}
     {% EndUIToolbar %}
 {% EndUIForm %}
+
+{% UITitle Neutral {sTitle:'', iLevel:value, sId:'value'} %}{% EndUITitle %}
+{% UIDataTable ForRenderingObject {sListId:'tasks', oSet:oAnonymizationTaskSet} %}{% EndUIDataTable %}
