@@ -75,11 +75,6 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		$aIdWithClass = $oSet->GetColumnAsArray('finalclass');
 		$aIdUser = array_keys($aIdWithClass);
 
-		if (count($aIdUser) == 0) {
-			//nothing to do
-			return false;
-		}
-
 		$iChangeOpId = $aContext['origin']['changeop_id'];
 		$sOrigFriendlyname = $aContext['origin']['friendlyname'];
 		$sTargetFriendlyname = $aContext['anonymized']['friendlyname'];
@@ -101,15 +96,14 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		} else {
 			$sStartReplace = '';
 			$sEndReplaceInCaseLog = '';
-			$sEndReplaceInTxt = "";
 			foreach ($aIdUser as $sIdUser) {
 				$sSearch = sprintf($sPattern, $sOrigFriendlyname, $sIdUser);
 				$sReplace = sprintf($sPattern, str_repeat('*', strlen($sOrigFriendlyname)), $sIdUser);
 
 				$sStartReplace = "REPLACE(".$sStartReplace;
 				$sEndReplaceInCaseLog = $sEndReplaceInCaseLog.", ".CMDBSource::Quote($sSearch).", ".CMDBSource::Quote($sReplace).")";
-				$sEndReplaceInTxt = ", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sTargetFriendlyname).")";
 			}
+			$sEndReplaceInTxt = ', '.CMDBSource::Quote($sOrigFriendlyname).', '.CMDBSource::Quote($sTargetFriendlyname).')';
 		}
 
 		if ($sOrigEmail != '' && in_array('email', $aCleanupCaseLog)) {

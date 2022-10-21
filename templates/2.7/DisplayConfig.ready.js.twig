@@ -8,4 +8,5 @@ $("#checkbox_anonymize, #checkbox_purge").on("click", function () {
 
 $("#btn_cancel").on("click", function() {
     window.location.href='{{ sUrl|raw }}';
+    return false;
 });
