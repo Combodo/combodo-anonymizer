@@ -134,7 +134,7 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 		while ($iUserId !== false) {
 			/** @var \User $oUser */
 			$sUserClass = User::class;
-			$oUser = MetaModel::GetObject($sUserClass, $iUserId);
+			$oUser = MetaModel::GetObject($sUserClass, $iUserId, false, true);
 			AnonymizerLog::Debug("Anonymize User ".$oUser->Get('login'));
 			$oService = new CleanupService(get_class($oUser), $iUserId, $iEndExecutionTime);
 			$oDatabaseService = new DatabaseService();

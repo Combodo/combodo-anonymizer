@@ -205,7 +205,6 @@
           <class id="RessourceAnonymization"/>
           <class id="BackgroundTaskEx"/>
           <class id="BackgroundTaskExAction"/>
-          <class id="Person"/>
         </classes>
       </group>
       <group id="RessourcePersonGroup">
