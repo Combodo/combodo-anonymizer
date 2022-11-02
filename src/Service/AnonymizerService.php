@@ -61,7 +61,7 @@ class AnonymizerService
 	 */
 	public function AnonymizeOneObject($sClass, $sId, $bInteractive = false)
 	{
-		$this->AddAnonymizationToProcessList($sClass, $sId);
+		$this->AddAnonymizationToProcessList($sClass, $sId, $bInteractive);
 
 		if ($bInteractive) {
 			// run one time background process.
@@ -91,7 +91,7 @@ class AnonymizerService
 		CMDBSource::Query('START TRANSACTION');
 		try {
 			while ($oObject = $oSet->Fetch()) {
-				$this->AddAnonymizationToProcessList(get_class($oObject), $oObject->GetKey());
+				$this->AddAnonymizationToProcessList(get_class($oObject), $oObject->GetKey(), $bInteractive);
 				$iCount++;
 				if ($iCount > $this->iMaxChunkSize) {
 					$iCount = 1;
@@ -127,7 +127,7 @@ class AnonymizerService
 	 * @throws \MySQLException
 	 * @throws \OQLException
 	 */
-	protected function AddAnonymizationToProcessList($sClass, $sId)
+	protected function AddAnonymizationToProcessList($sClass, $sId, $bInteractive = false)
 	{
 		if (!$this->IsAllowedToAnonymize($sClass, $sId)) {
 			AnonymizerLog::Error("Trying to anonymize administrator user with contact id $sId");
@@ -137,6 +137,9 @@ class AnonymizerService
 		$oTask = MetaModel::NewObject(AnonymizationTask::class);
 		$oTask->Set('name', 'Anonymizer');
 		$oTask->Set('person_id', $sId);
+		if ($bInteractive) {
+			$oTask->Set('status', 'interactive');
+		}
 		$oTask->DBInsert();
 	}
 
