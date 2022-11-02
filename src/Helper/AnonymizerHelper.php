@@ -16,7 +16,7 @@ class AnonymizerHelper
 	const MENU_ID = 'ConfigAnonymizer';
 	const ADAPTATIVE_MIN_TIME = 10.0;
 	const ADAPTATIVE_MAX_TIME = 60.0;
-	const ADAPTATIVE_MAX_CHUNK_SIZE = 1000000;
+	const ADAPTATIVE_MAX_CHUNK_SIZE = 100000000;
 
 	public function CanAnonymize()
 	{
