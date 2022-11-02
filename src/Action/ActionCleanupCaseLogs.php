@@ -74,11 +74,12 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		$aIdUser = array_keys($aIdWithClass);
 
 		$iChangeOpId = $aContext['origin']['changeop_id'];
-		$sOrigFriendlyname = $aContext['origin']['friendlyname'];
+		$sOrigFriendlyname = $aContext['origin']['user_friendlyname'];
 		$sTargetFriendlyname = $aContext['anonymized']['friendlyname'];
 
 		$sOrigEmail = $aContext['origin']['email'];
 		$sTargetEmail = $aContext['anonymized']['email'];
+
 		// 1) Build the expression to search (and replace)
 		$sPattern = ' : %1$s (%2$d) ============';
 
@@ -86,6 +87,9 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		$sStartReplaceInIdx = "REPLACE(";
 		$sEndReplaceInIdx = ", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sReplaceInIdx).")";
 
+		$sStartReplace = '';
+		$sEndReplaceInCaseLog = '';
+		$sEndReplaceInTxt = '';
 		if ($sOrigFriendlyname !== '') {
 			if (in_array('friendlyname', $aCleanupCaseLog)) {
 				$sReplace = str_repeat('*', strlen($sOrigFriendlyname));;
@@ -93,8 +97,6 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 				$sEndReplaceInCaseLog = ", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sReplace).")";
 				$sEndReplaceInTxt = ", ".CMDBSource::Quote($sOrigFriendlyname).", ".CMDBSource::Quote($sTargetFriendlyname).")";
 			} else {
-				$sStartReplace = '';
-				$sEndReplaceInCaseLog = '';
 				foreach ($aIdUser as $sIdUser) {
 					$sSearch = sprintf($sPattern, $sOrigFriendlyname, $sIdUser);
 					$sReplace = sprintf($sPattern, str_repeat('*', strlen($sOrigFriendlyname)), $sIdUser);

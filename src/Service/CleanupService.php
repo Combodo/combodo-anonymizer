@@ -113,7 +113,9 @@ class CleanupService
 		$oObject->DBWrite();
 		$fDuration = microtime(true) - $fStart;
 		AnonymizerLog::Debug(sprintf("ResetObjectFields duration %.2f", $fDuration));
-		CMDBObject::SetCurrentChangeFromParams(null);
+		if (method_exists('CMDBObject', 'SetCurrentChangeFromParams')) {
+			CMDBObject::SetCurrentChangeFromParams(null);
+		}
 		CMDBObject::SetCurrentChange(null);
 
 		return true;
@@ -224,7 +226,7 @@ class CleanupService
 		} else {
 			$sDateCreateCondition = "";
 		}
-		$sOrigFriendlyname = $aContext['origin']['friendlyname'];
+		$sOrigFriendlyname = $aContext['origin']['user_friendlyname'];
 		$sTargetFriendlyname = $aContext['anonymized']['friendlyname'];
 
 		if (trim($sOrigFriendlyname) === ''){

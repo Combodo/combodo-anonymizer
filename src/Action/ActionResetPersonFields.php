@@ -6,6 +6,7 @@
 
 
 use Combodo\iTop\Anonymizer\Helper\AnonymizerLog;
+use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 use Combodo\iTop\Anonymizer\Service\CleanupService;
 
 /**
@@ -46,10 +47,23 @@ class ActionResetPersonFields extends AnonymizationTaskAction
 		$sId = $oTask->Get('person_id');
 
 		$oObject = MetaModel::GetObject($sClass, $sId);
+		$sUserFriendlyname = trim($oObject->Get('friendlyname'));
+		$oAnonymizerService = new AnonymizerService();
+		$aUsersId = $oAnonymizerService->GetUserIdListFromContact($sId);
+		foreach ($aUsersId as $iUserId) {
+			/** @var \User $oUser */
+			$oUser = MetaModel::GetObject('User', $iUserId, false, true);
+			if ($oUser) {
+				$sUserFriendlyname = $oUser->GetFriendlyName();
+				break;
+			}
+		}
+
 		$aContext = [
 			'origin' => [
-				'friendlyname' => trim($oObject->Get('friendlyname')),
-				'email'        => trim($oObject->Get('email')),
+				'friendlyname'      => trim($oObject->Get('friendlyname')),
+				'email'             => trim($oObject->Get('email')),
+				'user_friendlyname' => $sUserFriendlyname,
 			],
 		];
 

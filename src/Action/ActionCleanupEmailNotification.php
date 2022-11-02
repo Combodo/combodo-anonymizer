@@ -66,7 +66,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 		}
 
 		$aContext = json_decode($oTask->Get('anonymization_context'), true);
-		$sOrigFriendlyname = $aContext['origin']['friendlyname'];
+		$sOrigFriendlyname = $aContext['origin']['user_friendlyname'];
 		$sTargetFriendlyname = $aContext['anonymized']['friendlyname'];
 
 		$sOrigEmail = $aContext['origin']['email'];
