@@ -57,8 +57,8 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 	{
 		$oTask = $this->GetTask();
 
-		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
-		$aCleanupCaseLog = (array)MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'caselog_content');
+		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
+		$aCleanupCaseLog = (array)MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'caselog_content');
 
 		$aRequests = [];
 

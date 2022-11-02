@@ -86,7 +86,7 @@
             $sCurrentActionId = $this->Get('current_action_id');
             if (!$sCurrentActionId) {
                 // Create actions
-                $aActions = MetaModel::GetConfig()->GetModuleParameter(\Combodo\iTop\Anonymizer\Helper\AnonymizerHelper::MODULE_NAME, 'actions', []);
+                $aActions = MetaModel::GetConfig()->GetModuleSetting(\Combodo\iTop\Anonymizer\Helper\AnonymizerHelper::MODULE_NAME, 'actions', []);
                 foreach ($aActions as $iRank => $sActionClass) {
                     if (MetaModel::IsValidClass($sActionClass)) {
                         $oAction = MetaModel::NewObject($sActionClass, ['name' => $sActionClass, 'rank' => $iRank, 'task_id' => $this->GetKey()]);

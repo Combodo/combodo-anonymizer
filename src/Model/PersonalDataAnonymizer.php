@@ -40,7 +40,7 @@ class PersonalDataAnonymizer extends AbstractTimeRangeWeeklyScheduledProcess
 	 */
 	public function Process($iUnixTimeLimit)
 	{
-		$iSelfLimit = time() + MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, static::MODULE_SETTING_MAX_EXECUTION_TIME, 30);
+		$iSelfLimit = time() + MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, static::MODULE_SETTING_MAX_EXECUTION_TIME, 30);
 		if ($iSelfLimit < $iUnixTimeLimit) {
 			$iUnixTimeLimit = $iSelfLimit;
 		}

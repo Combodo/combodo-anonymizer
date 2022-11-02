@@ -48,7 +48,7 @@ class ActionPurgePersonHistory extends AnonymizationTaskAction
 	 */
 	public function InitActionParams(): bool
 	{
-		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleParameter(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
+		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
 
 		$this->Set('action_params', json_encode($aParams));
 		$this->DBWrite();
