@@ -17,6 +17,16 @@ class AnonymizerHelper
 	const ADAPTATIVE_MIN_TIME = 10.0;
 	const ADAPTATIVE_MAX_TIME = 60.0;
 	const ADAPTATIVE_MAX_CHUNK_SIZE = 100000000;
+	const ACTION_LIST = [
+		'ActionResetPersonFields',
+        'ActionAnonymizePerson',
+        'ActionCleanupCaseLogs',
+        'ActionCleanupOnMention',
+        'ActionCleanupEmailNotification',
+        'ActionCleanupUsers',
+        'ActionPurgePersonHistory',
+        'ActionEndOfAnonymization',
+	];
 
 	public function CanAnonymize()
 	{

@@ -98,7 +98,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 			$sNotificationTable = MetaModel::DBGetTable('EventNotificationEmail');
 			$sKey = MetaModel::DBGetKey('EventNotificationEmail');
 
-			$sSqlSearch = "SELECT `$sKey` from `$sNotificationTable` WHERE ".implode(' OR ', $aConditions);
+			$sSqlSearch = "SELECT `$sKey` from `$sNotificationTable` WHERE (".implode(' OR ', $aConditions).")";
 			$sSqlUpdate = "UPDATE `$sNotificationTable` /*JOIN*/ SET".
 				"  `from` =  ".$sStartReplaceEmail."`from`".$sEndReplaceEmail.",".
 				"  `to` = ".$sStartReplaceEmail."`to`".$sEndReplaceEmail.",".

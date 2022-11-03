@@ -3,9 +3,7 @@
              version="1.0">
   <module_parameters>
     <parameters  id="combodo-anonymizer" _delta="define">
-      <enabled>true</enabled>
-      <debug>true</debug>
-      <init_chunk_size>1000</init_chunk_size>
+      <init_chunk_size>1000000</init_chunk_size>
       <time>00:30</time>
       <end_time>05:30</end_time>
       <week_days>monday, tuesday, wednesday, thursday, friday, saturday, sunday</week_days>
@@ -16,24 +14,11 @@
       <caselog_content type="array">
         <field id="0">friendlyname</field>
         <field id="1">email</field>
-        <field id="2">name</field>
       </caselog_content>
-      <on_mention>trigger-only</on_mention>
       <notification_content type="array">
         <field id="0">friendlyname</field>
         <field id="1">email</field>
-        <field id="2">name</field>
       </notification_content>
-      <actions type="array">
-        <action id="0">ActionResetPersonFields</action>
-        <action id="10">ActionAnonymizePerson</action>
-        <action id="20">ActionCleanupCaseLogs</action>
-        <action id="30">ActionCleanupOnMention</action>
-        <action id="40">ActionCleanupEmailNotification</action>
-        <action id="50">ActionCleanupUsers</action>
-        <action id="60">ActionPurgePersonHistory</action>
-        <action id="1000">ActionEndOfAnonymization</action>
-      </actions>
       <anonymized_fields type="hash">
         <name>Contact %1$s</name>
         <first_name>Anonymous</first_name>
@@ -86,7 +71,7 @@
             $sCurrentActionId = $this->Get('current_action_id');
             if (!$sCurrentActionId) {
                 // Create actions
-                $aActions = MetaModel::GetConfig()->GetModuleSetting(\Combodo\iTop\Anonymizer\Helper\AnonymizerHelper::MODULE_NAME, 'actions', []);
+                $aActions = \Combodo\iTop\Anonymizer\Helper\AnonymizerHelper::ACTION_LIST;
                 foreach ($aActions as $iRank => $sActionClass) {
                     if (MetaModel::IsValidClass($sActionClass)) {
                         $oAction = MetaModel::NewObject($sActionClass, ['name' => $sActionClass, 'rank' => $iRank, 'task_id' => $this->GetKey()]);

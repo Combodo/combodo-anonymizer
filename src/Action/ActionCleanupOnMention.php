@@ -60,7 +60,6 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 		$oDatabaseService = new DatabaseService();
 
 		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'init_chunk_size', 1000);
-		$sCleanupOnMention = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'on_mention');
 		$aCleanupCaseLog = (array)MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'caselog_content');
 
 		//mention exists only since iTop 3.0
@@ -103,7 +102,6 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 
 		$aRequests = [];
 
-		if ($sCleanupOnMention == 'trigger-only') {
 			$oScopeQuery = "SELECT TriggerOnObjectMention";
 			$oSet = new DBObjectSet(DBSearch::FromOQL($oScopeQuery));
 			while ($oTrigger = $oSet->Fetch()) {
@@ -143,7 +141,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 					}
 
 					if (count($aConditions) > 0) {
-						$sSqlSearch = "SELECT `$sKey` from `$sTable` WHERE ".implode(' OR ', $aConditions);
+						$sSqlSearch = "SELECT `$sKey` from `$sTable` WHERE (".implode(' OR ', $aConditions).")";
 
 						$aColumnsToUpdate = $this->GetColumnsToUpdate($sClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt);
 
@@ -165,9 +163,6 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 					}
 				}
 			}
-			//} elseif ($sCleanupOnMention == 'all') {
-			//TODO maybe in the futur
-		}
 
 		$aParams['aRequests'] = $aRequests;
 		$this->Set('action_params', json_encode($aParams));
