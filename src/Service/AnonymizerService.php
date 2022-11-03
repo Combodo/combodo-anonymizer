@@ -35,7 +35,7 @@ class AnonymizerService
 	{
 		AnonymizerLog::Enable(APPROOT.'log/error.log');
 		$this->iProcessEndTime = time() + MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'max_interactive_anonymization_time_in_s', 30);
-		$this->iMaxChunkSize = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
+		$this->iMaxChunkSize = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'init_chunk_size', 1000);
 		$this->aAnonymizedFields = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'anonymized_fields', []);
 		$bAnonymizeObsoletePersons = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'anonymize_obsolete_persons', false);
 		$this->bBackgroundAnonymizationEnabled = ($bAnonymizeObsoletePersons === true || $bAnonymizeObsoletePersons === 'true');

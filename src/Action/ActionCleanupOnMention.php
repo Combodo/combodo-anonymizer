@@ -59,7 +59,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 		$oTask = $this->GetTask();
 		$oDatabaseService = new DatabaseService();
 
-		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
+		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'init_chunk_size', 1000);
 		$sCleanupOnMention = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'on_mention');
 		$aCleanupCaseLog = (array)MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'caselog_content');
 

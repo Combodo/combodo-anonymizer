@@ -5,7 +5,7 @@
     <parameters  id="combodo-anonymizer" _delta="define">
       <enabled>true</enabled>
       <debug>true</debug>
-      <max_chunk_size>1000</max_chunk_size>
+      <init_chunk_size>1000</init_chunk_size>
       <time>00:30</time>
       <end_time>05:30</end_time>
       <week_days>monday, tuesday, wednesday, thursday, friday, saturday, sunday</week_days>

@@ -57,9 +57,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 	{
 		$oTask = $this->GetTask();
 
-		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
 		$aCleanupCaseLog = (array)MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'caselog_content');
-
 		$aRequests = [];
 
 		$aContext = json_decode($oTask->Get('anonymization_context'), true);
@@ -189,9 +187,8 @@ SELECT DISTINCT `CMDBChangeOp`.`$sObjKey`
     INNER JOIN `$sChangeTable` AS `CMDBChange` ON `CMDBChangeOp`.`$sChangeOpChangeId` = `CMDBChange`.`$sChangeKey`
 	WHERE `CMDBChangeOp`.`$sChangeOpFinalClass` = 'CMDBChangeOpSetAttributeCaseLog'
 	  AND `CMDBChangeOp`.`$sObjClass` = '$sClass'
-	  AND `CMDBChange`.`$sChangeUserInfo` IN ('Job Cron', $sOrigFriendlyname)
-	  AND `CMDBChangeOp`.`$sChangeOpId` >= '$iChangeOpId'
-	ORDER BY `CMDBChangeOp`.`$sObjKey`
+	  AND `CMDBChange`.`$sChangeUserInfo`  = $sOrigFriendlyname
+	  AND `CMDBChangeOp`.`$sChangeOpId` >= $iChangeOpId
 SQL;
 
 		return $sSQL;
@@ -264,6 +261,8 @@ SQL;
 		$aRequests = $aParams['aRequests'];
 
 		foreach ($aRequests as $sName => $aRequest) {
+			// reset chunk size for every request
+			$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'init_chunk_size', 1000);
 			$iProgress = $aParams['aChangesProgress'][$sName] ?? 0;
 			$bCompleted = ($iProgress == -1);
 			AnonymizerLog::Debug("=> Request: $sName Progress: $iProgress");

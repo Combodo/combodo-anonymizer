@@ -56,7 +56,7 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 	{
 		$oTask = $this->GetTask();
 
-		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'max_chunk_size', 1000);
+		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'init_chunk_size', 1000);
 
 		$sId = $oTask->Get('person_id');
 		$oService = new AnonymizerService();
