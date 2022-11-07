@@ -71,7 +71,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 		$aIdWithClass = $oSet->GetColumnAsArray('finalclass');
 		$aIdUser = array_keys($aIdWithClass);
 
-		$iChangeOpId = $aContext['origin']['changeop_id'];
+		$iChangeOpId = $aContext['origin']['changeop_id'] ?? 0;
 		$sOrigFriendlyname = $aContext['origin']['user_friendlyname'];
 		$sTargetFriendlyname = $aContext['anonymized']['friendlyname'];
 
@@ -285,11 +285,13 @@ SQL;
 					//in this case retry is possible
 					AnonymizerLog::Error('Error MySQLHasGoneAwayException during ActionCleanupCaseLogs try again later');
 
+					// No way to continue, wait for another cron round
 					return false;
 				}
 				catch (Exception $e) {
 					AnonymizerLog::Error('Error during ActionCleanupCaseLogs with message :'.$e->getMessage());
 					$aParams['aChangesProgress'][$sName] = -1;
+					$bCompleted = true;
 				}
 				// Save progression
 				$this->Set('action_params', json_encode($aParams));

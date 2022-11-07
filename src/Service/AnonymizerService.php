@@ -138,7 +138,7 @@ class AnonymizerService
 		$oTask->Set('name', 'Anonymizer');
 		$oTask->Set('person_id', $sId);
 		if ($bInteractive) {
-			$oTask->Set('status', 'interactive');
+			$oTask->Set('type', 'interactive');
 		}
 		$oTask->DBInsert();
 	}
