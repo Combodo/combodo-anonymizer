@@ -110,7 +110,11 @@ class CleanupService
 		}
 		$oObject->AllowWrite();
 		$fStart = microtime(true);
-		$oObject->DBWrite();
+		try {
+			$oObject->DBWrite();
+		} catch (Exception $e) {
+			AnonymizerLog::Error('ResetObjectFields: '.$e->getMessage());
+		}
 		$fDuration = microtime(true) - $fStart;
 		AnonymizerLog::Debug(sprintf("ResetObjectFields duration %.2f", $fDuration));
 		if (method_exists('CMDBObject', 'SetCurrentChangeFromParams')) {

@@ -9,10 +9,6 @@ use Combodo\iTop\Anonymizer\Service\AnonymizerService;
 
 class PersonalDataAnonymizer extends AbstractTimeRangeWeeklyScheduledProcess
 {
-	const NEXT_OCCURRENCE = 'AnonymizationNextOccurrence';
-	const NEXT_OCCURRENCE_DESCRIPTION = 'Next occurrence date for the anonymization background task';
-	const NEXT_OCCURRENCE_COMMENT = 'In UNIX time stamp format';
-	const MODULE_SETTING_EXEC_INTERVAL = 'execution_interval_in_s';
 	const MODULE_SETTING_MAX_EXECUTION_TIME = 'max_execution_time';
 
 	public function GetNextOccurrence($sCurrentTime = 'now')

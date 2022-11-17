@@ -74,8 +74,11 @@ class ActionAnonymizePerson extends AnonymizationTaskAction
 		AnonymizerLog::Debug('Anonymization context: '.var_export($aContext, true));
 
 		$oTask->Set('anonymization_context', json_encode($aContext));
-		$oTask->DBWrite();
-
+		try {
+			$oTask->DBWrite();
+		} catch (Exception $e) {
+			AnonymizerLog::Error('ActionAnonymizePerson: '.$e->getMessage());
+		}
 		return true;
 	}
 }

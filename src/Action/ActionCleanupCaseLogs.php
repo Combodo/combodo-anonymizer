@@ -150,7 +150,10 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 				}
 			}
 		}
-		$aParams['aRequests'] = $aRequests;
+		$aParams = [
+			'aRequests'  => $aRequests,
+			'iChunkSize' => MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'init_chunk_size', 1000),
+		];
 		$this->Set('action_params', json_encode($aParams));
 		$this->DBWrite();
 
@@ -214,6 +217,7 @@ SQL;
 				}
 			}
 		}
+
 		return $aColumnsToUpdate;
 	}
 
@@ -232,12 +236,14 @@ SQL;
 			AnonymizerLog::Debug('Stop retry action ActionCleanupCaseLogs with params '.json_encode($aParams));
 			$this->Set('action_params', '');
 			$this->DBWrite();
+
 			return false;
 		}
 		$aParams['iChunkSize'] = (int)$iChunkSize / 2;
 
 		$this->Set('action_params', json_encode($aParams));
 		$this->DBWrite();
+
 		return true;
 	}
 
