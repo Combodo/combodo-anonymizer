@@ -148,7 +148,11 @@ class CleanupService
 			$oUser->Set('password', $oPassword);
 		}
 		$oUser->AllowWrite();
-		$oUser->DBWrite();
+		try {
+			$oUser->DBWrite();
+		} catch (Exception $e) {
+			AnonymizerLog::Error("CleanupUser: ".$e->getMessage());
+		}
 	}
 
 	/**

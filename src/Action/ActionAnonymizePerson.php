@@ -63,7 +63,11 @@ class ActionAnonymizePerson extends AnonymizationTaskAction
 		$oPerson = MetaModel::GetObject($sClass, $sId);
 		$oCleanupService->AnonymizePerson($oPerson);
 		$oPerson->AllowWrite();
-		$oPerson->DBWrite();
+		try {
+			$oPerson->DBWrite();
+		} catch (Exception $e) {
+			AnonymizerLog::Error('ActionAnonymizePerson: '.$e->getMessage());
+		}
 		$oPerson->Reload();
 
 		$aContext = json_decode($oTask->Get('anonymization_context'), true);
