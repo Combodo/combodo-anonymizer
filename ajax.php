@@ -16,7 +16,7 @@ if (version_compare(ITOP_DESIGN_LATEST_VERSION, '3.0') >= 0) {
 	$sTemplates = MODULESROOT.AnonymizerHelper::MODULE_NAME.DIRECTORY_SEPARATOR.'templates/2.7';
 }
 
-AnonymizerLog::Enable(APPROOT.'log/error.log');
+AnonymizerLog::Enable(AnonymizerLog::DEBUG_FILE);
 
 $oUpdateController = new AjaxAnonymizerController($sTemplates, AnonymizerHelper::MODULE_NAME);
 $oUpdateController->SetMenuId(AnonymizerHelper::MENU_ID);

@@ -33,7 +33,7 @@ class AnonymizerService
 
 	public function __construct()
 	{
-		AnonymizerLog::Enable(APPROOT.'log/error.log');
+		AnonymizerLog::Enable(AnonymizerLog::DEBUG_FILE);
 		$this->iProcessEndTime = time() + MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'max_interactive_anonymization_time_in_s', 30);
 		$this->iMaxChunkSize = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'init_chunk_size', 1000);
 		$this->aAnonymizedFields = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'anonymized_fields', []);
@@ -155,10 +155,10 @@ class AnonymizerService
 	 */
 	public function ProcessAnonymization(&$sMessage)
 	{
-		$oComplexService = new BackgroundTaskExService();
-		$oComplexService->SetProcessEndTime($this->iProcessEndTime);
+		$oBackgroundTaskExService = new BackgroundTaskExService(AnonymizerLog::DEBUG_FILE);
+		$oBackgroundTaskExService->SetProcessEndTime($this->iProcessEndTime);
 
-		$oComplexService->ProcessTasks(AnonymizationTask::class, $sMessage);
+		$oBackgroundTaskExService->ProcessTasks(AnonymizationTask::class, $sMessage);
 	}
 
 	/**
@@ -178,10 +178,10 @@ class AnonymizerService
 			// Gather cleanup rules
 			$this->GatherAnonymizationTasks();
 		}
-		$oComplexService = new BackgroundTaskExService();
-		$oComplexService->SetProcessEndTime($this->iProcessEndTime);
+		$oBackgroundTaskExService = new BackgroundTaskExService(AnonymizerLog::DEBUG_FILE);
+		$oBackgroundTaskExService->SetProcessEndTime($this->iProcessEndTime);
 
-		return $oComplexService->ProcessTasks(AnonymizationTask::class, $sMessage);
+		return $oBackgroundTaskExService->ProcessTasks(AnonymizationTask::class, $sMessage);
 	}
 
 	private function GatherAnonymizationTasks()

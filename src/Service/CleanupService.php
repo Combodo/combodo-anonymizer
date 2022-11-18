@@ -31,7 +31,7 @@ class CleanupService
 	 */
 	public function __construct($sClass, $sId, $iProcessEndTime)
 	{
-		AnonymizerLog::Enable(APPROOT.'log/error.log');
+		AnonymizerLog::Enable(AnonymizerLog::DEBUG_FILE);
 		$this->sClass = $sClass;
 		$this->sId = $sId;
 		$this->iProcessEndTime = $iProcessEndTime;
@@ -242,7 +242,7 @@ class CleanupService
 		}
 
 		$aRequests = [];
-		$oDatabaseService = new DatabaseService();
+		$oDatabaseService = new DatabaseService(AnonymizerLog::DEBUG_FILE);
 
 		if (MetaModel::IsValidAttCode('CMDBChange', 'user_id')) {
 			$iMaxId = $oDatabaseService->QueryMaxKey($sKey, $sChangeTable);

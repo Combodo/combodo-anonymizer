@@ -55,7 +55,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 	public function InitActionParams(): bool
 	{
 		$oTask = $this->GetTask();
-		$oDatabaseService = new DatabaseService();
+		$oDatabaseService = new DatabaseService(AnonymizerLog::DEBUG_FILE);
 
 		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'init_chunk_size', 1000);
 		$aCleanupEmail = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'notification_content');
@@ -192,7 +192,7 @@ class ActionCleanupEmailNotification extends AnonymizationTaskAction
 		if ($this->Get('action_params') == '') {
 			return true;
 		}
-		$oDatabaseService = new DatabaseService();
+		$oDatabaseService = new DatabaseService(AnonymizerLog::DEBUG_FILE);
 		$aParams = json_decode($this->Get('action_params'), true);
 		$aRequest = $aParams['aRequest'];
 

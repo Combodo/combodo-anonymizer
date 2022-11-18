@@ -13,6 +13,7 @@ use utils;
 class AnonymizerHelper
 {
 	const MODULE_NAME = 'combodo-anonymizer';
+
 	const MENU_ID = 'ConfigAnonymizer';
 	const ADAPTATIVE_MIN_TIME = 10.0;
 	const ADAPTATIVE_MAX_TIME = 60.0;

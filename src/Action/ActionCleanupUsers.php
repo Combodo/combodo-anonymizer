@@ -116,7 +116,7 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 			return true;
 		}
 
-		AnonymizerLog::Enable(APPROOT.'log/error.log');
+		AnonymizerLog::Enable(AnonymizerLog::DEBUG_FILE);
 
 		$oTask = $this->GetTask();
 
@@ -137,7 +137,7 @@ class ActionCleanupUsers extends AnonymizationTaskAction
 			$oUser = MetaModel::GetObject($sUserClass, $iUserId, false, true);
 			AnonymizerLog::Debug("Anonymize User ".$oUser->Get('login'));
 			$oService = new CleanupService(get_class($oUser), $iUserId, $iEndExecutionTime);
-			$oDatabaseService = new DatabaseService();
+			$oDatabaseService = new DatabaseService(AnonymizerLog::DEBUG_FILE);
 			// Disable User, reset login and password
 			try {
 				$oService->CleanupUser($oUser);

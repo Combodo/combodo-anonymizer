@@ -114,7 +114,7 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 			$sEndReplaceInTxt = $sEndReplaceInTxt.", ".CMDBSource::Quote($sOrigEmail).", ".CMDBSource::Quote($sTargetEmail).")";
 		}
 
-		$oDatabaseService = new DatabaseService();
+		$oDatabaseService = new DatabaseService(AnonymizerLog::DEBUG_FILE);
 
 		// 2) Find all classes containing case logs
 		foreach (MetaModel::GetClasses() as $sClass) {
@@ -262,7 +262,7 @@ SQL;
 			return true;
 		}
 
-		$oDatabaseService = new DatabaseService();
+		$oDatabaseService = new DatabaseService(AnonymizerLog::DEBUG_FILE);
 		$aParams = json_decode($this->Get('action_params'), true);
 		$aRequests = $aParams['aRequests'];
 

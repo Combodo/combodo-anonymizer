@@ -57,7 +57,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 	public function InitActionParams(): bool
 	{
 		$oTask = $this->GetTask();
-		$oDatabaseService = new DatabaseService();
+		$oDatabaseService = new DatabaseService(AnonymizerLog::DEBUG_FILE);
 
 		$aParams['iChunkSize'] = MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'init_chunk_size', 1000);
 		$aCleanupCaseLog = (array)MetaModel::GetConfig()->GetModuleSetting(AnonymizerHelper::MODULE_NAME, 'caselog_content');
@@ -236,7 +236,7 @@ class ActionCleanupOnMention extends AnonymizationTaskAction
 			return true;
 		}
 
-		$oDatabaseService = new DatabaseService();
+		$oDatabaseService = new DatabaseService(AnonymizerLog::DEBUG_FILE);
 		$aParams = json_decode($this->Get('action_params'), true);
 		$aRequests = $aParams['aRequests'];
 
