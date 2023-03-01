@@ -71,6 +71,7 @@ class ActionManageSynchronization extends AnonymizationTaskAction
 						if ($sSynchroPolicy=='delete') {
 							$oObj->DBDelete();
 						} else {
+							$oObj->Set('status','obsolete');
 							$oObj->Set('dest_id',0);
 							$oObj->DBWrite();
 						}
