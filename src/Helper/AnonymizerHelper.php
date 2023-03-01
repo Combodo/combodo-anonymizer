@@ -19,6 +19,7 @@ class AnonymizerHelper
 	const ADAPTATIVE_MAX_TIME = 60.0;
 	const ADAPTATIVE_MAX_CHUNK_SIZE = 100000000;
 	const ACTION_LIST = [
+		'ActionManageSynchronization',
 		'ActionResetPersonFields',
         'ActionAnonymizePerson',
         'ActionCleanupCaseLogs',

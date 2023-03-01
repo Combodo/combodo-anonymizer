@@ -48,6 +48,7 @@ SetupWebPage::AddModule(
 			'src/Hook/AnonymizationMenuPlugIn.php',
 			'src/Hook/AnonymizationJsPlugin.php',
 			'model.combodo-anonymizer.php',
+			'src/Action/ActionManageSynchronization.php',
 			'src/Action/ActionAnonymizePerson.php',
 			'src/Action/ActionCleanupCaseLogs.php',
 			'src/Action/ActionCleanupEmailNotification.php',
