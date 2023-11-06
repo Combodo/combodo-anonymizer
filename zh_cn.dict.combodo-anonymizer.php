@@ -20,7 +20,7 @@ Dict::Add('ZH CN', 'Chinese', '简体中文', array(
 	'Anonymization:InProgress' => '匿名化处理中...',
 	'Anonymization:Success' => '匿名化成功',
 	'Anonymization:Error' => '匿名化失败',
-	'Anonymization:Close' => 'Close~~',
+	'Anonymization:Close' => '关闭',
 	'Anonymization:Configuration' => '配置',
 	'Menu:ConfigAnonymizer' => '匿名化',
 	'Menu:AnonymizationTask' => '匿名化任务',
