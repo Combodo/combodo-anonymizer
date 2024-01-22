@@ -41,8 +41,8 @@ Dict::Add('ZH CN', 'Chinese', '简体中文', array(
 	'Anonymization:Configuration:Weekday:sunday' => '周日',
 
 	// Default values used during anonymization
-	'Anonymization:Person:name' => '联系人~~',
-	'Anonymization:Person:first_name' => '匿名的~~',
+	'Anonymization:Person:name' => '联系人',
+	'Anonymization:Person:first_name' => '匿名的',
 	'Anonymization:Person:email' => '%1$s.%2$s%3$s@anony.mized',
 ));
 
