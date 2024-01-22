@@ -7,42 +7,42 @@
  */
 Dict::Add('ZH CN', 'Chinese', '简体中文', array(
 	// Dictionary entries go here
-	'combodo-anonymizer/Operation:DisplayConfig/Title' => 'Anonymization~~',
-	'combodo-anonymizer/Operation:ApplyConfig/Title' => 'Anonymization~~',
-	'Anonymization:AnonymizeAll' => 'Anonymize All~~',
-	'Anonymization:AnonymizeOne' => 'Anonymize~~',
-	'Anonymization:OnePersonWarning' => 'Are you sure that you want to anonymize this Person? (this cannot be undone)~~',
-	'Anonymization:ListOfPersonsWarning' => 'Are you sure that you want to anonymize %d Persons? (this cannot be undone)~~',
-	'Anonymization:Confirmation' => 'Please confirm~~',
-	'Anonymization:Information' => 'Information~~',
-	'Anonymization:RefreshTheList' => 'Refresh the list to see the effect of anonymization...~~',
-	'Anonymization:DoneOnePerson' => 'The contact has been anonymized...~~',
-	'Anonymization:InProgress' => 'Anonymization in progress...~~',
-	'Anonymization:Success' => 'Anonymization successful~~',
-	'Anonymization:Error' => 'Anonymization FAILED~~',
-	'Anonymization:Close' => 'Close~~',
-	'Anonymization:Configuration' => 'Configuration~~',
-	'Menu:ConfigAnonymizer' => 'Anonymization~~',
-	'Menu:AnonymizationTask' => 'Anonymization tasks~~',
-	'Menu:AnonymizationTask+' => 'Anonymization tasks~~',
-	'Anonymization:AutomationParameters' => 'Automatic anonymization~~',
-	'Anonymization:AnonymizationDelay_Input' => 'Automatically anonymize Persons which are obsolete since more than %1$s days.~~',
+	'combodo-anonymizer/Operation:DisplayConfig/Title' => '匿名化',
+	'combodo-anonymizer/Operation:ApplyConfig/Title' => '匿名化',
+	'Anonymization:AnonymizeAll' => '全部匿名化处理',
+	'Anonymization:AnonymizeOne' => '匿名化处理',
+	'Anonymization:OnePersonWarning' => '确认你要匿名化处理这名人员吗? (此操作不能回退)',
+	'Anonymization:ListOfPersonsWarning' => '确认你要匿名化处理这%d名人员吗? (此操作不能回退)',
+	'Anonymization:Confirmation' => '请确认',
+	'Anonymization:Information' => '信息',
+	'Anonymization:RefreshTheList' => '刷新列表以查看匿名化处理结果...',
+	'Anonymization:DoneOnePerson' => '此联系人已被匿名化处理...',
+	'Anonymization:InProgress' => '匿名化处理中...',
+	'Anonymization:Success' => '匿名化成功',
+	'Anonymization:Error' => '匿名化失败',
+	'Anonymization:Close' => '关闭',
+	'Anonymization:Configuration' => '配置',
+	'Menu:ConfigAnonymizer' => '匿名化',
+	'Menu:AnonymizationTask' => '匿名化任务',
+	'Menu:AnonymizationTask+' => '匿名化任务',
+	'Anonymization:AutomationParameters' => '自动匿名化',
+	'Anonymization:AnonymizationDelay_Input' => '自动匿名化处理标记为已废弃超过%1$s天的人员.',
 
-	'Anonymization:Configuration:TimeRange' => 'Allowed execution time range~~',
-	'Anonymization:Configuration:time' => 'Start time (HH:MM)~~',
-	'Anonymization:Configuration:end_time' => 'End time (HH:MM)~~',
-	'Anonymization:Configuration:Weekdays' => 'Week days~~',
-	'Anonymization:Configuration:Weekday:monday' => 'Monday~~',
-	'Anonymization:Configuration:Weekday:tuesday' => 'Tuesday~~',
-	'Anonymization:Configuration:Weekday:wednesday' => 'Wednesday~~',
-	'Anonymization:Configuration:Weekday:thursday' => 'Thursday~~',
-	'Anonymization:Configuration:Weekday:friday' => 'Friday~~',
-	'Anonymization:Configuration:Weekday:saturday' => 'Saturday~~',
-	'Anonymization:Configuration:Weekday:sunday' => 'Sunday~~',
+	'Anonymization:Configuration:TimeRange' => '允许操作的时间范围',
+	'Anonymization:Configuration:time' => '开始时间 (HH:MM)',
+	'Anonymization:Configuration:end_time' => '结束时间 (HH:MM)',
+	'Anonymization:Configuration:Weekdays' => '周天',
+	'Anonymization:Configuration:Weekday:monday' => '周一',
+	'Anonymization:Configuration:Weekday:tuesday' => '周二',
+	'Anonymization:Configuration:Weekday:wednesday' => '周三',
+	'Anonymization:Configuration:Weekday:thursday' => '周四',
+	'Anonymization:Configuration:Weekday:friday' => '周为',
+	'Anonymization:Configuration:Weekday:saturday' => '周六',
+	'Anonymization:Configuration:Weekday:sunday' => '周日',
 
 	// Default values used during anonymization
-	'Anonymization:Person:name' => 'Contact~~',
-	'Anonymization:Person:first_name' => 'Anonymous~~',
+	'Anonymization:Person:name' => '联系人',
+	'Anonymization:Person:first_name' => '匿名的',
 	'Anonymization:Person:email' => '%1$s.%2$s%3$s@anony.mized',
 ));
 
@@ -51,7 +51,7 @@ Dict::Add('ZH CN', 'Chinese', '简体中文', array(
 //
 
 Dict::Add('ZH CN', 'Chinese', '简体中文', array(
-	'Class:Person/Attribute:anonymized' => 'Anonymized~~',
+	'Class:Person/Attribute:anonymized' => '已匿名',
 	'Class:Person/Attribute:anonymized+' => '~~',
 ));
 
@@ -60,7 +60,7 @@ Dict::Add('ZH CN', 'Chinese', '简体中文', array(
 //
 
 Dict::Add('ZH CN', 'Chinese', '简体中文', array(
-	'Class:RessourceAnonymization' => 'RessourceAnonymization~~',
+	'Class:RessourceAnonymization' => '资源匿名化',
 	'Class:RessourceAnonymization+' => '~~',
 ));
 
@@ -69,9 +69,9 @@ Dict::Add('ZH CN', 'Chinese', '简体中文', array(
 //
 
 Dict::Add('ZH CN', 'Chinese', '简体中文', array(
-	'Class:AnonymizationTaskAction' => 'AnonymizationTaskAction~~',
+	'Class:AnonymizationTaskAction' => '匿名化任务操作',
 	'Class:AnonymizationTaskAction+' => '~~',
-	'Class:AnonymizationTaskAction/Attribute:action_params' => 'Action params~~',
+	'Class:AnonymizationTaskAction/Attribute:action_params' => '操作参数',
 	'Class:AnonymizationTaskAction/Attribute:action_params+' => '~~',
 ));
 
@@ -80,20 +80,20 @@ Dict::Add('ZH CN', 'Chinese', '简体中文', array(
 //
 
 Dict::Add('ZH CN', 'Chinese', '简体中文', array(
-	'Class:AnonymizationTask' => 'AnonymizationTask~~',
+	'Class:AnonymizationTask' => '匿名化任务',
 	'Class:AnonymizationTask+' => '~~',
-	'Class:AnonymizationTask/Attribute:person_id' => 'Person id~~',
+	'Class:AnonymizationTask/Attribute:person_id' => '人员',
 	'Class:AnonymizationTask/Attribute:person_id+' => '~~',
-	'Class:AnonymizationTask/Attribute:anonymization_context' => 'Anonymization context~~',
+	'Class:AnonymizationTask/Attribute:anonymization_context' => '匿名化上下文',
 	'Class:AnonymizationTask/Attribute:anonymization_context+' => '~~',
 ));
 
 // Additional language entries not present in English dict
 Dict::Add('ZH CN', 'Chinese', '简体中文', array(
- 'Class:AnonymizationTask/Attribute:class_to_anonymize' => 'Class to anonymize~~',
+ 'Class:AnonymizationTask/Attribute:class_to_anonymize' => '要匿名化处理的类型',
  'Class:AnonymizationTask/Attribute:class_to_anonymize+' => '~~',
- 'Class:AnonymizationTask/Attribute:id_to_anonymize' => 'Id to anonymize~~',
+ 'Class:AnonymizationTask/Attribute:id_to_anonymize' => '要匿名化处理的对象',
  'Class:AnonymizationTask/Attribute:id_to_anonymize+' => '~~',
- 'Anonymization:NotificationsPurgeParameters' => 'Automatic purge of notifications~~',
- 'Anonymization:PurgeDelay_Input' => 'Automatically delete all notifications emitted since more than %1$s days.~~',
+ 'Anonymization:NotificationsPurgeParameters' => '自动清除通知',
+ 'Anonymization:PurgeDelay_Input' => '自动删除所有%1$s天前生成的通知.',
 ));
