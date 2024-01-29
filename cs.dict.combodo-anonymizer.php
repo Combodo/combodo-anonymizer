@@ -7,42 +7,42 @@
  */
 Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	// Dictionary entries go here
-	'combodo-anonymizer/Operation:DisplayConfig/Title' => 'Anonymization~~',
-	'combodo-anonymizer/Operation:ApplyConfig/Title' => 'Anonymization~~',
-	'Anonymization:AnonymizeAll' => 'Anonymize All~~',
-	'Anonymization:AnonymizeOne' => 'Anonymize~~',
-	'Anonymization:OnePersonWarning' => 'Are you sure that you want to anonymize this Person? (this cannot be undone)~~',
-	'Anonymization:ListOfPersonsWarning' => 'Are you sure that you want to anonymize %d Persons? (this cannot be undone)~~',
-	'Anonymization:Confirmation' => 'Please confirm~~',
-	'Anonymization:Information' => 'Information~~',
-	'Anonymization:RefreshTheList' => 'Refresh the list to see the effect of anonymization...~~',
-	'Anonymization:DoneOnePerson' => 'The contact has been anonymized...~~',
-	'Anonymization:InProgress' => 'Anonymization in progress...~~',
-	'Anonymization:Success' => 'Anonymization successful~~',
-	'Anonymization:Error' => 'Anonymization FAILED~~',
-	'Anonymization:Close' => 'Close~~',
-	'Anonymization:Configuration' => 'Configuration~~',
-	'Menu:ConfigAnonymizer' => 'Anonymization~~',
-	'Menu:AnonymizationTask' => 'Anonymization tasks~~',
-	'Menu:AnonymizationTask+' => 'Anonymization tasks~~',
-	'Anonymization:AutomationParameters' => 'Automatic anonymization~~',
-	'Anonymization:AnonymizationDelay_Input' => 'Automatically anonymize Persons which are obsolete since more than %1$s days.~~',
+	'combodo-anonymizer/Operation:DisplayConfig/Title' => 'Anonymizace',
+	'combodo-anonymizer/Operation:ApplyConfig/Title' => 'Anonymizace dat v iTopu',
+	'Anonymization:AnonymizeAll' => 'Anonymizuj vše',
+	'Anonymization:AnonymizeOne' => 'Anonymizuj',
+	'Anonymization:OnePersonWarning' => 'Opravdu jste si jistý s nevratnou anonymizací tohoto kontaktu?',
+	'Anonymization:ListOfPersonsWarning' => 'Opravdu jste si jistý s nevratnou anonymizací těchto %d kontaktů?',
+	'Anonymization:Confirmation' => 'Prosím o potvrzení',
+	'Anonymization:Information' => 'Informace',
+	'Anonymization:RefreshTheList' => 'Obnov stránku pro načtení aktuálního stavu Anonymizace...',
+	'Anonymization:DoneOnePerson' => 'Kontakt byl anonymizován!',
+	'Anonymization:InProgress' => 'Probíhá anonymizace...',
+	'Anonymization:Success' => 'Anonymizace úspěšně provedena',
+	'Anonymization:Error' => 'Anonymizace SELHALA!',
+	'Anonymization:Close' => 'Zavřít',
+	'Anonymization:Configuration' => 'Nastavení',
+	'Menu:ConfigAnonymizer' => 'Anonymizace',
+	'Menu:AnonymizationTask' => 'Úlohy Anonymizace',
+	'Menu:AnonymizationTask+' => '',
+	'Anonymization:AutomationParameters' => 'Automatická anonymizace',
+	'Anonymization:AnonymizationDelay_Input' => 'Automaticky anonymizuj kontakty, které mají status zastaralé déle jak %1$s dní',
 
-	'Anonymization:Configuration:TimeRange' => 'Allowed execution time range~~',
-	'Anonymization:Configuration:time' => 'Start time (HH:MM)~~',
-	'Anonymization:Configuration:end_time' => 'End time (HH:MM)~~',
-	'Anonymization:Configuration:Weekdays' => 'Week days~~',
-	'Anonymization:Configuration:Weekday:monday' => 'Monday~~',
-	'Anonymization:Configuration:Weekday:tuesday' => 'Tuesday~~',
-	'Anonymization:Configuration:Weekday:wednesday' => 'Wednesday~~',
-	'Anonymization:Configuration:Weekday:thursday' => 'Thursday~~',
-	'Anonymization:Configuration:Weekday:friday' => 'Friday~~',
-	'Anonymization:Configuration:Weekday:saturday' => 'Saturday~~',
-	'Anonymization:Configuration:Weekday:sunday' => 'Sunday~~',
+	'Anonymization:Configuration:TimeRange' => 'Povolený čas spouštění úlohy',
+	'Anonymization:Configuration:time' => 'Začátek (HH:MM)',
+	'Anonymization:Configuration:end_time' => 'Konec (HH:MM)',
+	'Anonymization:Configuration:Weekdays' => 'Dny v týdnu',
+	'Anonymization:Configuration:Weekday:monday' => 'Pondělí',
+	'Anonymization:Configuration:Weekday:tuesday' => 'Úterý',
+	'Anonymization:Configuration:Weekday:wednesday' => 'Středa',
+	'Anonymization:Configuration:Weekday:thursday' => 'Čtvrtek',
+	'Anonymization:Configuration:Weekday:friday' => 'Pátek',
+	'Anonymization:Configuration:Weekday:saturday' => 'Sobota',
+	'Anonymization:Configuration:Weekday:sunday' => 'Neděle',
 
 	// Default values used during anonymization
-	'Anonymization:Person:name' => 'Contact~~',
-	'Anonymization:Person:first_name' => 'Anonymous~~',
+	'Anonymization:Person:name' => 'Kontakt',
+	'Anonymization:Person:first_name' => 'Anonymní',
 	'Anonymization:Person:email' => '%1$s.%2$s%3$s@anony.mized',
 ));
 
@@ -51,8 +51,8 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 //
 
 Dict::Add('CS CZ', 'Czech', 'Čeština', array(
-	'Class:Person/Attribute:anonymized' => 'Anonymized~~',
-	'Class:Person/Attribute:anonymized+' => '~~',
+	'Class:Person/Attribute:anonymized' => 'Anonymizován',
+	'Class:Person/Attribute:anonymized+' => '',
 ));
 
 //
@@ -80,20 +80,20 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 //
 
 Dict::Add('CS CZ', 'Czech', 'Čeština', array(
-	'Class:AnonymizationTask' => 'AnonymizationTask~~',
+	'Class:AnonymizationTask' => 'Anonymizační úloha',
 	'Class:AnonymizationTask+' => '~~',
-	'Class:AnonymizationTask/Attribute:person_id' => 'Person id~~',
-	'Class:AnonymizationTask/Attribute:person_id+' => '~~',
+	'Class:AnonymizationTask/Attribute:person_id' => 'Kontakt id',
+	'Class:AnonymizationTask/Attribute:person_id+' => 'Identifikační číslo kontaktu',
 	'Class:AnonymizationTask/Attribute:anonymization_context' => 'Anonymization context~~',
 	'Class:AnonymizationTask/Attribute:anonymization_context+' => '~~',
 ));
 
 // Additional language entries not present in English dict
 Dict::Add('CS CZ', 'Czech', 'Čeština', array(
- 'Class:AnonymizationTask/Attribute:class_to_anonymize' => 'Class to anonymize~~',
- 'Class:AnonymizationTask/Attribute:class_to_anonymize+' => '~~',
- 'Class:AnonymizationTask/Attribute:id_to_anonymize' => 'Id to anonymize~~',
- 'Class:AnonymizationTask/Attribute:id_to_anonymize+' => '~~',
- 'Anonymization:NotificationsPurgeParameters' => 'Automatic purge of notifications~~',
- 'Anonymization:PurgeDelay_Input' => 'Automatically delete all notifications emitted since more than %1$s days.~~',
+ 'Class:AnonymizationTask/Attribute:class_to_anonymize' => 'Třída k anonymizování',
+ 'Class:AnonymizationTask/Attribute:class_to_anonymize+' => 'Třída, kterou požadujete anonymizovat',
+ 'Class:AnonymizationTask/Attribute:id_to_anonymize' => 'Id k anonymizování',
+ 'Class:AnonymizationTask/Attribute:id_to_anonymize+' => 'Identifikační číslo, které požadujete anonymizovat',
+ 'Anonymization:NotificationsPurgeParameters' => 'Automatické mazání notifikací',
+ 'Anonymization:PurgeDelay_Input' => 'Automaticky smazat všechny notifikace starší %1$s dní.',
 ));
