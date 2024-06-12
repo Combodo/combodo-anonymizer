@@ -60,8 +60,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 //
 
 Dict::Add('FR FR', 'French', 'Français', array(
-	'Class:RessourceAnonymization' => 'RessourceAnonymization~~',
-	'Class:RessourceAnonymization+' => '~~',
+	'Class:RessourceAnonymization' => 'RessourceAnonymization',
+	'Class:RessourceAnonymization+' => '',
 ));
 
 //
