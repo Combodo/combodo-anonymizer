@@ -118,36 +118,34 @@ class ActionCleanupCaseLogs extends AnonymizationTaskAction
 
 		// 2) Find all classes containing case logs
 		foreach (MetaModel::GetClasses() as $sClass) {
-			if (MetaModel::IsLeafClass($sClass)) {
-				$sLeafTable = MetaModel::DBGetTable($sClass);
-				$sKey = MetaModel::DBGetKey($sClass);
-				$bHasCaseLog = false;
-				foreach (MetaModel::ListAttributeDefs($sClass) as $oAttDef) {
-					if ($oAttDef instanceof AttributeCaseLog) {
-						$bHasCaseLog = true;
-						break;
-					}
+			$sLeafTable = MetaModel::DBGetTable($sClass);
+			$sKey = MetaModel::DBGetKey($sClass);
+			$bHasCaseLog = false;
+			foreach (MetaModel::ListAttributeDefs($sClass) as $sAttCode => $oAttDef) {
+				if ($oAttDef instanceof AttributeCaseLog && MetaModel::IsAttributeOrigin($sClass, $sAttCode)) {
+					$bHasCaseLog = true;
+					break;
 				}
+			}
 
-				if ($bHasCaseLog) {
-					// Search case logs by the changes
-					$sSqlSearch = $this->GetCaseLogChangeQuery($sClass, $sSearchKey, $sOrigFriendlyname, $iChangeOpId);
-					$aColumnsToUpdate = $this->GetColumnsToUpdate($sClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt, $sStartReplaceInIdx, $sEndReplaceInIdx);
-					$aSqlUpdate = [];
-					foreach ($aColumnsToUpdate as $sTable => $aRequestReplace) {
-						$sSqlUpdate = "UPDATE `$sTable` /*JOIN*/ ".
-							"SET ".implode(' , ', $aRequestReplace);
-						$aSqlUpdate[$sTable] = $sSqlUpdate;
-					}
-					$aAction = [];
-					$aAction['class'] = $sClass;
-					$aAction['search_query'] = $sSqlSearch;
-					$aAction['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sLeafTable);
-					$aAction['apply_queries'] = $aSqlUpdate;
-					$aAction['search_key'] = $sSearchKey;
-					$aAction['key'] = $sKey;
-					$aRequests[$sClass] = $aAction;
+			if ($bHasCaseLog) {
+				// Search case logs by the changes
+				$sSqlSearch = $this->GetCaseLogChangeQuery($sClass, $sSearchKey, $sOrigFriendlyname, $iChangeOpId);
+				$aColumnsToUpdate = $this->GetColumnsToUpdate($sClass, $sStartReplace, $sEndReplaceInCaseLog, $sEndReplaceInTxt, $sStartReplaceInIdx, $sEndReplaceInIdx);
+				$aSqlUpdate = [];
+				foreach ($aColumnsToUpdate as $sTable => $aRequestReplace) {
+					$sSqlUpdate = "UPDATE `$sTable` /*JOIN*/ ".
+						"SET ".implode(' , ', $aRequestReplace);
+					$aSqlUpdate[$sTable] = $sSqlUpdate;
 				}
+				$aAction = [];
+				$aAction['class'] = $sClass;
+				$aAction['search_query'] = $sSqlSearch;
+				$aAction['search_max_id'] = $oDatabaseService->QueryMaxKey($sKey, $sLeafTable);
+				$aAction['apply_queries'] = $aSqlUpdate;
+				$aAction['search_key'] = $sSearchKey;
+				$aAction['key'] = $sKey;
+				$aRequests[$sClass] = $aAction;
 			}
 		}
 		$aParams = [
