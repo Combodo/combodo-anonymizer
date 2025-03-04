@@ -252,10 +252,26 @@ class CleanupService
 					'search_key'    => $sKey,
 					'key'           => $sKey,
 					'search_max_id' => $iMaxId,
-					'search_query'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).' AND user_id IS NULL'.$sDateCreateCondition,
+					'search_query'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).' AND user_id = 0'.$sDateCreateCondition,
 					'apply_queries' => [$sChangeTable => "UPDATE `$sChangeTable` /*JOIN*/ SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
 				];
 				$aRequests['req2'] = [
+					'class'         => 'CMDBChange',
+					'search_key'    => $sKey,
+					'key'           => $sKey,
+					'search_max_id' => $iMaxId,
+					'search_query'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname.' (CSV)').' AND user_id = 0'.$sDateCreateCondition,
+					'apply_queries' => [$sChangeTable => "UPDATE `$sChangeTable` /*JOIN*/ SET userinfo=".CMDBSource::Quote($sTargetFriendlyname.' (CSV)')],
+				];
+				$aRequests['req1_itop27'] = [
+					'class'         => 'CMDBChange',
+					'search_key'    => $sKey,
+					'key'           => $sKey,
+					'search_max_id' => $iMaxId,
+					'search_query'  => "SELECT `$sKey` from `$sChangeTable` WHERE userinfo=".CMDBSource::Quote($sOrigFriendlyname).' AND user_id IS NULL'.$sDateCreateCondition,
+					'apply_queries' => [$sChangeTable => "UPDATE `$sChangeTable` /*JOIN*/ SET userinfo=".CMDBSource::Quote($sTargetFriendlyname)],
+				];
+				$aRequests['req2_itop27'] = [
 					'class'         => 'CMDBChange',
 					'search_key'    => $sKey,
 					'key'           => $sKey,
